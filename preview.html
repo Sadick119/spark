@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameNight — Phone Live Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 font-['Plus_Jakarta_Sans']">
+
+  <div class="max-w-md w-full bg-[#121422] border border-cyan-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-[0_0_80px_rgba(0,240,255,0.25)]">
+    
+    <!-- Official SPARK Logo Badge -->
+    <div class="w-20 h-20 rounded-3xl overflow-hidden mx-auto border-2 border-amber-500/50 shadow-[0_0_30px_rgba(255,140,0,0.4)]">
+      <img src="assets/spark_official_logo.jpg" class="w-full h-full object-cover" alt="SPARK Official Logo">
+    </div>
+
+    <div class="space-y-1">
+      <span class="text-xs font-black tracking-widest text-amber-400 uppercase">SPARK Live Mobile Preview</span>
+      <h1 class="text-2xl sm:text-3xl font-black font-['Outfit'] text-white">Scan with Your Phone</h1>
+      <p class="text-xs text-slate-400">Works on Wi-Fi and anywhere on Mobile Cellular Data (4G/5G)!</p>
+    </div>
+
+    <!-- QR Code (Cloudflare Global Link) -->
+    <div class="p-3 bg-white rounded-3xl inline-block shadow-2xl mx-auto border-4 border-cyan-400/50">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://builders-engaging-owner-endorsement.trycloudflare.com" class="w-48 h-48 rounded-xl" alt="QR Code">
+    </div>
+
+    <!-- Links Section -->
+    <div class="space-y-3 text-left">
+      
+      <!-- Option A: Direct Cloudflare Link -->
+      <div class="p-3.5 rounded-2xl bg-cyan-950/70 border border-cyan-400/50 space-y-1.5">
+        <div class="flex items-center justify-between text-[11px] font-bold text-cyan-300">
+          <span>⚡ CLOUDFLARE 1-CLICK LINK (Zero Password):</span>
+        </div>
+        <a href="https://builders-engaging-owner-endorsement.trycloudflare.com" target="_blank" class="text-xs text-white font-mono font-bold block truncate hover:underline">
+          https://builders-engaging-owner-endorsement.trycloudflare.com
+        </a>
+        <p class="text-[10px] text-slate-400">Direct 1-click access with zero passwords required!</p>
+      </div>
+
+      <!-- Option B: Local Wi-Fi Link -->
+      <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+        <div class="text-[11px] font-bold text-slate-300">
+          📶 LOCAL WI-FI LINK (Fastest at home):
+        </div>
+        <div class="text-xs text-slate-200 font-mono font-bold select-all">
+          http://172.20.10.4:8080
+        </div>
+      </div>
+
+    </div>
+
+    <a href="index.html" class="inline-block text-xs font-bold text-cyan-400 hover:underline pt-1">
+      &larr; Open PC View in this tab
+    </a>
+
+  </div>
+
+</body>
+</html>

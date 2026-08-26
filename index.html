@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="icon" type="image/jpeg" href="assets/spark_official_logo.jpg">
+  <link rel="apple-touch-icon" href="assets/spark_official_logo.jpg">
+  <title>SPARK — Official Party Edition</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            display: ['"Outfit"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            appleBlack: '#05060A',
+            todCyan: '#00F0FF',
+            todPink: '#FF007F',
+            drinkAmber: '#FF9900',
+            drinkCrimson: '#E11D48',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 0px; height: 0px; }
+    
+    .apple-emoji {
+      display: inline-block;
+      vertical-align: -0.15em;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* ================= 1. DARE OR DRINK EXACT MOCKUP REPLICA VIBE ================= */
+    .mockup-drink-bg {
+      background: radial-gradient(circle at 50% 15%, #220B20 0%, #120516 45%, #050208 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ambient party laser beams in background */
+    .mockup-drink-bg::before {
+      content: "";
+      position: absolute;
+      top: -20%;
+      left: -10%;
+      width: 120%;
+      height: 140%;
+      background: 
+        linear-gradient(135deg, transparent 40%, rgba(225, 29, 72, 0.12) 50%, transparent 60%),
+        linear-gradient(45deg, transparent 40%, rgba(147, 51, 234, 0.12) 50%, transparent 60%),
+        linear-gradient(115deg, transparent 45%, rgba(245, 158, 11, 0.08) 50%, transparent 55%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Stacked card shadow layers */
+    .mockup-stacked-deck {
+      position: relative;
+      z-index: 10;
+    }
+    .mockup-card-back-2 {
+      position: absolute;
+      top: -12px;
+      left: 14px;
+      right: 14px;
+      height: 100%;
+      background: rgba(35, 15, 28, 0.6);
+      border: 1.5px solid rgba(245, 158, 11, 0.25);
+      border-radius: 28px;
+      z-index: 1;
+      transform: scale(0.94);
+    }
+    .mockup-card-back-1 {
+      position: absolute;
+      top: -6px;
+      left: 7px;
+      right: 7px;
+      height: 100%;
+      background: rgba(30, 12, 24, 0.8);
+      border: 1.5px solid rgba(245, 158, 11, 0.45);
+      border-radius: 28px;
+      z-index: 2;
+      transform: scale(0.97);
+    }
+    .mockup-card-main {
+      position: relative;
+      background: rgba(22, 9, 20, 0.95);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 2px solid #FF8C00;
+      box-shadow: 0 0 35px rgba(255, 140, 0, 0.35), inset 0 0 20px rgba(255, 140, 0, 0.12);
+      border-radius: 28px;
+      z-index: 3;
+    }
+
+    /* Buttons from mockup */
+    .btn-mockup-next {
+      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+      border: 1.5px solid #FB7185;
+      box-shadow: 0 0 25px rgba(225, 29, 72, 0.55);
+    }
+    .btn-mockup-skip {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Scrubber line glow */
+    .mockup-scrubber-track {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 3px;
+      position: relative;
+    }
+    .mockup-scrubber-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #E11D48, #F59E0B);
+      border-radius: 3px;
+      width: 42%;
+      transition: width 0.3s ease;
+    }
+    .mockup-scrubber-thumb {
+      position: absolute;
+      top: -4.5px;
+      left: 42%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #F59E0B;
+      box-shadow: 0 0 10px #F59E0B, 0 0 4px #FFFFFF;
+      transform: translateX(-50%);
+      transition: left 0.3s ease;
+    }
+
+    /* ================= TRUTH OR DARE VIBE ================= */
+    .tod-bg {
+      background: radial-gradient(circle at 50% 25%, #181D35 0%, #0B0D18 60%, #05060C 100%);
+    }
+    .tod-card-cyan {
+      background: rgba(8, 24, 44, 0.88);
+      border: 2.5px solid #00F0FF;
+      box-shadow: 0 0 28px rgba(0, 240, 255, 0.5), inset 0 0 16px rgba(0, 240, 255, 0.2);
+    }
+    .tod-card-pink {
+      background: rgba(44, 8, 30, 0.88);
+      border: 2.5px solid #FF007F;
+      box-shadow: 0 0 28px rgba(255, 0, 127, 0.5), inset 0 0 16px rgba(255, 0, 127, 0.2);
+    }
+
+    /* ================= SPIN THE BOTTLE VIBE ================= */
+    .bottle-bg {
+      background: radial-gradient(circle at 50% 50%, #1D0F40 0%, #0D0720 60%, #04020A 100%);
+    }
+    .bottle-ring {
+      border: 2.5px solid #9D00FF;
+      box-shadow: 0 0 35px rgba(157, 0, 255, 0.55), inset 0 0 25px rgba(0, 255, 255, 0.25);
+    }
+    .bottle-node {
+      border: 2px solid #00FFFF;
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.5);
+    }
+
+    /* 1-Card Fullscreen Deck */
+    .card-stage {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      overflow: hidden;
+      touch-action: pan-y;
+      user-select: none;
+    }
+    .game-hero-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 36px;
+      transition: transform 0.42s cubic-bezier(0.25, 1, 0.3, 1), opacity 0.42s ease;
+      cursor: pointer;
+      will-change: transform, opacity;
+    }
+
+    /* Audio Equalizer Waves */
+    .bar-wave {
+      display: inline-block;
+      width: 2px;
+      background-color: #00F0FF;
+      border-radius: 2px;
+      animation: audioWave 1.2s ease-in-out infinite alternate;
+    }
+    .bar-wave:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+    .bar-wave:nth-child(2) { height: 14px; animation-delay: 0.3s; }
+    .bar-wave:nth-child(3) { height: 18px; animation-delay: 0.2s; }
+    .bar-wave:nth-child(4) { height: 10px; animation-delay: 0.4s; }
+
+    @keyframes audioWave {
+      0% { transform: scaleY(0.3); }
+      100% { transform: scaleY(1.2); }
+    }
+
+    /* Screen Transitions */
+    .screen {
+      display: none;
+      animation: screenFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes screenFade {
+      from { opacity: 0; transform: scale(0.985) translateY(4px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-[#000000] text-slate-100 min-h-screen flex flex-col items-center justify-center p-0 sm:p-4 font-sans select-none antialiased">
+
+  <!-- iPhone Shell Frame Container -->
+  <div id="app-shell" class="w-full max-w-md h-screen sm:h-[880px] bg-appleBlack sm:rounded-[50px] sm:border-[9px] sm:border-[#1A1C28] sm:shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col relative transition-colors duration-500">
+    
+    <!-- iPhone Top Dynamic Island & Status Bar -->
+    <div class="w-full bg-black/60 backdrop-blur-md pt-3 pb-1.5 px-7 flex items-center justify-between z-50 text-xs font-semibold text-slate-400">
+      <span id="current-time" class="tracking-tight text-white font-medium">9:41</span>
+      <!-- Dynamic Island Capsule with Music Beat Status -->
+      <div onclick="toggleMusic()" class="w-26 h-5 bg-black rounded-full border border-white/15 hidden sm:flex items-center justify-center px-2 space-x-1.5 cursor-pointer hover:border-cyan-400/50 transition" title="Toggle Lo-Fi Beats">
+        <div id="island-wave-bars" class="flex items-center space-x-0.5">
+          <span class="bar-wave"></span>
+          <span class="bar-wave"></span>
+          <span class="bar-wave"></span>
+          <span class="bar-wave"></span>
+        </div>
+        <span class="text-[9px] font-bold text-slate-300">BEATS</span>
+      </div>
+      <div class="flex items-center space-x-2 text-slate-300">
+        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4z"/></svg>
+        <div class="w-5 h-2.5 rounded-sm border border-slate-300 p-0.5 flex items-center">
+          <div class="h-full w-full bg-white rounded-2xs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Navigation Header -->
+    <header id="app-header" class="px-6 py-2.5 flex items-center justify-between border-b border-white/[0.08] bg-black/40 backdrop-blur z-40">
+      <div class="flex items-center space-x-3">
+        <button id="header-back-btn" onclick="handleHeaderBack()" class="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-slate-300 hover:text-white transition hidden">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="flex items-center space-x-2.5">
+          <img id="header-logo-thumb" src="assets/spark_official_logo.jpg" class="w-7 h-7 rounded-[7px] border border-amber-500/40 shadow-[0_0_10px_rgba(255,140,0,0.4)] object-cover" alt="SPARK">
+          <div>
+            <span id="header-subtitle" class="text-[9px] uppercase font-bold tracking-widest text-amber-400 block leading-none">Party Night</span>
+            <h1 id="header-title" class="font-display font-black text-base tracking-tight text-white leading-tight flex items-center space-x-1">
+              <span>SPARK</span>
+              <span class="text-xs text-amber-400">⚡</span>
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Beat Toggle + Phone Preview + Sound FX Switch -->
+      <div class="flex items-center space-x-2">
+        <button onclick="openPhonePreviewModal()" class="w-8 h-8 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 flex items-center justify-center text-cyan-300 transition" title="Preview on Phone (QR Code)">
+          <img src="https://emojicdn.elk.sh/📱?style=apple" class="w-4 h-4 apple-emoji" alt="Phone">
+        </button>
+        <button onclick="toggleMusic()" id="music-btn" class="px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-[11px] font-bold text-cyan-300 flex items-center space-x-1.5 transition" title="Toggle Lo-Fi Beats">
+          <span>🎵</span>
+          <span id="music-btn-label">Lo-Fi ON</span>
+        </button>
+        <button onclick="toggleSound()" id="sound-btn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 transition" title="Sound FX">
+          <img src="https://emojicdn.elk.sh/🔊?style=apple" class="w-4 h-4 apple-emoji" alt="Sound">
+        </button>
+      </div>
+    </header>
+
+    <!-- PHONE PREVIEW MODAL -->
+    <div id="phone-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6">
+      <div class="bg-[#121422] border border-cyan-400/40 rounded-3xl p-6 max-w-xs w-full text-center space-y-4 shadow-[0_0_50px_rgba(0,240,255,0.3)] animate-scale-up">
+        
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Mobile Live Preview</span>
+          <button onclick="closePhonePreviewModal()" class="w-7 h-7 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center text-xs">✕</button>
+        </div>
+
+        <div class="p-3 bg-white rounded-2xl inline-block shadow-lg mx-auto">
+          <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://builders-engaging-owner-endorsement.trycloudflare.com" class="w-44 h-44 rounded-xl" alt="QR Code to open on phone">
+        </div>
+
+        <div class="space-y-1">
+          <h4 class="font-display font-bold text-sm text-white">Scan with your Phone Camera</h4>
+          <p class="text-[11px] text-slate-400">Direct 1-click access — Zero passwords needed!</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-400/30 text-xs text-cyan-300 font-mono select-all">
+          https://builders-engaging-owner-endorsement.trycloudflare.com
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME RULES MODAL -->
+    <div id="rules-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] hidden flex items-center justify-center p-5">
+      <div class="bg-[#121422] border border-amber-400/50 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-[0_0_50px_rgba(255,153,0,0.3)] animate-scale-up text-left">
+        
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center space-x-2">
+            <span id="rules-icon" class="text-xl">📖</span>
+            <div>
+              <span class="text-[9px] font-bold text-amber-400 uppercase tracking-widest block">Official Rules</span>
+              <h3 id="rules-title" class="font-display font-black text-lg text-white">How to Play</h3>
+            </div>
+          </div>
+          <button onclick="closeGameRules()" class="w-8 h-8 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center text-xs transition">✕</button>
+        </div>
+
+        <div id="rules-content" class="space-y-3 text-xs text-slate-300 max-h-[340px] overflow-y-auto pr-1">
+          <!-- Populated dynamically by JS -->
+        </div>
+
+        <button onclick="closeGameRules()" class="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-black text-xs tracking-wider uppercase transition shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+          Got It! Let's Play ✨
+        </button>
+
+      </div>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 overflow-y-auto relative flex flex-col">
+
+      <!-- ================= SCREEN 1: INITIAL SETUP & MODE SELECTION ================= -->
+      <div id="screen-setup" class="screen active flex-col justify-between p-6 pb-8 min-h-full">
+        
+        <div class="space-y-5">
+          <div class="pt-2 space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black tracking-wider text-amber-400 uppercase">SPARK PARTY</span>
+              <span class="text-xs">⚡</span>
+            </div>
+            <h2 class="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-rose-500 tracking-tight">
+              Let's Partyyyy! 🎉🔥
+            </h2>
+            <p class="text-xs text-slate-400">Choose intensity mode & type player names below to begin.</p>
+          </div>
+
+          <!-- Mode Selector with Intensity Color Transition -->
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-center px-0.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Intensity Level</span>
+              <span id="setup-mode-tag" class="text-xs font-black text-rose-400 transition-colors duration-300">Extreme & unfiltered dares 🔥</span>
+            </div>
+
+            <!-- Segmented Control with dynamic intensity border glow -->
+            <div id="mode-selector-box" class="p-1 rounded-2xl bg-white/5 border border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.2)] grid grid-cols-4 gap-1 transition-all duration-300">
+              <button onclick="selectInitialMode('chill')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-sky-300 hover:bg-sky-500/10 flex flex-col items-center space-y-0.5" data-mode="chill">
+                <img src="https://emojicdn.elk.sh/🍦?style=apple" class="w-4 h-4 apple-emoji" alt="Chill">
+                <span>Chill</span>
+              </button>
+              <button onclick="selectInitialMode('party')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-purple-300 hover:bg-purple-500/10 flex flex-col items-center space-y-0.5" data-mode="party">
+                <img src="https://emojicdn.elk.sh/🎉?style=apple" class="w-4 h-4 apple-emoji" alt="Party">
+                <span>Party</span>
+              </button>
+              <button onclick="selectInitialMode('spicy')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 flex flex-col items-center space-y-0.5" data-mode="spicy">
+                <img src="https://emojicdn.elk.sh/🌶️?style=apple" class="w-4 h-4 apple-emoji" alt="Spicy">
+                <span>Spicy</span>
+              </button>
+              <button onclick="selectInitialMode('extreme')" class="mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_25px_rgba(239,68,68,0.7)] border border-red-500/60 flex flex-col items-center space-y-0.5" data-mode="extreme">
+                <img src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Extreme">
+                <span>Extreme</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Participants Stepper & Dynamic Names Entry on Homepage (Starts at 2 Players) -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center px-0.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Participants (<span id="setup-player-num">2</span>)</span>
+              <!-- Stepper Controls -->
+              <div class="flex items-center space-x-2 bg-white/10 p-1 rounded-full border border-white/10">
+                <button onclick="changePlayerCount(-1)" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center transition">-</button>
+                <span id="setup-player-badge" class="w-6 text-center font-display font-bold text-xs text-white">2</span>
+                <button onclick="changePlayerCount(1)" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center transition">+</button>
+              </div>
+            </div>
+
+            <!-- Dynamic Player Name Inputs directly on Homepage -->
+            <div class="space-y-2">
+              <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[220px] overflow-y-auto">
+                <!-- Dynamically populated -->
+              </div>
+
+              <!-- Quick actions -->
+              <div class="flex items-center justify-between px-1 text-xs">
+                <button onclick="fillExampleNames()" class="text-amber-400 hover:text-amber-300 font-bold flex items-center space-x-1 transition" title="Fill Sarah, Mike, Jess from the mockup">
+                  <span>⚡ Quick Fill (Sarah, Mike, Jess)</span>
+                </button>
+                <button onclick="addParticipantRow()" class="text-cyan-400 hover:text-cyan-300 font-bold transition">
+                  + Add Player
+                </button>
+              </div>
+            </div>
+
+            <!-- Validation Warning on Homepage -->
+            <div id="homepage-name-validation" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-xs font-bold text-center">
+              ⚠️ Please type names for all players before continuing!
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Continue CTA Button -->
+        <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-5 transition active:scale-95">
+          <span>Continue to Game Deck</span>
+          <span>&rarr;</span>
+        </button>
+
+      </div>
+
+
+      <!-- ================= SCREEN 2: 1-CARD-AT-A-TIME SWIPEABLE DECK ================= -->
+      <div id="screen-carousel" class="screen flex-col justify-between p-6 pb-6 min-h-full">
+        
+        <div class="flex justify-between items-end px-1 pt-1">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Swipe Left / Right</span>
+            <h2 class="text-2xl font-display font-black text-white">Game Deck</h2>
+          </div>
+          <span id="card-counter-badge" class="text-xs font-bold text-cyan-300 bg-cyan-950/60 border border-cyan-800/50 px-3 py-1 rounded-full">
+            1 of 5
+          </span>
+        </div>
+
+        <!-- 1-CARD STAGE -->
+        <div class="my-auto py-2">
+          
+          <div id="card-stage" class="card-stage">
+            
+            <!-- Card 0: Dare or Drink (Featured) -->
+            <div id="hero-card-0" onclick="selectGame('dare-drink')" class="game-hero-card mockup-card-main overflow-hidden flex flex-col justify-between p-6">
+              <img src="assets/drink_dare_screen_1787610340317.jpg" class="absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none" alt="Dare or Drink">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#120516] via-transparent to-black/50"></div>
+
+              <div class="relative z-10 flex justify-between items-center">
+                <span class="px-3 py-1 rounded-full bg-amber-500/25 border border-amber-400/60 text-[10px] font-black text-amber-300 uppercase tracking-wider shadow">
+                  DARE OR DRINK 🍺
+                </span>
+                <button onclick="openGameRules(event, 'dare-drink')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                  <span>📖</span>
+                  <span>Rules</span>
+                </button>
+              </div>
+
+              <div class="relative z-10 space-y-2">
+                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Dare or Drink</h3>
+                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">The exact glowing amber card interface with live drinks counter, reaction avatars, and spice switcher.</p>
+                
+                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                  <span class="text-amber-200 font-bold">2-20 Players</span>
+                  <span class="font-black text-black bg-amber-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                    <span>Play Now</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 1: Truth or Dare -->
+            <div id="hero-card-1" onclick="selectGame('truth-dare')" class="game-hero-card tod-card-cyan overflow-hidden flex flex-col justify-between p-6 opacity-0 pointer-events-none">
+              <img src="assets/truth_dare_screen_1787610280118.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" alt="Truth or Dare">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#080910] via-transparent to-black/40"></div>
+
+              <div class="relative z-10 flex justify-between items-center">
+                <span class="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-[10px] font-black text-cyan-300 uppercase tracking-wider shadow">
+                  NEON TRUTH OR DARE
+                </span>
+                <button onclick="openGameRules(event, 'truth-dare')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                  <span>📖</span>
+                  <span>Rules</span>
+                </button>
+              </div>
+
+              <div class="relative z-10 space-y-2">
+                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Truth or Dare</h3>
+                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">Cyan & Pink neon choice cards with live countdown timers and forfeit drinks.</p>
+                
+                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                  <span class="text-cyan-200 font-bold">2-20 Players</span>
+                  <span class="font-black text-black bg-cyan-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                    <span>Play Now</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Spin the Bottle -->
+            <div id="hero-card-2" onclick="selectGame('spin-bottle')" class="game-hero-card bottle-ring overflow-hidden flex flex-col justify-between p-6 opacity-0 pointer-events-none">
+              <img src="assets/spin_bottle_screen_1787610310378.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" alt="Spin the Bottle">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0A0618] via-transparent to-black/40"></div>
+
+              <div class="relative z-10 flex justify-between items-center">
+                <span class="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/50 text-[10px] font-black text-purple-300 uppercase tracking-wider shadow">
+                  COSMIC BOTTLE ARENA
+                </span>
+                <button onclick="openGameRules(event, 'spin-bottle')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                  <span>📖</span>
+                  <span>Rules</span>
+                </button>
+              </div>
+
+              <div class="relative z-10 space-y-2">
+                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Spin the Bottle</h3>
+                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">Glowing circular arena with physics bottle landing on the closest participant.</p>
+                
+                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                  <span class="text-purple-200 font-bold">2-15 Players</span>
+                  <span class="font-black text-black bg-purple-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                    <span>Spin Now</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Never Have I Ever -->
+            <div id="hero-card-3" onclick="selectGame('never-ever')" class="game-hero-card mockup-card-main overflow-hidden flex flex-col justify-between p-6 opacity-0 pointer-events-none">
+              <img src="assets/drink_dare_screen_1787610340317.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" alt="Never Have I Ever">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#120516] via-transparent to-black/40"></div>
+
+              <div class="relative z-10 flex justify-between items-center">
+                <span class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-[10px] font-black text-amber-300 uppercase tracking-wider shadow">
+                  CONFESSION DECK
+                </span>
+                <button onclick="openGameRules(event, 'never-ever')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                  <span>📖</span>
+                  <span>Rules</span>
+                </button>
+              </div>
+
+              <div class="relative z-10 space-y-2">
+                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Never Have I Ever</h3>
+                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">Amber glowing cards with drink tallies, reactions, and confession points.</p>
+                
+                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                  <span class="text-amber-200 font-bold">3-25 Players</span>
+                  <span class="font-black text-black bg-amber-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                    <span>Swipe Now</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Double Dare -->
+            <div id="hero-card-4" onclick="selectGame('double-dare')" class="game-hero-card overflow-hidden flex flex-col justify-between p-6 opacity-0 pointer-events-none" style="background: rgba(32, 10, 24, 0.94); border: 2px solid #FF2A54;">
+              <img src="assets/party_home_screen_1787610256101.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" alt="Double Dare">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#14040E] via-transparent to-black/40"></div>
+
+              <div class="relative z-10 flex justify-between items-center">
+                <span class="px-3 py-1 rounded-full bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-300 uppercase tracking-wider shadow">
+                  ESCALATION STAKES
+                </span>
+                <button onclick="openGameRules(event, 'double-dare')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                  <span>📖</span>
+                  <span>Rules</span>
+                </button>
+              </div>
+
+              <div class="relative z-10 space-y-2">
+                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Double Dare</h3>
+                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">Pass the dare back to double the penalty multipliers!</p>
+                
+                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
+                  <span class="text-rose-200 font-bold">3-18 Players</span>
+                  <span class="font-black text-black bg-rose-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                    <span>Play Now</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Carousel Navigation Controls -->
+        <div class="flex items-center justify-between px-2 pt-1">
+          <button onclick="prevCard()" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-base transition">
+            &larr;
+          </button>
+
+          <!-- Morphing Dots -->
+          <div id="deck-dots" class="flex items-center space-x-1.5">
+            <!-- Injected by JS -->
+          </div>
+
+          <button onclick="nextCard()" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-base transition">
+            &rarr;
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN 3: ENTER PARTICIPANT NAMES (MANDATORY TYPING) ================= -->
+      <div id="screen-participants" class="screen flex-col justify-between p-6 pb-6 min-h-full">
+        
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <span id="part-game-tag" class="text-xs font-bold uppercase tracking-wider text-amber-400">Dare or Drink</span>
+            <h2 class="text-2xl font-display font-black text-white">Enter Player Names</h2>
+            <p class="text-xs text-slate-400">Type each participant's name to personalize the game:</p>
+          </div>
+
+          <!-- Dynamic List of Empty Name Inputs -->
+          <div id="participants-input-list" class="bg-white/[0.03] border border-white/10 rounded-3xl divide-y divide-white/[0.08] max-h-[420px] overflow-y-auto">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Validation Warning -->
+          <div id="name-validation-msg" class="hidden p-2.5 rounded-xl bg-red-950/70 border border-red-500/50 text-red-300 text-xs font-bold text-center">
+            ⚠️ Please type names for all players before starting!
+          </div>
+
+          <div class="flex space-x-2.5 pt-1">
+            <button onclick="addParticipantRow()" class="flex-1 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-white transition">
+              + Add Player
+            </button>
+            <button onclick="fillExampleNames()" class="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs text-amber-300 font-bold transition" title="Fill names like Sarah, Mike, Jess from the mockup">
+              ⚡ Fill Sarah, Mike, Jess
+            </button>
+          </div>
+        </div>
+
+        <button onclick="validateAndStartGame()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-4 transition active:scale-95">
+          <span>Start The Game</span>
+          <img src="https://emojicdn.elk.sh/✨?style=apple" class="w-4 h-4 apple-emoji" alt="Sparkles">
+        </button>
+
+      </div>
+
+
+      <!-- ================= SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA OF THE GENERATED CARD) ================= -->
+      <div id="screen-dare-drink" class="screen mockup-drink-bg flex-col justify-between p-5 pb-5 min-h-full">
+        
+        <!-- Top Neon Header: DARE or DRINK 🍺 / NEVER HAVE I EVER (Exact Mockup Match) -->
+        <div class="text-center pt-1 z-20 space-y-0.5">
+          <div class="font-display font-black text-2xl tracking-wide drop-shadow-[0_0_15px_rgba(157,0,255,0.7)] flex items-center justify-center space-x-2">
+            <span class="text-[#B975FF]">DARE</span>
+            <span class="font-serif italic font-normal text-slate-300 text-lg">or</span>
+            <span class="text-[#FF2A6D] drop-shadow-[0_0_12px_rgba(255,42,109,0.8)]">DRINK</span>
+            <span>🍺</span>
+          </div>
+          <h3 class="font-display font-bold text-xs tracking-widest text-[#FF7A8A] uppercase">
+            NEVER HAVE I EVER
+          </h3>
+        </div>
+
+        <!-- Center Stacked Amber Card with Layers (Exact Mockup Match) -->
+        <div class="mockup-stacked-deck my-auto py-2 w-full max-w-[340px] mx-auto">
+          <!-- Back layer 2 -->
+          <div class="mockup-card-back-2"></div>
+          <!-- Back layer 1 -->
+          <div class="mockup-card-back-1"></div>
+
+          <!-- Main Card Front -->
+          <div id="mockup-card-main-body" class="mockup-card-main p-5 flex flex-col justify-between text-center space-y-3.5">
+            
+            <!-- Card Header inside box -->
+            <span id="dod-question-label" class="text-xs font-semibold text-slate-400">Never Have I Ever...</span>
+
+            <!-- Main Big Question Text -->
+            <div class="py-1 min-h-[72px] flex items-center justify-center">
+              <p id="dod-prompt-text" class="text-xl font-display font-extrabold text-white leading-tight">
+                been caught sneaking out of a early
+              </p>
+            </div>
+
+            <!-- "Take 1 Drink if you did! 🍺" Red Text -->
+            <div id="dod-penalty-callout" class="font-extrabold text-sm text-[#FF4D6D] drop-shadow-[0_0_10px_rgba(255,77,109,0.5)]">
+              Take 1 Drink if you did! 🍺
+            </div>
+
+            <!-- DRINKS TAKEN: [ - 🍺 ] [ 3 ] [ + 🍺 ] (Exact Mockup Match) -->
+            <div class="space-y-1 pt-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">DRINKS TAKEN:</span>
+              <div class="flex items-center justify-center space-x-3">
+                <!-- Minus Drink Button -->
+                <button onclick="changeDrinks(-1)" class="w-16 h-12 rounded-2xl bg-[#2D1220] border border-[#FF3366]/50 hover:border-[#FF3366] text-amber-300 font-black text-sm flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(255,51,102,0.25)] transition active:scale-90">
+                  <span>-</span>
+                  <span>🍺</span>
+                </button>
+                
+                <!-- Center Big Number Box -->
+                <div id="drink-counter-box" class="w-20 h-12 rounded-2xl bg-[#1C0D1C] border border-[#FF9900]/70 text-[#FFB703] font-display font-black text-3xl flex items-center justify-center shadow-[0_0_20px_rgba(255,153,0,0.35)]">
+                  <span id="drink-counter">3</span>
+                </div>
+
+                <!-- Plus Drink Button -->
+                <button onclick="changeDrinks(1)" class="w-16 h-12 rounded-2xl bg-[#2D1220] border border-[#FF3366]/50 hover:border-[#FF3366] text-amber-300 font-black text-sm flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(255,51,102,0.25)] transition active:scale-90">
+                  <span>+</span>
+                  <span>🍺</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Player Reactions Section: Sarah 🎉, Mike 🤫, Jess 🔥 (Exact Mockup Match) -->
+            <div class="space-y-1.5 pt-1">
+              <span class="text-[10px] font-bold text-slate-400">Player Reactions</span>
+              <div id="mockup-reactions-row" class="flex justify-center items-center space-x-4">
+                <!-- Dynamically filled with typed players or Sarah, Mike, Jess -->
+              </div>
+
+              <!-- Little Scrubber Track from Mockup: |<< ━━━━━●━━━━━━━━━ >>| -->
+              <div class="flex items-center space-x-2 pt-2 px-1 text-slate-500">
+                <button onclick="prevPrompt()" class="text-[11px] font-bold hover:text-white transition">|&lt;&lt;</button>
+                <div class="flex-1 mockup-scrubber-track">
+                  <div id="scrubber-fill" class="mockup-scrubber-fill"></div>
+                  <div id="scrubber-thumb" class="mockup-scrubber-thumb"></div>
+                </div>
+                <button onclick="nextPrompt()" class="text-[11px] font-bold hover:text-white transition">&gt;&gt;|</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom Actions & Spice Level (Exact Mockup Match) -->
+        <div class="space-y-3 z-20 w-full max-w-[340px] mx-auto">
+          <!-- Next Card ➡️ & Skip ⏭️ Button Pair -->
+          <div class="grid grid-cols-5 gap-2.5">
+            <button onclick="nextPrompt()" class="col-span-3 py-3.5 rounded-2xl btn-mockup-next text-white font-display font-extrabold text-sm tracking-wide flex items-center justify-center space-x-2 transition active:scale-95">
+              <span>Next Card</span>
+              <span>➡️</span>
+            </button>
+            <button onclick="skipPrompt()" class="col-span-2 py-3.5 rounded-2xl btn-mockup-skip text-slate-300 font-display font-extrabold text-sm tracking-wide flex items-center justify-center space-x-1.5 transition active:scale-95">
+              <span>Skip</span>
+              <span>⏭️</span>
+            </button>
+          </div>
+
+          <!-- Spice Level Capsule Selector from Mockup: [ (○) Classic | EXTREME 🔥 | Wild ] -->
+          <div class="space-y-1 text-center">
+            <span class="text-[11px] font-semibold text-slate-400">Spice Level:</span>
+            <div class="p-1 rounded-full bg-black/70 border border-white/15 flex items-center justify-between text-xs font-bold text-slate-400">
+              <button onclick="setSpiceMode('chill')" id="spice-btn-chill" class="flex items-center space-x-1 px-3 py-1 rounded-full transition">
+                <span id="spice-thumb-classic" class="w-3.5 h-3.5 rounded-full bg-slate-600 inline-block"></span>
+                <span>Classic</span>
+              </button>
+
+              <button onclick="setSpiceMode('extreme')" id="spice-btn-extreme" class="px-3.5 py-1 rounded-full bg-red-950/80 border border-red-500 text-red-300 font-black shadow-[0_0_12px_rgba(239,68,68,0.5)] transition">
+                <span>EXTREME</span>
+                <span>🔥</span>
+              </button>
+
+              <button onclick="setSpiceMode('spicy')" id="spice-btn-wild" class="px-3 py-1 rounded-full text-slate-400 hover:text-white transition">
+                <span>Wild</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN 4: TRUTH OR DARE ================= -->
+      <div id="screen-truth-dare" class="screen tod-bg flex-col justify-between p-5 pb-6 min-h-full">
+        <div class="space-y-3">
+          <div class="flex justify-center">
+            <span class="px-4 py-1 rounded-full bg-gradient-to-r from-red-600/90 to-orange-600/90 border border-red-400/60 shadow-[0_0_15px_rgba(255,0,0,0.5)] text-xs font-black text-white uppercase tracking-widest flex items-center space-x-1.5">
+              <span>EXTREME MODE</span>
+              <img src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Fire">
+            </span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-400/40 shadow-[0_0_20px_rgba(0,240,255,0.2)] flex items-center justify-center space-x-2">
+            <div id="tod-avatar-box" class="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center">
+              <img id="tod-avatar-img" src="https://emojicdn.elk.sh/👨?style=apple" class="w-5 h-5 apple-emoji" alt="Avatar">
+            </div>
+            <h4 id="tod-player-name" class="font-display font-black text-lg text-white">Player 1's Turn</h4>
+          </div>
+        </div>
+
+        <div id="tod-choice-container" class="grid grid-cols-2 gap-3.5 my-auto py-2">
+          <button onclick="pickTruthOrDare('truth')" class="tod-card-cyan h-56 rounded-3xl flex flex-col items-center justify-center space-y-3 transition active:scale-95 group">
+            <span class="font-display font-black text-2xl text-cyan-300 tracking-wider">TRUTH</span>
+            <div class="w-20 h-20 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center group-hover:scale-110 transition duration-300 shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+              <img src="https://emojicdn.elk.sh/❓?style=apple" class="w-12 h-12 apple-emoji" alt="Truth">
+            </div>
+            <span class="text-[11px] font-bold text-cyan-200/80 uppercase tracking-widest">Answer</span>
+          </button>
+
+          <button onclick="pickTruthOrDare('dare')" class="tod-card-pink h-56 rounded-3xl flex flex-col items-center justify-center space-y-3 transition active:scale-95 group">
+            <span class="font-display font-black text-2xl text-pink-300 tracking-wider">DARE</span>
+            <div class="w-20 h-20 rounded-2xl bg-pink-500/10 border border-pink-400/30 flex items-center justify-center group-hover:scale-110 transition duration-300 shadow-[0_0_20px_rgba(255,0,127,0.4)]">
+              <img src="https://emojicdn.elk.sh/⚡?style=apple" class="w-12 h-12 apple-emoji" alt="Dare">
+            </div>
+            <span class="text-[11px] font-bold text-pink-200/80 uppercase tracking-widest">Challenge</span>
+          </button>
+        </div>
+
+        <div id="tod-prompt-container" class="tod-prompt-box p-5 rounded-3xl space-y-4 my-auto hidden">
+          <div class="flex items-center justify-between">
+            <span id="tod-challenge-title" class="text-xs font-black uppercase text-slate-300">Challenge</span>
+            <div class="w-14 h-14 rounded-full border-2 border-pink-500 shadow-[0_0_15px_rgba(255,0,127,0.4)] flex flex-col items-center justify-center">
+              <span id="tod-timer" class="font-display font-black text-sm text-white">30s</span>
+              <span class="text-[8px] uppercase font-bold text-slate-400 leading-none">Time</span>
+            </div>
+          </div>
+
+          <div class="py-2">
+            <p id="tod-prompt-text" class="text-base font-bold text-white leading-relaxed">
+              "I dare you to text your ex something incredibly flirty right now, no explanation! 🔥 (2 MINS TO POST PROOF)"
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <button onclick="finishTodTurn(true)" class="py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              <span>Completed</span>
+              <img src="https://emojicdn.elk.sh/✅?style=apple" class="w-4 h-4 apple-emoji" alt="Done">
+            </button>
+            <button onclick="finishTodTurn(false)" class="py-3 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+              <span>Forfeit (2 Drinks)</span>
+              <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-4 h-4 apple-emoji" alt="Drink">
+            </button>
+          </div>
+        </div>
+
+        <button onclick="nextPlayer('tod')" class="w-full py-3.5 rounded-2xl bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-400/60 text-cyan-300 font-display font-black text-sm tracking-wider flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+          <span>Next Player Turn</span>
+          <span>➡️</span>
+        </button>
+      </div>
+
+
+      <!-- ================= SCREEN 5: SPIN THE BOTTLE ================= -->
+      <div id="screen-spin-bottle" class="screen bottle-bg flex-col items-center justify-between p-5 pb-6 min-h-full">
+        <div class="text-center pt-1">
+          <h3 class="font-display font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 drop-shadow-[0_0_15px_rgba(157,0,255,0.6)]">
+            SPIN THE BOTTLE
+          </h3>
+        </div>
+
+        <div class="relative w-full aspect-square max-w-[340px] my-auto flex items-center justify-center">
+          <div class="absolute inset-4 rounded-full bottle-ring pointer-events-none"></div>
+          <div id="bottle-players-container" class="absolute inset-0 pointer-events-none"></div>
+          <canvas id="bottle-canvas" width="280" height="280" class="cursor-pointer z-20"></canvas>
+          <div class="absolute w-16 h-16 rounded-full bg-cyan-400/20 blur-xl pointer-events-none"></div>
+        </div>
+
+        <div class="w-full space-y-2.5">
+          <div id="spin-result-card" class="bottle-modal p-4 rounded-2xl hidden space-y-2 animate-bounce-short">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-cyan-300 uppercase tracking-wider drop-shadow" id="spin-chosen-name">The bottle pointed to MIA!</span>
+              <img src="https://emojicdn.elk.sh/🎯?style=apple" class="w-4 h-4 apple-emoji" alt="Target">
+            </div>
+            <p id="spin-chosen-sub" class="text-[11px] text-slate-300 font-semibold">Mia must complete the dare:</p>
+            <div class="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-400/40 text-xs font-bold text-white shadow">
+              <span id="spin-dare-text">"Perform a 30-second interpretive dance to the next song! 💃✨"</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <button id="spin-btn" onclick="spinTheBottle()" class="py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(255,0,127,0.5)]">
+              <span>SPIN AGAIN</span>
+              <span>🔄</span>
+            </button>
+            <button onclick="passBottleChallenge()" class="py-3.5 rounded-2xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-300 font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+              <span>Pass Challenge</span>
+              <span>🎲</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC & ENGINES ================= -->
+  <script>
+    function getAppleEmojiImg(emojiChar, size = "w-5 h-5") {
+      return `<img src="https://emojicdn.elk.sh/${encodeURIComponent(emojiChar)}?style=apple" class="${size} apple-emoji" alt="${emojiChar}">`;
+    }
+
+    const STATE = {
+      mode: 'extreme',
+      playerCount: 2,
+      currentCardIndex: 0,
+      totalGames: 5,
+      gameKeys: ['dare-drink', 'truth-dare', 'spin-bottle', 'never-ever', 'double-dare'],
+      selectedGame: 'dare-drink',
+      soundEnabled: true,
+      musicEnabled: true,
+      totalDrinks: 3,
+      promptIndex: 0,
+      players: [
+        { name: '', avatar: '👩' },
+        { name: '', avatar: '🧔' }
+      ],
+      currentPlayerIndex: 0,
+      todState: { type: null, prompt: null, timerInterval: null },
+      doubleDareLevel: 1,
+      navigationStack: ['setup']
+    };
+
+    const AVATAR_POOL = ['👩', '🧔', '👱‍♀️', '👨', '🧑', '🤠', '🥳', '😎', '💃', '🕺', '🦄', '👑', '🔥'];
+
+    // Rich Question & Challenge Database for Dare or Drink / Never Have I Ever
+    const DOD_PROMPTS = {
+      chill: [
+        "fallen asleep in a movie theater during a film",
+        "eaten an entire large pizza by myself in one sitting",
+        "re-gifted a present to someone else in this circle",
+        "blamed a pet for something I accidentally broke"
+      ],
+      party: [
+        "been caught sneaking out of a party early",
+        "ghosted someone after two or more great dates",
+        "sent a message to the wrong group chat and panicked",
+        "pretended to be on a phone call to avoid someone in public"
+      ],
+      spicy: [
+        "kissed someone whose name I didn't know at the time",
+        "looked through a partner’s phone without them knowing",
+        "made out in a public place where we could have been caught",
+        "flirted my way out of getting a ticket or paying for something"
+      ],
+      extreme: [
+        "been caught sneaking out of a early",
+        "had a crush on a close friend's partner or ex",
+        "sent a spicy photo that I immediately regretted",
+        "hooked up with someone in this room or friend group"
+      ]
+    };
+
+    const TOD_PROMPTS = {
+      truth: {
+        extreme: [
+          "Read aloud the last 3 direct messages you sent on Instagram/Snapchat right now!",
+          "What is something you have done that you hope nobody in your family ever finds out?",
+          "Who in this room would you kiss if you were forced to make a choice right now?",
+          "What is your biggest regret regarding an ex or a former crush?"
+        ]
+      },
+      dare: {
+        extreme: [
+          "Text your ex or recent crush: 'I still think about that night...' with zero explanation for 5 minutes!",
+          "Let the player to your right text anything they want to your 5th phone contact.",
+          "Take a mystery drink concoction created by the two players next to you.",
+          "Let someone in the room blindfold you and feed you a mystery bite from the kitchen."
+        ]
+      }
+    };
+
+    /* -------------------------------------------------------------
+       AUDIO FX & LO-FI BEATS ENGINE
+    ------------------------------------------------------------- */
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let musicInterval = null;
+    let beatStep = 0;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new AudioContextClass();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.08) {
+      if (!STATE.soundEnabled) return;
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playClick() { playBeep(580, 'sine', 0.04); }
+    function playSwipe() { playBeep(420, 'triangle', 0.05); }
+    function playSuccess() { 
+      playBeep(523, 'sine', 0.08); 
+      setTimeout(() => playBeep(659, 'sine', 0.08), 70);
+      setTimeout(() => playBeep(784, 'sine', 0.16), 140);
+    }
+    function playSpinSound() { playBeep(320, 'square', 0.03); }
+
+    function startMusicLoop() {
+      if (musicInterval) clearInterval(musicInterval);
+      const stepTimeMs = 165;
+      const chords = [
+        [293.66, 349.23, 440.00, 523.25],
+        [293.66, 392.00, 493.88, 587.33],
+        [261.63, 329.63, 392.00, 493.88],
+        [220.00, 261.63, 329.63, 392.00]
+      ];
+
+      musicInterval = setInterval(() => {
+        if (!STATE.musicEnabled) return;
+        try {
+          const ctx = getAudioCtx();
+          const t = ctx.currentTime;
+          const currentBar = Math.floor(beatStep / 16) % chords.length;
+          const stepInBar = beatStep % 16;
+          const chord = chords[currentBar];
+
+          if (stepInBar === 0 || stepInBar === 8) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.setValueAtTime(110, t);
+            osc.frequency.exponentialRampToValueAtTime(32, t + 0.12);
+            gain.gain.setValueAtTime(0.09, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.12);
+          }
+
+          if (stepInBar === 4 || stepInBar === 12) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, t);
+            gain.gain.setValueAtTime(0.04, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.08);
+          }
+
+          if (stepInBar % 2 === 0) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'highpass';
+            osc.frequency.setValueAtTime(1200, t);
+            gain.gain.setValueAtTime(0.015, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.03);
+          }
+
+          if (stepInBar % 4 === 0) {
+            const noteIdx = (stepInBar / 4) % chord.length;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(chord[noteIdx], t);
+            gain.gain.setValueAtTime(0.035, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.4);
+          }
+          beatStep++;
+        } catch (e) {}
+      }, stepTimeMs);
+    }
+
+    function toggleMusic() {
+      STATE.musicEnabled = !STATE.musicEnabled;
+      const btn = document.getElementById('music-btn');
+      const label = document.getElementById('music-btn-label');
+      const waveBars = document.getElementById('island-wave-bars');
+      
+      if (STATE.musicEnabled) {
+        btn.className = "px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-[11px] font-bold text-cyan-300 flex items-center space-x-1.5";
+        label.innerText = 'Lo-Fi ON';
+        if (waveBars) waveBars.style.display = 'flex';
+        startMusicLoop();
+      } else {
+        btn.className = "px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-400 flex items-center space-x-1.5";
+        label.innerText = 'Muted';
+        if (waveBars) waveBars.style.display = 'none';
+      }
+      playClick();
+    }
+
+    function toggleSound() {
+      STATE.soundEnabled = !STATE.soundEnabled;
+      const soundBtn = document.getElementById('sound-btn');
+      soundBtn.innerHTML = getAppleEmojiImg(STATE.soundEnabled ? '🔊' : '🔇', 'w-4 h-4');
+      playClick();
+    }
+
+    /* -------------------------------------------------------------
+       NAVIGATION ROUTER
+    ------------------------------------------------------------- */
+    function navigate(screenName, addToStack = true) {
+      playClick();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      
+      const target = document.getElementById(`screen-${screenName}`);
+      if (target) target.classList.add('active');
+
+      const backBtn = document.getElementById('header-back-btn');
+      const title = document.getElementById('header-title');
+      const subtitle = document.getElementById('header-subtitle');
+
+      if (addToStack && STATE.navigationStack[STATE.navigationStack.length - 1] !== screenName) {
+        STATE.navigationStack.push(screenName);
+      }
+
+      const logoThumb = document.getElementById('header-logo-thumb');
+
+      if (screenName === 'setup') {
+        backBtn.classList.add('hidden');
+        if (logoThumb) logoThumb.classList.remove('hidden');
+        title.innerHTML = '<span>SPARK</span><span class="text-xs text-amber-400">⚡</span>';
+        subtitle.innerText = 'Party Night';
+      } else {
+        backBtn.classList.remove('hidden');
+        if (logoThumb) logoThumb.classList.add('hidden');
+
+        if (screenName === 'carousel') {
+          title.innerText = 'Game Deck';
+          subtitle.innerText = '1 Card View';
+          render1CardStage();
+        }
+        if (screenName === 'participants') {
+          title.innerText = 'Participants';
+          subtitle.innerText = 'Type Names';
+        }
+        if (screenName === 'dare-drink') {
+          title.innerText = 'Dare or Drink';
+          subtitle.innerText = 'Mockup Match 1:1';
+          renderMockupDrinkScreen();
+        }
+        if (screenName === 'truth-dare') {
+          title.innerText = 'Truth or Dare';
+          subtitle.innerText = 'Neon Edition';
+        }
+        if (screenName === 'spin-bottle') {
+          title.innerText = 'Spin the Bottle';
+          subtitle.innerText = 'Cosmic Arena';
+          initBottleArena();
+        }
+      }
+    }
+
+    function handleHeaderBack() {
+      if (STATE.navigationStack.length > 1) {
+        STATE.navigationStack.pop();
+        const previous = STATE.navigationStack[STATE.navigationStack.length - 1];
+        navigate(previous, false);
+      } else {
+        navigate('setup', false);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       SCREEN 1: SETUP & HOMEPAGE PARTICIPANTS ENTRY
+    ------------------------------------------------------------- */
+    function openPhonePreviewModal() {
+      playClick();
+      const modal = document.getElementById('phone-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closePhonePreviewModal() {
+      playClick();
+      const modal = document.getElementById('phone-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function selectInitialMode(modeKey) {
+      playClick();
+      STATE.mode = modeKey;
+
+      const tagEl = document.getElementById('setup-mode-tag');
+      const boxEl = document.getElementById('mode-selector-box');
+
+      const modeStyles = {
+        chill: {
+          tag: 'Chilled & relaxed vibes 🍦',
+          tagClass: 'text-xs font-black text-sky-400 transition-colors duration-300',
+          btnClass: 'mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_0_20px_rgba(14,165,233,0.6)] border border-sky-400/50 flex flex-col items-center space-y-0.5',
+          boxClass: 'p-1 rounded-2xl bg-white/5 border border-sky-500/40 shadow-[0_0_20px_rgba(14,165,233,0.25)] grid grid-cols-4 gap-1 transition-all duration-300'
+        },
+        party: {
+          tag: 'High energy party games 🎉',
+          tagClass: 'text-xs font-black text-purple-300 transition-colors duration-300',
+          btnClass: 'mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.6)] border border-purple-400/50 flex flex-col items-center space-y-0.5',
+          boxClass: 'p-1 rounded-2xl bg-white/5 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.25)] grid grid-cols-4 gap-1 transition-all duration-300'
+        },
+        spicy: {
+          tag: 'Flirty questions & spicy secrets 🌶️',
+          tagClass: 'text-xs font-black text-amber-400 transition-colors duration-300',
+          btnClass: 'mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-[0_0_20px_rgba(245,158,11,0.6)] border border-amber-400/50 flex flex-col items-center space-y-0.5',
+          boxClass: 'p-1 rounded-2xl bg-white/5 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.25)] grid grid-cols-4 gap-1 transition-all duration-300'
+        },
+        extreme: {
+          tag: 'Extreme & unfiltered dares 🔥',
+          tagClass: 'text-xs font-black text-rose-400 transition-colors duration-300',
+          btnClass: 'mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_25px_rgba(239,68,68,0.7)] border border-red-500/60 flex flex-col items-center space-y-0.5',
+          boxClass: 'p-1 rounded-2xl bg-white/5 border border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.25)] grid grid-cols-4 gap-1 transition-all duration-300'
+        }
+      };
+
+      const current = modeStyles[modeKey] || modeStyles.extreme;
+      if (tagEl) {
+        tagEl.innerText = current.tag;
+        tagEl.className = current.tagClass;
+      }
+      if (boxEl) {
+        boxEl.className = current.boxClass;
+      }
+
+      document.querySelectorAll('.mode-tab').forEach(tab => {
+        if (tab.dataset.mode === modeKey) {
+          tab.className = current.btnClass;
+        } else {
+          tab.className = "mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white flex flex-col items-center space-y-0.5";
+        }
+      });
+    }
+
+    const GAME_RULES = {
+      'dare-drink': {
+        title: 'Dare or Drink 🍺',
+        icon: '🍻',
+        intro: 'A high-energy party game where you either face a bold dare or drink the penalty!',
+        steps: [
+          'The active player reads the dare challenge aloud to everyone.',
+          'Choose to either perform the dare challenge in full view of the group, or refuse and drink the designated number of drinks.',
+          'If other players have completed or failed the action, they tap their reaction avatar to log a drink penalty.',
+          'Use the timeline scrubber or Next Card to advance to the next player.'
+        ],
+        goldenRule: 'No skipping without taking the drinks!'
+      },
+      'truth-dare': {
+        title: 'Truth or Dare ❓⚡',
+        icon: '🔥',
+        intro: 'The ultimate party classic with Cyan Truth and Neon Pink Dare choices!',
+        steps: [
+          'The active player chooses either TRUTH (electric cyan) or DARE (hot pink).',
+          'For Truth: You must answer 100% truthfully without omitting details.',
+          'For Dare: You have 30 seconds to complete the challenge before the timer buzzer rings!',
+          'Tap "Completed ✅" to win or "Forfeit (Take 2 Drinks) 🍺" if you back out.'
+        ],
+        goldenRule: 'Whatever happens in Truth or Dare stays in the room!'
+      },
+      'spin-bottle': {
+        title: 'Spin the Bottle 🍾',
+        icon: '🎯',
+        intro: 'A circular cosmic arena where the bottle tip chooses the next victim!',
+        steps: [
+          'Tap or swipe the neon bottle in the center of the arena to spin it.',
+          'Realistic physics will slow the bottle down until it stops.',
+          'The player closest to the bottle tip is highlighted and assigned a spicy dare.',
+          'That player must complete the dare or pass it by taking 2 penalty drinks.'
+        ],
+        goldenRule: 'The bottle tip never lies!'
+      },
+      'never-ever': {
+        title: 'Never Have I Ever ✋',
+        icon: '🤫',
+        intro: 'A spicy confession game to discover your friends’ wildest secrets.',
+        steps: [
+          'Read the "Never Have I Ever..." confession card aloud.',
+          'Every participant in the room who HAS done that action must tap their avatar and take 1 drink.',
+          'If nobody drinks, the person who read the card must take 1 drink!',
+          'Tap Next Card to draw the next statement.'
+        ],
+        goldenRule: 'Honesty is mandatory — no hiding your past!'
+      },
+      'double-dare': {
+        title: 'Double Dare 🎭',
+        icon: '🚀',
+        intro: 'An escalating multiplier challenge where stakes double with every pass!',
+        steps: [
+          'A dare is presented with a 1x drink penalty.',
+          'The target player can either Accept the dare or Double Dare the next player.',
+          'Each pass doubles the drink stakes: 1x ➡️ 2x ➡️ 4x ➡️ 8x!',
+          'The first player who refuses or fails must drink the entire accumulated multiplier!'
+        ],
+        goldenRule: 'High risk, high glory — dare to double!'
+      }
+    };
+
+    function openGameRules(event, gameKey) {
+      if (event) event.stopPropagation();
+      playClick();
+
+      const ruleData = GAME_RULES[gameKey] || GAME_RULES['dare-drink'];
+      document.getElementById('rules-title').innerText = ruleData.title;
+      document.getElementById('rules-icon').innerText = ruleData.icon;
+
+      const contentEl = document.getElementById('rules-content');
+      contentEl.innerHTML = `
+        <p class="text-slate-300 leading-relaxed font-semibold">${ruleData.intro}</p>
+        <div class="space-y-2 pt-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Step-by-Step Rules:</span>
+          <ol class="space-y-2">
+            ${ruleData.steps.map((s, i) => `
+              <li class="flex items-start space-x-2">
+                <span class="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">${i + 1}</span>
+                <span class="text-slate-200 leading-tight">${s}</span>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
+        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-[11px] text-amber-300 font-bold flex items-center space-x-2 mt-2">
+          <span>💡</span>
+          <span>Golden Rule: ${ruleData.goldenRule}</span>
+        </div>
+      `;
+
+      const modal = document.getElementById('rules-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeGameRules() {
+      playClick();
+      const modal = document.getElementById('rules-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function renderHomepageParticipants() {
+      const list = document.getElementById('homepage-participants-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      while (STATE.players.length < STATE.playerCount) {
+        const idx = STATE.players.length;
+        const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
+        STATE.players.push({ name: '', avatar: avatar });
+      }
+      if (STATE.players.length > STATE.playerCount) {
+        STATE.players = STATE.players.slice(0, STATE.playerCount);
+      }
+
+      STATE.players.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'p-2.5 px-3 flex items-center space-x-3';
+        row.innerHTML = `
+          <button onclick="cycleAvatar(${idx})" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center flex-shrink-0 transition" title="Tap to change avatar">
+            ${getAppleEmojiImg(p.avatar, 'w-5 h-5')}
+          </button>
+          <div class="flex-1">
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Player ${idx + 1}</span>
+            <input type="text" id="homepage-player-input-${idx}" value="${p.name}" oninput="updatePlayerName(${idx}, this.value)" placeholder="Enter Player ${idx + 1}'s name..." class="w-full bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-500 border-b border-transparent focus:border-amber-400 py-0.5">
+          </div>
+          ${STATE.players.length > 2 ? `
+            <button onclick="removeParticipant(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-1.5 py-0.5">✕</button>
+          ` : ''}
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function updatePlayerName(idx, val) {
+      STATE.players[idx].name = val;
+      const warn = document.getElementById('homepage-name-validation');
+      if (warn) warn.classList.add('hidden');
+    }
+
+    function cycleAvatar(idx) {
+      playClick();
+      const currentAvatar = STATE.players[idx].avatar;
+      const curIndex = AVATAR_POOL.indexOf(currentAvatar);
+      const nextAvatar = AVATAR_POOL[(curIndex + 1) % AVATAR_POOL.length];
+      STATE.players[idx].avatar = nextAvatar;
+      renderHomepageParticipants();
+    }
+
+    function changePlayerCount(delta) {
+      playClick();
+      STATE.playerCount = Math.max(2, Math.min(20, STATE.playerCount + delta));
+      document.getElementById('setup-player-num').innerText = STATE.playerCount;
+      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
+      renderHomepageParticipants();
+    }
+
+    function addParticipantRow() {
+      playClick();
+      const idx = STATE.players.length;
+      const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
+      STATE.players.push({ name: '', avatar: avatar });
+      STATE.playerCount = STATE.players.length;
+      document.getElementById('setup-player-num').innerText = STATE.playerCount;
+      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
+      renderHomepageParticipants();
+    }
+
+    function removeParticipant(idx) {
+      if (STATE.players.length <= 2) return;
+      playClick();
+      STATE.players.splice(idx, 1);
+      STATE.playerCount = STATE.players.length;
+      document.getElementById('setup-player-num').innerText = STATE.playerCount;
+      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
+      renderHomepageParticipants();
+    }
+
+    function fillExampleNames() {
+      playSuccess();
+      const exampleNames = ['Sarah', 'Mike', 'Jess', 'Alex', 'Chris', 'Mia'];
+      const exampleAvatars = ['👩', '🧔', '👱‍♀️', '👨', '🧑', '💃'];
+      STATE.players.forEach((p, idx) => {
+        p.name = exampleNames[idx % exampleNames.length];
+        p.avatar = exampleAvatars[idx % exampleAvatars.length];
+      });
+      renderHomepageParticipants();
+      const warn = document.getElementById('homepage-name-validation');
+      if (warn) warn.classList.add('hidden');
+    }
+
+    function validateAndGoToGameDeck() {
+      // Check if all players have typed their names
+      const hasEmpty = STATE.players.some(p => !p.name.trim());
+      if (hasEmpty) {
+        playBeep(220, 'sawtooth', 0.2);
+        const warn = document.getElementById('homepage-name-validation');
+        if (warn) warn.classList.remove('hidden');
+        return;
+      }
+
+      playSuccess();
+      startMusicLoop();
+      navigate('carousel');
+    }
+
+    function selectGame(gameId) {
+      playClick();
+      STATE.selectedGame = gameId;
+      STATE.currentPlayerIndex = 0;
+      STATE.promptIndex = 0;
+      
+      confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
+      navigate(gameId);
+    }
+
+    /* -------------------------------------------------------------
+       SCREEN 2: 1-CARD DECK
+    ------------------------------------------------------------- */
+    function render1CardStage() {
+      for (let i = 0; i < STATE.totalGames; i++) {
+        const card = document.getElementById(`hero-card-${i}`);
+        if (!card) continue;
+        
+        if (i === STATE.currentCardIndex) {
+          card.style.transform = 'translateX(0%) scale(1)';
+          card.style.opacity = '1';
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '20';
+        } else if (i < STATE.currentCardIndex) {
+          card.style.transform = 'translateX(-120%) scale(0.9)';
+          card.style.opacity = '0';
+          card.style.pointerEvents = 'none';
+          card.style.zIndex = '10';
+        } else {
+          card.style.transform = 'translateX(120%) scale(0.9)';
+          card.style.opacity = '0';
+          card.style.pointerEvents = 'none';
+          card.style.zIndex = '10';
+        }
+      }
+
+      document.getElementById('card-counter-badge').innerText = `${STATE.currentCardIndex + 1} of ${STATE.totalGames}`;
+
+      const dotsContainer = document.getElementById('deck-dots');
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < STATE.totalGames; i++) {
+        const dot = document.createElement('span');
+        if (i === STATE.currentCardIndex) {
+          dot.className = 'w-6 h-2 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(255,153,0,0.8)] transition-all duration-300';
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-white/25 transition-all duration-300 cursor-pointer';
+          dot.onclick = () => { STATE.currentCardIndex = i; playSwipe(); render1CardStage(); };
+        }
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function nextCard() {
+      if (STATE.currentCardIndex < STATE.totalGames - 1) {
+        STATE.currentCardIndex++;
+      } else {
+        STATE.currentCardIndex = 0;
+      }
+      playSwipe();
+      render1CardStage();
+    }
+
+    function prevCard() {
+      if (STATE.currentCardIndex > 0) {
+        STATE.currentCardIndex--;
+      } else {
+        STATE.currentCardIndex = STATE.totalGames - 1;
+      }
+      playSwipe();
+      render1CardStage();
+    }
+
+    // Touch & Drag Gesture
+    let startX = 0;
+    let isDragging = false;
+    const cardStage = document.getElementById('card-stage');
+    
+    cardStage.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    cardStage.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = e.changedTouches[0].clientX - startX;
+      if (diffX < -45) nextCard();
+      else if (diffX > 45) prevCard();
+    }, { passive: true });
+
+    cardStage.addEventListener('mousedown', (e) => {
+      startX = e.clientX;
+      isDragging = true;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = e.clientX - startX;
+      if (diffX < -45) nextCard();
+      else if (diffX > 45) prevCard();
+    });
+
+    /* -------------------------------------------------------------
+       SCREEN 3: PARTICIPANTS
+    ------------------------------------------------------------- */
+    function selectGame(gameId) {
+      playClick();
+      STATE.selectedGame = gameId;
+
+      const gameTitles = {
+        'dare-drink': 'Dare or Drink',
+        'truth-dare': 'Truth or Dare',
+        'spin-bottle': 'Spin the Bottle',
+        'never-ever': 'Never Have I Ever',
+        'double-dare': 'Double Dare'
+      };
+
+      document.getElementById('part-game-tag').innerText = `${gameTitles[gameId]} • ${STATE.mode.toUpperCase()} MODE`;
+      buildParticipantInputs();
+      navigate('participants');
+    }
+
+    function buildParticipantInputs() {
+      while (STATE.players.length < STATE.playerCount) {
+        const idx = STATE.players.length;
+        const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
+        STATE.players.push({ name: '', avatar: avatar });
+      }
+      if (STATE.players.length > STATE.playerCount) {
+        STATE.players = STATE.players.slice(0, STATE.playerCount);
+      }
+      renderParticipantRows();
+    }
+
+    function renderParticipantRows() {
+      const list = document.getElementById('participants-input-list');
+      list.innerHTML = '';
+
+      STATE.players.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 flex items-center space-x-3.5';
+        row.innerHTML = `
+          <button onclick="cycleAvatar(${idx})" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center flex-shrink-0" title="Tap to change avatar">
+            ${getAppleEmojiImg(p.avatar, 'w-6 h-6')}
+          </button>
+          <div class="flex-1">
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Player ${idx + 1} Name</span>
+            <input type="text" id="player-input-${idx}" value="${p.name}" oninput="updatePlayerName(${idx}, this.value)" placeholder="Type name..." class="w-full bg-transparent text-sm font-bold text-white focus:outline-none placeholder-slate-500 border-b border-transparent focus:border-amber-400 py-0.5">
+          </div>
+          ${STATE.players.length > 2 ? `
+            <button onclick="removeParticipant(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-2 py-1">✕</button>
+          ` : ''}
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function updatePlayerName(idx, val) {
+      STATE.players[idx].name = val;
+      document.getElementById('name-validation-msg').classList.add('hidden');
+    }
+
+    function cycleAvatar(idx) {
+      playClick();
+      const currentAvatar = STATE.players[idx].avatar;
+      const curIndex = AVATAR_POOL.indexOf(currentAvatar);
+      const nextAvatar = AVATAR_POOL[(curIndex + 1) % AVATAR_POOL.length];
+      STATE.players[idx].avatar = nextAvatar;
+      renderParticipantRows();
+    }
+
+    function addParticipantRow() {
+      playClick();
+      const idx = STATE.players.length;
+      const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
+      STATE.players.push({ name: '', avatar: avatar });
+      STATE.playerCount = STATE.players.length;
+      renderParticipantRows();
+    }
+
+    function removeParticipant(idx) {
+      if (STATE.players.length <= 2) return;
+      playClick();
+      STATE.players.splice(idx, 1);
+      STATE.playerCount = STATE.players.length;
+      renderParticipantRows();
+    }
+
+    function fillExampleNames() {
+      playSuccess();
+      const exampleNames = ['Sarah', 'Mike', 'Jess', 'Alex', 'Chris', 'Mia'];
+      const exampleAvatars = ['👩', '🧔', '👱‍♀️', '👨', '🧑', '💃'];
+      STATE.players.forEach((p, idx) => {
+        p.name = exampleNames[idx % exampleNames.length];
+        p.avatar = exampleAvatars[idx % exampleAvatars.length];
+      });
+      renderParticipantRows();
+      document.getElementById('name-validation-msg').classList.add('hidden');
+    }
+
+    function validateAndStartGame() {
+      const hasEmpty = STATE.players.some(p => !p.name.trim());
+      if (hasEmpty) {
+        playBeep(220, 'sawtooth', 0.2);
+        document.getElementById('name-validation-msg').classList.remove('hidden');
+        return;
+      }
+
+      playSuccess();
+      confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
+      
+      STATE.currentPlayerIndex = 0;
+      STATE.promptIndex = 0;
+      navigate(STATE.selectedGame);
+    }
+
+    /* -------------------------------------------------------------
+       SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA ENGINE)
+    ------------------------------------------------------------- */
+    function renderMockupDrinkScreen() {
+      // 1. Render Current Prompt
+      const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
+      const prompt = list[STATE.promptIndex % list.length];
+      document.getElementById('dod-prompt-text').innerText = `"${prompt}"`;
+
+      // 2. Render Drink Count
+      document.getElementById('drink-counter').innerText = STATE.totalDrinks;
+
+      // 3. Render Reactions Row matching mockup (Sarah, Mike, Jess or typed players)
+      const reactionsRow = document.getElementById('mockup-reactions-row');
+      reactionsRow.innerHTML = '';
+
+      const emojis = ['👍', '😆', '😍', '🔥', '🎉'];
+      const ringBorders = ['border-[#A855F7]', 'border-[#F59E0B]', 'border-[#F43F5E]'];
+
+      STATE.players.slice(0, 3).forEach((p, idx) => {
+        const borderClass = ringBorders[idx % ringBorders.length];
+        const emoji = emojis[idx % emojis.length];
+
+        const chip = document.createElement('div');
+        chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
+        chip.innerHTML = `
+          <div class="relative">
+            <div class="w-11 h-11 rounded-full bg-black/60 border-2 ${borderClass} shadow-[0_0_12px_rgba(255,255,255,0.25)] flex items-center justify-center text-lg">
+              ${getAppleEmojiImg(p.avatar, 'w-6 h-6')}
+            </div>
+            <span class="absolute -top-1 -right-1 text-xs">${emoji}</span>
+          </div>
+          <span class="text-[10px] font-bold text-slate-200 mt-0.5">${p.name || 'Player'} ${emoji}</span>
+        `;
+        chip.onclick = () => {
+          playBeep(350, 'sine', 0.1);
+          changeDrinks(1);
+          confetti({ particleCount: 15, spread: 35, origin: { y: 0.7 } });
+        };
+        reactionsRow.appendChild(chip);
+      });
+
+      // 4. Update Scrubber Track position
+      updateScrubberPosition();
+    }
+
+    function updateScrubberPosition() {
+      const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
+      const pct = Math.min(100, Math.max(10, ((STATE.promptIndex + 1) / list.length) * 100));
+      document.getElementById('scrubber-fill').style.width = `${pct}%`;
+      document.getElementById('scrubber-thumb').style.left = `${pct}%`;
+    }
+
+    function nextPrompt() {
+      playClick();
+      const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
+      STATE.promptIndex = (STATE.promptIndex + 1) % list.length;
+      
+      const card = document.getElementById('mockup-card-main-body');
+      card.style.transform = 'scale(0.97)';
+      setTimeout(() => {
+        renderMockupDrinkScreen();
+        card.style.transform = 'scale(1)';
+      }, 120);
+    }
+
+    function prevPrompt() {
+      playClick();
+      const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
+      STATE.promptIndex = (STATE.promptIndex - 1 + list.length) % list.length;
+      renderMockupDrinkScreen();
+    }
+
+    function skipPrompt() {
+      playSwipe();
+      nextPrompt();
+    }
+
+    function changeDrinks(delta) {
+      STATE.totalDrinks = Math.max(0, STATE.totalDrinks + delta);
+      document.getElementById('drink-counter').innerText = STATE.totalDrinks;
+      if (delta > 0) {
+        playBeep(260, 'sawtooth', 0.15);
+      } else {
+        playClick();
+      }
+    }
+
+    function setSpiceMode(modeKey) {
+      playClick();
+      STATE.mode = modeKey;
+      STATE.promptIndex = 0;
+
+      const classicThumb = document.getElementById('spice-thumb-classic');
+      const btnClassic = document.getElementById('spice-btn-chill');
+      const btnExtreme = document.getElementById('spice-btn-extreme');
+      const btnWild = document.getElementById('spice-btn-wild');
+
+      if (modeKey === 'chill') {
+        classicThumb.className = 'w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF] inline-block';
+        btnClassic.className = 'flex items-center space-x-1 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-400 text-cyan-300 font-bold';
+        btnExtreme.className = 'px-3 py-1 rounded-full text-slate-400 hover:text-white';
+        btnWild.className = 'px-3 py-1 rounded-full text-slate-400 hover:text-white';
+      } else if (modeKey === 'extreme') {
+        classicThumb.className = 'w-3.5 h-3.5 rounded-full bg-slate-600 inline-block';
+        btnClassic.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-slate-400 hover:text-white';
+        btnExtreme.className = 'px-3.5 py-1 rounded-full bg-red-950/80 border border-red-500 text-red-300 font-black shadow-[0_0_12px_rgba(239,68,68,0.5)]';
+        btnWild.className = 'px-3 py-1 rounded-full text-slate-400 hover:text-white';
+      } else {
+        classicThumb.className = 'w-3.5 h-3.5 rounded-full bg-slate-600 inline-block';
+        btnClassic.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-slate-400 hover:text-white';
+        btnExtreme.className = 'px-3 py-1 rounded-full text-slate-400 hover:text-white';
+        btnWild.className = 'px-3.5 py-1 rounded-full bg-amber-950/80 border border-amber-400 text-amber-300 font-black shadow-[0_0_12px_rgba(245,158,11,0.5)]';
+      }
+
+      renderMockupDrinkScreen();
+    }
+
+    /* -------------------------------------------------------------
+       TRUTH OR DARE & SPIN THE BOTTLE ENGINES
+    ------------------------------------------------------------- */
+    function pickTruthOrDare(type) {
+      playClick();
+      STATE.todState.type = type;
+
+      document.getElementById('tod-choice-container').classList.add('hidden');
+      document.getElementById('tod-prompt-container').classList.remove('hidden');
+
+      const modeList = TOD_PROMPTS[type].extreme;
+      const randomPrompt = modeList[Math.floor(Math.random() * modeList.length)];
+      
+      const curPlayer = STATE.players[STATE.currentPlayerIndex].name || `Player ${STATE.currentPlayerIndex + 1}`;
+      document.getElementById('tod-prompt-text').innerText = `"${randomPrompt}"`;
+      document.getElementById('tod-challenge-title').innerText = `${curPlayer}'s ${type.toUpperCase()} Challenge`;
+
+      startTodTimer();
+    }
+
+    function startTodTimer() {
+      let seconds = 30;
+      const timerEl = document.getElementById('tod-timer');
+      clearInterval(STATE.todState.timerInterval);
+      timerEl.innerText = `${seconds}s`;
+      STATE.todState.timerInterval = setInterval(() => {
+        seconds--;
+        timerEl.innerText = `${seconds}s`;
+        if (seconds <= 0) {
+          clearInterval(STATE.todState.timerInterval);
+          timerEl.innerText = '0s';
+          playBeep(220, 'sawtooth', 0.4);
+        }
+      }, 1000);
+    }
+
+    function finishTodTurn(completed) {
+      clearInterval(STATE.todState.timerInterval);
+      if (completed) {
+        playSuccess();
+        confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
+      } else {
+        playBeep(200, 'square', 0.2);
+        changeDrinks(2);
+      }
+      nextPlayer('tod');
+    }
+
+    function nextPlayer(game = 'tod') {
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      const curPlayer = STATE.players[STATE.currentPlayerIndex];
+      document.getElementById('tod-player-name').innerText = `${curPlayer.name || 'Player'}'s Turn`;
+      document.getElementById('tod-avatar-img').src = `https://emojicdn.elk.sh/${encodeURIComponent(curPlayer.avatar)}?style=apple`;
+      document.getElementById('tod-choice-container').classList.remove('hidden');
+      document.getElementById('tod-prompt-container').classList.add('hidden');
+      clearInterval(STATE.todState.timerInterval);
+    }
+
+    /* -------------------------------------------------------------
+       SPIN THE BOTTLE ENGINE
+    ------------------------------------------------------------- */
+    let canvas, ctx;
+    let bottleAngle = 0;
+    let bottleSpeed = 0;
+    let isSpinning = false;
+
+    function initBottleArena() {
+      canvas = document.getElementById('bottle-canvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      const container = document.getElementById('bottle-players-container');
+      container.innerHTML = '';
+      
+      const num = STATE.players.length;
+      const radius = 130;
+      const cx = 170;
+      const cy = 170;
+
+      STATE.players.forEach((p, idx) => {
+        const angle = (idx / num) * 2 * Math.PI - (Math.PI / 2);
+        const x = cx + radius * Math.cos(angle) - 24;
+        const y = cy + radius * Math.sin(angle) - 24;
+
+        const node = document.createElement('div');
+        node.className = `player-node-${idx} absolute w-12 h-12 rounded-full bg-black/80 bottle-node flex flex-col items-center justify-center transition-all duration-300 shadow-md`;
+        node.style.left = `${x}px`;
+        node.style.top = `${y}px`;
+        node.innerHTML = `
+          ${getAppleEmojiImg(p.avatar, 'w-5 h-5')}
+          <span class="text-[9px] font-black text-white truncate max-w-[44px]">${p.name || 'Player'}</span>
+        `;
+        container.appendChild(node);
+      });
+
+      drawBottle();
+    }
+
+    function drawBottle() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(bottleAngle);
+
+      ctx.shadowColor = '#00FFFF';
+      ctx.shadowBlur = 18;
+
+      const grad = ctx.createLinearGradient(-16, -65, 16, 65);
+      grad.addColorStop(0, '#00FFFF');
+      grad.addColorStop(0.5, '#9D00FF');
+      grad.addColorStop(1, '#FF007F');
+
+      ctx.fillStyle = grad;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.roundRect(-6, -72, 12, 18, 2);
+      ctx.moveTo(-7, -54);
+      ctx.lineTo(-7, -42);
+      ctx.lineTo(-17, 30);
+      ctx.lineTo(-17, 50);
+      ctx.arcTo(-17, 62, -5, 62, 10);
+      ctx.lineTo(5, 62);
+      ctx.arcTo(17, 62, 17, 50, 10);
+      ctx.lineTo(17, 30);
+      ctx.lineTo(7, -42);
+      ctx.lineTo(7, -54);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.moveTo(0, -90);
+      ctx.lineTo(-8, -76);
+      ctx.lineTo(8, -76);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spinTheBottle() {
+      if (isSpinning) return;
+      isSpinning = true;
+      playClick();
+      
+      document.getElementById('spin-result-card').classList.add('hidden');
+      bottleSpeed = 0.38 + Math.random() * 0.45;
+      
+      let lastBeep = 0;
+      function animate() {
+        bottleAngle += bottleSpeed;
+        bottleSpeed *= 0.982;
+
+        if (Date.now() - lastBeep > 65 && bottleSpeed > 0.05) {
+          playSpinSound();
+          lastBeep = Date.now();
+        }
+
+        drawBottle();
+
+        if (bottleSpeed > 0.002) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          onBottleLanded();
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    function onBottleLanded() {
+      let tipAngle = (bottleAngle - Math.PI / 2) % (2 * Math.PI);
+      if (tipAngle < 0) tipAngle += 2 * Math.PI;
+
+      const num = STATE.players.length;
+      let closestIndex = 0;
+      let minDiff = Infinity;
+
+      STATE.players.forEach((p, idx) => {
+        let playerAngle = ((idx / num) * 2 * Math.PI - Math.PI / 2) % (2 * Math.PI);
+        if (playerAngle < 0) playerAngle += 2 * Math.PI;
+
+        let diff = Math.abs(tipAngle - playerAngle);
+        if (diff > Math.PI) diff = 2 * Math.PI - diff;
+
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIndex = idx;
+        }
+      });
+
+      const chosen = STATE.players[closestIndex];
+
+      playSuccess();
+      confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
+
+      document.querySelectorAll('[class*="player-node-"]').forEach(n => {
+        n.classList.remove('scale-125', 'border-pink-400', 'bg-pink-900/70', 'shadow-[0_0_25px_rgba(255,0,127,0.9)]');
+      });
+      const targetNode = document.querySelector(`.player-node-${closestIndex}`);
+      if (targetNode) {
+        targetNode.classList.add('scale-125', 'border-pink-400', 'bg-pink-900/70', 'shadow-[0_0_25px_rgba(255,0,127,0.9)]');
+      }
+
+      document.getElementById('spin-chosen-name').innerText = `The bottle pointed to ${(chosen.name || 'Player').toUpperCase()}!`;
+      document.getElementById('spin-chosen-sub').innerText = `${chosen.name || 'Player'} must complete the dare:`;
+      document.getElementById('spin-dare-text').innerText = `"Perform a 30-second interpretive dance to the next song! 💃✨"`;
+      document.getElementById('spin-result-card').classList.remove('hidden');
+    }
+
+    function passBottleChallenge() {
+      playClick();
+      document.getElementById('spin-result-card').classList.add('hidden');
+      spinTheBottle();
+    }
+
+    // Time ticker
+    setInterval(() => {
+      const d = new Date();
+      const h = d.getHours().toString().padStart(2, '0');
+      const m = d.getMinutes().toString().padStart(2, '0');
+      const timeEl = document.getElementById('current-time');
+      if (timeEl) timeEl.innerText = `${h}:${m}`;
+    }, 1000);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectInitialMode('extreme');
+      renderHomepageParticipants();
+      render1CardStage();
+
+      // 🎉 Opening Confetti Celebration Blast!
+      setTimeout(() => {
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 80,
+            spread: 90,
+            origin: { y: 0.45 },
+            colors: ['#FF9900', '#FF007F', '#00F0FF', '#FFD700', '#FF2A54']
+          });
+        }
+      }, 350);
+    });
+
+    window.addEventListener('click', () => {
+      getAudioCtx();
+    }, { once: true });
+  </script>
+</body>
+</html>

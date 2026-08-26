@@ -1,0 +1,5 @@
+# Scratch & Tools
+scratch/
+cloudflared.exe
+*.zip
+*.log
