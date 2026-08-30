@@ -14,6 +14,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- PeerJS for Realtime WebRTC Multiplayer -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -35,14 +37,15 @@
     }
   </script>
   <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 0px; height: 0px; }
-    
-    .apple-emoji {
-      display: inline-block;
-      vertical-align: -0.15em;
-      object-fit: contain;
-      pointer-events: none;
+    /* Floating Emoji Reactions Animation */
+    @keyframes floatUp {
+      0% { transform: translateY(0px) scale(0.6); opacity: 0; }
+      15% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+      80% { transform: translateY(-180px) scale(1); opacity: 0.9; }
+      100% { transform: translateY(-260px) scale(0.8); opacity: 0; }
+    }
+    .animate-float-up {
+      animation: floatUp 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
 
     /* ================= 1. DARE OR DRINK EXACT MOCKUP REPLICA VIBE ================= */
@@ -360,6 +363,17 @@
             <p class="text-xs text-slate-400">Choose intensity mode & type player names below to begin.</p>
           </div>
 
+          <!-- Play Mode Switcher: Single Phone vs Live Multiplayer -->
+          <div class="p-1 rounded-2xl bg-white/[0.06] border border-white/10 grid grid-cols-2 gap-1 text-xs font-bold shadow-inner">
+            <button id="mode-tab-local" onclick="switchPlayMode('local')" class="py-2.5 rounded-xl bg-white text-black shadow-md flex items-center justify-center space-x-1.5 transition">
+              <span>📱 Pass & Play</span>
+            </button>
+            <button id="mode-tab-multiplayer" onclick="switchPlayMode('multiplayer')" class="py-2.5 rounded-xl text-slate-400 hover:text-white flex items-center justify-center space-x-1.5 transition">
+              <span>🌐 Room Multiplayer</span>
+              <span class="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-500 text-black font-black uppercase tracking-wider">Live</span>
+            </button>
+          </div>
+
           <!-- Mode Selector with Intensity Color Transition -->
           <div class="space-y-2.5">
             <div class="flex justify-between items-center px-0.5">
@@ -388,8 +402,8 @@
             </div>
           </div>
 
-          <!-- Participants Stepper & Dynamic Names Entry on Homepage (Starts at 2 Players) -->
-          <div class="space-y-3">
+          <!-- LOCAL PASS & PLAY PANEL -->
+          <div id="panel-local-setup" class="space-y-3">
             <div class="flex justify-between items-center px-0.5">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Participants (<span id="setup-player-num">2</span>)</span>
               <!-- Stepper Controls -->
@@ -402,14 +416,14 @@
 
             <!-- Dynamic Player Name Inputs directly on Homepage -->
             <div class="space-y-2">
-              <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[220px] overflow-y-auto">
+              <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[200px] overflow-y-auto">
                 <!-- Dynamically populated -->
               </div>
 
               <!-- Quick actions -->
               <div class="flex items-center justify-between px-1 text-xs">
-                <button onclick="fillExampleNames()" class="text-amber-400 hover:text-amber-300 font-bold flex items-center space-x-1 transition" title="Fill Sarah, Mike, Jess from the mockup">
-                  <span>⚡ Quick Fill (Sarah, Mike, Jess)</span>
+                <button onclick="fillExampleNames()" class="text-amber-400 hover:text-amber-300 font-bold flex items-center space-x-1 transition" title="Fill Sarah, Mike from the mockup">
+                  <span>⚡ Quick Fill</span>
                 </button>
                 <button onclick="addParticipantRow()" class="text-cyan-400 hover:text-cyan-300 font-bold transition">
                   + Add Player
@@ -421,15 +435,80 @@
             <div id="homepage-name-validation" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-xs font-bold text-center">
               ⚠️ Please type names for all players before continuing!
             </div>
+
+            <!-- Continue CTA Button for Local Pass & Play -->
+            <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-3 transition active:scale-95">
+              <span>Continue to Game Deck</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+
+          <!-- MULTIPLAYER ROOM SETUP PANEL (Hidden by default) -->
+          <div id="panel-multiplayer-setup" class="hidden space-y-4">
+            
+            <!-- Host / Join Sub-Tabs -->
+            <div class="p-1 rounded-xl bg-white/5 border border-white/10 grid grid-cols-2 gap-1 text-xs font-bold">
+              <button id="mp-subtab-host" onclick="switchMPSubTab('host')" class="py-2 rounded-lg bg-amber-500 text-black shadow-md flex items-center justify-center space-x-1 transition">
+                <span>👑 Host Game</span>
+              </button>
+              <button id="mp-subtab-join" onclick="switchMPSubTab('join')" class="py-2 rounded-lg text-slate-400 hover:text-white flex items-center justify-center space-x-1 transition">
+                <span>🔗 Join Room</span>
+              </button>
+            </div>
+
+            <!-- HOST VIEW -->
+            <div id="mp-host-view" class="space-y-3 bg-white/[0.03] border border-amber-500/30 rounded-2xl p-4">
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Step 1: Your Host Profile</span>
+                <div class="flex items-center space-x-2">
+                  <button type="button" onclick="cycleMyAvatar()" id="mp-host-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
+                    👑
+                  </button>
+                  <input type="text" id="mp-host-name-input" placeholder="Enter your name (Host)..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400" />
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 space-y-1">
+                <div class="font-bold flex items-center space-x-1">
+                  <span>💡 How it works:</span>
+                </div>
+                <p class="text-slate-300">You will get a 4-digit Room Code. Friends can scan your QR code or type the code on their phones to play with you!</p>
+              </div>
+
+              <button onclick="createMultiplayerRoom()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,140,0,0.5)] transition active:scale-95">
+                <span>Create Game Room ⚡</span>
+              </button>
+            </div>
+
+            <!-- JOIN VIEW -->
+            <div id="mp-join-view" class="hidden space-y-3 bg-white/[0.03] border border-cyan-500/30 rounded-2xl p-4">
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Room Code (4-Digits)</span>
+                <input type="text" id="mp-join-code-input" maxlength="4" placeholder="e.g. 7429" class="w-full text-center font-mono font-black text-2xl tracking-[0.3em] uppercase bg-white/5 border border-cyan-400/40 rounded-xl py-2.5 text-cyan-300 placeholder:text-slate-600 focus:outline-none focus:border-cyan-300" />
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Your Player Name</span>
+                <div class="flex items-center space-x-2">
+                  <button type="button" onclick="cycleMyAvatar()" id="mp-join-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
+                    😎
+                  </button>
+                  <input type="text" id="mp-join-name-input" placeholder="Enter your nickname..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400" />
+                </div>
+              </div>
+
+              <div id="mp-join-error" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-[11px] font-bold text-center">
+                <!-- Error msg -->
+              </div>
+
+              <button onclick="joinMultiplayerRoom()" id="mp-join-submit-btn" class="w-full py-3.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95">
+                <span>Enter Room 🎮</span>
+              </button>
+            </div>
+
           </div>
 
         </div>
-
-        <!-- Continue CTA Button -->
-        <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-5 transition active:scale-95">
-          <span>Continue to Game Deck</span>
-          <span>&rarr;</span>
-        </button>
 
       </div>
 
@@ -889,9 +968,101 @@
             </button>
           </div>
         </div>
+      <!-- ================= SCREEN 6: MULTIPLAYER LOBBY ================= -->
+      <div id="screen-lobby" class="screen flex-col justify-between p-6 pb-6 min-h-full">
+        <div class="space-y-4">
+          <!-- Room Header & Status -->
+          <div class="pt-2 flex items-center justify-between">
+            <div class="space-y-1">
+              <div class="flex items-center space-x-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Room Live</span>
+              </div>
+              <h3 class="text-2xl font-display font-black text-white tracking-tight">Party Lobby</h3>
+            </div>
+            <!-- Intensity badge -->
+            <span id="lobby-mode-badge" class="px-3 py-1 rounded-full text-xs font-black uppercase bg-red-600/30 text-rose-300 border border-red-500/40">
+              🔥 Extreme
+            </span>
+          </div>
+
+          <!-- Room Code Card -->
+          <div class="p-4 rounded-3xl bg-white/[0.04] border border-amber-500/40 text-center space-y-3 shadow-[0_0_25px_rgba(255,140,0,0.15)]">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Share this Room Code with friends</span>
+            <div class="flex items-center justify-center space-x-2">
+              <span id="lobby-room-code" class="text-4xl font-mono font-black text-amber-400 tracking-[0.25em] select-all">----</span>
+              <button onclick="copyRoomLink()" class="p-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-bold transition active:scale-95" title="Copy Invite Link">
+                📋 Copy Link
+              </button>
+            </div>
+            <!-- QR code toggle -->
+            <div class="pt-1 flex items-center justify-center">
+              <button onclick="toggleLobbyQR()" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center space-x-1">
+                <span>📱 Show QR Code</span>
+              </button>
+            </div>
+            <div id="lobby-qr-container" class="hidden p-3 bg-white rounded-2xl inline-block mx-auto">
+              <img id="lobby-qr-img" src="" class="w-36 h-36 rounded-lg" alt="Lobby QR">
+            </div>
+          </div>
+
+          <!-- Connected Players List -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Connected Players (<span id="lobby-player-count">1</span>)
+              </span>
+              <span id="lobby-status-text" class="text-[11px] text-amber-400 font-medium">Waiting for friends to join...</span>
+            </div>
+            
+            <div id="lobby-players-list" class="bg-white/[0.03] border border-white/10 rounded-2xl p-2 divide-y divide-white/[0.06] max-h-[220px] overflow-y-auto space-y-1">
+              <!-- Dynamically populated with connected peers -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Lobby Actions: Host can start, Guest sees waiting -->
+        <div class="space-y-2 pt-2">
+          <div id="lobby-host-controls" class="space-y-2">
+            <button onclick="startMultiplayerGame()" id="lobby-start-btn" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.5)] transition active:scale-95">
+              <span>Start Game with Squad 🚀</span>
+            </button>
+            <p class="text-[10px] text-center text-slate-400">Need at least 2 players in the room to launch.</p>
+          </div>
+
+          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+            <div class="flex items-center justify-center space-x-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span class="text-xs font-bold text-cyan-300">Connected! Waiting for host to launch the game...</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Get your drinks ready! 🍺</p>
+          </div>
+
+          <button onclick="leaveMultiplayerRoom()" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-bold transition">
+            Leave Room
+          </button>
+        </div>
       </div>
 
     </main>
+
+    <!-- REAL-TIME FLOATING EMOJI REACTION CONTAINER -->
+    <div id="floating-emoji-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+    <!-- FLOATING REACTION BUTTON BAR (Visible in multiplayer games) -->
+    <div id="mp-reaction-bar" class="fixed bottom-3 right-4 left-4 max-w-[430px] mx-auto z-40 hidden justify-between items-center bg-black/70 backdrop-blur-md border border-amber-500/30 px-4 py-2 rounded-full shadow-[0_0_25px_rgba(0,0,0,0.8)]">
+      <div class="flex items-center space-x-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">React</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="sendEmojiReaction('🔥')" class="text-xl hover:scale-125 transition active:scale-90" title="Fire">🔥</button>
+        <button onclick="sendEmojiReaction('🍺')" class="text-xl hover:scale-125 transition active:scale-90" title="Drink">🍺</button>
+        <button onclick="sendEmojiReaction('💀')" class="text-xl hover:scale-125 transition active:scale-90" title="Dead">💀</button>
+        <button onclick="sendEmojiReaction('👀')" class="text-xl hover:scale-125 transition active:scale-90" title="Eyes">👀</button>
+        <button onclick="sendEmojiReaction('😂')" class="text-xl hover:scale-125 transition active:scale-90" title="Laugh">😂</button>
+      </div>
+    </div>
 
   </div>
 
@@ -1142,6 +1313,22 @@
         backBtn.classList.remove('hidden');
         if (logoThumb) logoThumb.classList.add('hidden');
 
+        const reactionBar = document.getElementById('mp-reaction-bar');
+        const isGameScreen = ['dare-drink', 'truth-dare', 'spin-bottle', 'never-ever', 'double-dare'].includes(screenName);
+        if (reactionBar) {
+          if (MP.active && isGameScreen) {
+            reactionBar.classList.remove('hidden');
+            reactionBar.classList.add('flex');
+          } else {
+            reactionBar.classList.add('hidden');
+            reactionBar.classList.remove('flex');
+          }
+        }
+
+        if (screenName === 'lobby') {
+          title.innerText = 'Lobby Room';
+          subtitle.innerText = 'Waiting Squad';
+        }
         if (screenName === 'carousel') {
           title.innerText = 'Game Deck';
           subtitle.innerText = '1 Card View';
@@ -1733,17 +1920,29 @@
       document.getElementById('scrubber-thumb').style.left = `${pct}%`;
     }
 
-    function nextPrompt() {
+    function nextPrompt(sync = true) {
       playClick();
       const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
       STATE.promptIndex = (STATE.promptIndex + 1) % list.length;
       
       const card = document.getElementById('mockup-card-main-body');
-      card.style.transform = 'scale(0.97)';
-      setTimeout(() => {
+      if (card) {
+        card.style.transform = 'scale(0.97)';
+        setTimeout(() => {
+          renderMockupDrinkScreen();
+          card.style.transform = 'scale(1)';
+        }, 120);
+      } else {
         renderMockupDrinkScreen();
-        card.style.transform = 'scale(1)';
-      }, 120);
+      }
+
+      if (sync && MP.active) {
+        if (MP.role === 'host') {
+          broadcastToClients({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        } else if (MP.role === 'client' && MP.hostConn) {
+          MP.hostConn.send({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        }
+      }
     }
 
     function prevPrompt() {
@@ -1751,6 +1950,14 @@
       const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
       STATE.promptIndex = (STATE.promptIndex - 1 + list.length) % list.length;
       renderMockupDrinkScreen();
+
+      if (MP.active) {
+        if (MP.role === 'host') {
+          broadcastToClients({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        } else if (MP.role === 'client' && MP.hostConn) {
+          MP.hostConn.send({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        }
+      }
     }
 
     function skipPrompt() {
@@ -1758,13 +1965,22 @@
       nextPrompt();
     }
 
-    function changeDrinks(delta) {
+    function changeDrinks(delta, sync = true) {
       STATE.totalDrinks = Math.max(0, STATE.totalDrinks + delta);
-      document.getElementById('drink-counter').innerText = STATE.totalDrinks;
+      const countEl = document.getElementById('drink-counter');
+      if (countEl) countEl.innerText = STATE.totalDrinks;
       if (delta > 0) {
         playBeep(260, 'sawtooth', 0.15);
       } else {
         playClick();
+      }
+
+      if (sync && MP.active) {
+        if (MP.role === 'host') {
+          broadcastToClients({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
+        } else if (MP.role === 'client' && MP.hostConn) {
+          MP.hostConn.send({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
+        }
       }
     }
 
@@ -2018,6 +2234,422 @@
       spinTheBottle();
     }
 
+    /* -------------------------------------------------------------
+       MULTIPLAYER ENGINE (PeerJS WebRTC Cross-Device Sync)
+    ------------------------------------------------------------- */
+    const MP = {
+      active: false,
+      role: 'local', // 'local' | 'host' | 'client'
+      roomCode: null,
+      peer: null,
+      hostConn: null,
+      connections: [],
+      myId: 'player_' + Math.random().toString(36).substr(2, 6),
+      myName: '',
+      myAvatar: '😎',
+      players: []
+    };
+
+    function switchPlayMode(mode) {
+      playClick();
+      const tabLocal = document.getElementById('mode-tab-local');
+      const tabMP = document.getElementById('mode-tab-multiplayer');
+      const panelLocal = document.getElementById('panel-local-setup');
+      const panelMP = document.getElementById('panel-multiplayer-setup');
+
+      if (mode === 'local') {
+        MP.role = 'local';
+        MP.active = false;
+        tabLocal.className = "py-2.5 rounded-xl bg-white text-black shadow-md flex items-center justify-center space-x-1.5 transition";
+        tabMP.className = "py-2.5 rounded-xl text-slate-400 hover:text-white flex items-center justify-center space-x-1.5 transition";
+        panelLocal.classList.remove('hidden');
+        panelMP.classList.add('hidden');
+        document.getElementById('mp-reaction-bar').classList.add('hidden');
+        document.getElementById('mp-reaction-bar').classList.remove('flex');
+      } else {
+        MP.role = 'host';
+        MP.active = true;
+        tabMP.className = "py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md flex items-center justify-center space-x-1.5 font-black transition";
+        tabLocal.className = "py-2.5 rounded-xl text-slate-400 hover:text-white flex items-center justify-center space-x-1.5 transition";
+        panelLocal.classList.add('hidden');
+        panelMP.classList.remove('hidden');
+        switchMPSubTab('host');
+      }
+    }
+
+    function switchMPSubTab(subTab) {
+      playClick();
+      const tabHost = document.getElementById('mp-subtab-host');
+      const tabJoin = document.getElementById('mp-subtab-join');
+      const viewHost = document.getElementById('mp-host-view');
+      const viewJoin = document.getElementById('mp-join-view');
+
+      if (subTab === 'host') {
+        tabHost.className = "py-2 rounded-lg bg-amber-500 text-black shadow-md flex items-center justify-center space-x-1 transition";
+        tabJoin.className = "py-2 rounded-lg text-slate-400 hover:text-white flex items-center justify-center space-x-1 transition";
+        viewHost.classList.remove('hidden');
+        viewJoin.classList.add('hidden');
+      } else {
+        tabJoin.className = "py-2 rounded-lg bg-cyan-400 text-black shadow-md flex items-center justify-center space-x-1 transition";
+        tabHost.className = "py-2 rounded-lg text-slate-400 hover:text-white flex items-center justify-center space-x-1 transition";
+        viewJoin.classList.remove('hidden');
+        viewHost.classList.add('hidden');
+      }
+    }
+
+    function cycleMyAvatar() {
+      playClick();
+      const currentIdx = AVATAR_POOL.indexOf(MP.myAvatar);
+      const nextIdx = (currentIdx + 1) % AVATAR_POOL.length;
+      MP.myAvatar = AVATAR_POOL[nextIdx];
+      const hostBtn = document.getElementById('mp-host-avatar-btn');
+      const joinBtn = document.getElementById('mp-join-avatar-btn');
+      if (hostBtn) hostBtn.innerText = MP.myAvatar;
+      if (joinBtn) joinBtn.innerText = MP.myAvatar;
+    }
+
+    function createMultiplayerRoom() {
+      playClick();
+      const nameInput = document.getElementById('mp-host-name-input');
+      const hostName = nameInput.value.trim() || 'Host ' + MP.myAvatar;
+      MP.myName = hostName;
+      MP.role = 'host';
+      MP.active = true;
+
+      // Generate 4-digit code
+      const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+      MP.roomCode = roomCode;
+
+      const peerId = `spark-v1-${roomCode}`;
+      try {
+        if (MP.peer) MP.peer.destroy();
+        MP.peer = new Peer(peerId, { debug: 1 });
+
+        MP.peer.on('open', (id) => {
+          console.log('Host Peer opened with ID:', id);
+          MP.players = [{
+            id: MP.myId,
+            name: MP.myName,
+            avatar: MP.myAvatar,
+            isHost: true,
+            isReady: true,
+            drinks: 0
+          }];
+          syncLocalStateWithMP();
+          openLobbyScreen();
+        });
+
+        MP.peer.on('connection', (conn) => {
+          MP.connections.push(conn);
+          conn.on('data', (data) => {
+            handleHostIncomingMessage(conn, data);
+          });
+          conn.on('close', () => {
+            MP.connections = MP.connections.filter(c => c !== conn);
+            MP.players = MP.players.filter(p => p.conn !== conn);
+            syncLocalStateWithMP();
+            broadcastRoomState();
+            renderLobbyPlayers();
+          });
+        });
+
+        MP.peer.on('error', (err) => {
+          console.error('Peer error:', err);
+          createMultiplayerRoom(); // retry with fresh room code
+        });
+      } catch (e) {
+        console.error('PeerJS init failed:', e);
+        alert('Could not start multiplayer. Please check your internet connection.');
+      }
+    }
+
+    function joinMultiplayerRoom() {
+      playClick();
+      const codeInput = document.getElementById('mp-join-code-input');
+      const nameInput = document.getElementById('mp-join-name-input');
+      const errEl = document.getElementById('mp-join-error');
+      const roomCode = codeInput.value.trim();
+      const playerName = nameInput.value.trim() || 'Player ' + MP.myAvatar;
+
+      if (!roomCode || roomCode.length < 4) {
+        errEl.innerText = '⚠️ Please enter a 4-digit Room Code!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      errEl.classList.add('hidden');
+
+      MP.myName = playerName;
+      MP.roomCode = roomCode;
+      MP.role = 'client';
+      MP.active = true;
+
+      const hostPeerId = `spark-v1-${roomCode}`;
+      try {
+        if (MP.peer) MP.peer.destroy();
+        MP.peer = new Peer({ debug: 1 });
+
+        MP.peer.on('open', () => {
+          const conn = MP.peer.connect(hostPeerId, { reliable: true });
+          MP.hostConn = conn;
+
+          conn.on('open', () => {
+            conn.send({
+              type: 'JOIN_REQUEST',
+              player: {
+                id: MP.myId,
+                name: MP.myName,
+                avatar: MP.myAvatar,
+                isHost: false,
+                isReady: true,
+                drinks: 0
+              }
+            });
+            openLobbyScreen();
+          });
+
+          conn.on('data', (data) => {
+            handleClientIncomingMessage(data);
+          });
+
+          conn.on('close', () => {
+            alert('Host disconnected from the room.');
+            leaveMultiplayerRoom();
+          });
+        });
+
+        MP.peer.on('error', (err) => {
+          errEl.innerText = '❌ Room ' + roomCode + ' not found or Host is offline!';
+          errEl.classList.remove('hidden');
+        });
+      } catch (e) {
+        errEl.innerText = '❌ Failed to connect to room.';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    function openLobbyScreen() {
+      navigate('lobby');
+      document.getElementById('lobby-room-code').innerText = MP.roomCode;
+      document.getElementById('lobby-mode-badge').innerText = `🔥 ${STATE.mode.toUpperCase()}`;
+
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getRoomInviteUrl())}`;
+      document.getElementById('lobby-qr-img').src = qrUrl;
+
+      if (MP.role === 'host') {
+        document.getElementById('lobby-host-controls').classList.remove('hidden');
+        document.getElementById('lobby-guest-controls').classList.add('hidden');
+      } else {
+        document.getElementById('lobby-host-controls').classList.add('hidden');
+        document.getElementById('lobby-guest-controls').classList.remove('hidden');
+      }
+
+      renderLobbyPlayers();
+    }
+
+    function getRoomInviteUrl() {
+      const base = window.location.origin + window.location.pathname;
+      return `${base}?join=${MP.roomCode}`;
+    }
+
+    function copyRoomLink() {
+      playClick();
+      const url = getRoomInviteUrl();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+      }
+      confetti({ particleCount: 30, spread: 50, origin: { y: 0.5 } });
+      alert(`Invite link copied to clipboard!\n\nRoom Code: ${MP.roomCode}\n${url}`);
+    }
+
+    function toggleLobbyQR() {
+      playClick();
+      const qrBox = document.getElementById('lobby-qr-container');
+      qrBox.classList.toggle('hidden');
+    }
+
+    function renderLobbyPlayers() {
+      const listEl = document.getElementById('lobby-players-list');
+      const countEl = document.getElementById('lobby-player-count');
+      const statusEl = document.getElementById('lobby-status-text');
+      const startBtn = document.getElementById('lobby-start-btn');
+
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      countEl.innerText = MP.players.length;
+
+      if (MP.players.length >= 2) {
+        statusEl.innerText = 'Squad is ready! 🚀';
+        statusEl.className = 'text-[11px] text-emerald-400 font-bold';
+        if (startBtn) {
+          startBtn.disabled = false;
+          startBtn.className = "w-full py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.5)] transition active:scale-95";
+        }
+      } else {
+        statusEl.innerText = 'Waiting for friends to join...';
+        statusEl.className = 'text-[11px] text-amber-400 font-medium';
+        if (startBtn && MP.role === 'host') {
+          startBtn.disabled = true;
+          startBtn.className = "w-full py-4 rounded-full bg-slate-700 text-slate-400 font-display font-black text-sm tracking-wider uppercase cursor-not-allowed transition";
+        }
+      }
+
+      MP.players.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-xl bg-white/[0.02]';
+        row.innerHTML = `
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-base">
+              ${p.avatar || '😎'}
+            </div>
+            <div>
+              <span class="text-xs font-bold text-white block leading-tight">${p.name}</span>
+              <span class="text-[9px] ${p.isHost ? 'text-amber-400 font-bold' : 'text-slate-400'}">${p.isHost ? '👑 Room Host' : 'Player ' + (idx + 1)}</span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[10px] text-emerald-400 font-bold">Ready</span>
+          </div>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+
+    function syncLocalStateWithMP() {
+      STATE.players = MP.players.map(p => ({
+        name: p.name,
+        avatar: p.avatar,
+        drinks: p.drinks || 0
+      }));
+      STATE.playerCount = STATE.players.length;
+      renderHomepageParticipants();
+    }
+
+    function handleHostIncomingMessage(conn, msg) {
+      console.log('Host received message:', msg);
+      if (msg.type === 'JOIN_REQUEST') {
+        const newPlayer = { ...msg.player, conn };
+        MP.players = MP.players.filter(p => p.id !== newPlayer.id);
+        MP.players.push(newPlayer);
+        syncLocalStateWithMP();
+        broadcastRoomState();
+        renderLobbyPlayers();
+        playSuccess();
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
+      } else if (msg.type === 'GAME_ACTION') {
+        handleRemoteGameAction(msg.action, msg.payload);
+        broadcastToClients(msg); // echo to other clients
+      }
+    }
+
+    function handleClientIncomingMessage(msg) {
+      console.log('Client received message:', msg);
+      if (msg.type === 'ROOM_STATE') {
+        MP.players = msg.players;
+        STATE.mode = msg.mode;
+        syncLocalStateWithMP();
+        renderLobbyPlayers();
+        if (msg.screen && msg.screen !== 'lobby' && msg.screen !== 'setup') {
+          navigate(msg.screen, false);
+        }
+      } else if (msg.type === 'START_GAME') {
+        STATE.selectedGame = msg.selectedGame;
+        navigate(msg.selectedGame, false);
+      } else if (msg.type === 'GAME_ACTION') {
+        handleRemoteGameAction(msg.action, msg.payload);
+      } else if (msg.type === 'EMOJI_BURST') {
+        renderFloatingEmoji(msg.emoji, msg.fromPlayer);
+      }
+    }
+
+    function broadcastRoomState() {
+      const stateMsg = {
+        type: 'ROOM_STATE',
+        players: MP.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, isHost: p.isHost, drinks: p.drinks })),
+        mode: STATE.mode,
+        screen: STATE.navigationStack[STATE.navigationStack.length - 1]
+      };
+      broadcastToClients(stateMsg);
+    }
+
+    function broadcastToClients(data) {
+      if (MP.role === 'host') {
+        MP.connections.forEach(conn => {
+          if (conn && conn.open) {
+            conn.send(data);
+          }
+        });
+      }
+    }
+
+    function startMultiplayerGame() {
+      if (MP.players.length < 2) {
+        alert('You need at least 2 players in the room to start!');
+        return;
+      }
+      playClick();
+      syncLocalStateWithMP();
+      const firstGame = 'dare-drink';
+      STATE.selectedGame = firstGame;
+      broadcastToClients({ type: 'START_GAME', selectedGame: firstGame });
+      navigate(firstGame);
+    }
+
+    function leaveMultiplayerRoom() {
+      playClick();
+      if (MP.peer) {
+        MP.peer.destroy();
+        MP.peer = null;
+      }
+      MP.active = false;
+      MP.role = 'local';
+      MP.connections = [];
+      MP.hostConn = null;
+      navigate('setup');
+      switchPlayMode('local');
+    }
+
+    function sendEmojiReaction(emoji) {
+      playClick();
+      renderFloatingEmoji(emoji, MP.myName || 'Me');
+      if (MP.active) {
+        if (MP.role === 'host') {
+          broadcastToClients({ type: 'EMOJI_BURST', emoji, fromPlayer: MP.myName });
+        } else if (MP.role === 'client' && MP.hostConn) {
+          MP.hostConn.send({ type: 'GAME_ACTION', action: 'emojiReaction', payload: { emoji, fromPlayer: MP.myName } });
+        }
+      }
+    }
+
+    function renderFloatingEmoji(emoji, senderName) {
+      const container = document.getElementById('floating-emoji-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      const startX = Math.random() * 70 + 15; // 15% to 85% width
+      el.className = 'fixed bottom-12 flex flex-col items-center pointer-events-none text-3xl animate-float-up z-50';
+      el.style.left = `${startX}%`;
+      el.innerHTML = `<span>${emoji}</span><span class="text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded-full mt-0.5">${senderName}</span>`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 2300);
+    }
+
+    function handleRemoteGameAction(action, payload) {
+      if (action === 'nextPrompt') {
+        STATE.promptIndex = payload.promptIndex;
+        renderMockupDrinkScreen();
+      } else if (action === 'spinBottle') {
+        spinTheBottle(false);
+      } else if (action === 'changeDrinks') {
+        STATE.totalDrinks = Math.max(0, STATE.totalDrinks + payload.delta);
+        const countEl = document.getElementById('mockup-drink-count');
+        if (countEl) countEl.innerText = STATE.totalDrinks;
+      } else if (action === 'todChoice') {
+        pickTruthOrDare(payload.choice, false);
+      } else if (action === 'emojiReaction') {
+        renderFloatingEmoji(payload.emoji, payload.fromPlayer);
+      }
+    }
+
     // Time ticker
     setInterval(() => {
       const d = new Date();
@@ -2031,6 +2663,16 @@
       selectInitialMode('extreme');
       renderHomepageParticipants();
       render1CardStage();
+
+      // Check URL search params for ?join=1234
+      const urlParams = new URLSearchParams(window.location.search);
+      const joinCode = urlParams.get('join');
+      if (joinCode) {
+        switchPlayMode('multiplayer');
+        switchMPSubTab('join');
+        const codeInput = document.getElementById('mp-join-code-input');
+        if (codeInput) codeInput.value = joinCode;
+      }
 
       // 🎉 Opening Confetti Celebration Blast!
       setTimeout(() => {
