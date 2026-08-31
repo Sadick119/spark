@@ -14,7 +14,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <!-- PeerJS for Realtime WebRTC Multiplayer -->
+  <!-- MQTT for Instant Bulletproof Realtime Room Syncing -->
+  <script src="https://unpkg.com/mqtt@5.3.5/dist/mqtt.min.js"></script>
+  <!-- PeerJS Fallback -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script>
     tailwind.config = {
@@ -514,14 +516,22 @@
       <!-- ================= SCREEN 2: 1-CARD-AT-A-TIME SWIPEABLE DECK ================= -->
       <div id="screen-carousel" class="screen flex-col justify-between p-6 pb-6 min-h-full">
         
-        <div class="flex justify-between items-end px-1 pt-1">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Swipe Left / Right</span>
-            <h2 class="text-2xl font-display font-black text-white">Game Deck</h2>
+        <div class="space-y-2 pt-1">
+          <div class="flex justify-between items-end px-1">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Swipe Left / Right</span>
+              <h2 class="text-2xl font-display font-black text-white">Game Deck</h2>
+            </div>
+            <span id="card-counter-badge" class="text-xs font-bold text-cyan-300 bg-cyan-950/60 border border-cyan-800/50 px-3 py-1 rounded-full">
+              1 of 5
+            </span>
           </div>
-          <span id="card-counter-badge" class="text-xs font-bold text-cyan-300 bg-cyan-950/60 border border-cyan-800/50 px-3 py-1 rounded-full">
-            1 of 5
-          </span>
+
+          <!-- Host Selection Banner in Multiplayer -->
+          <div id="carousel-mp-banner" class="hidden p-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/50 text-amber-300 text-xs font-black text-center shadow-[0_0_15px_rgba(255,140,0,0.25)] flex items-center justify-center space-x-1.5">
+            <span>👑</span>
+            <span>HOST: Pick any game below to launch for your squad!</span>
+          </div>
         </div>
 
         <!-- 1-CARD STAGE -->
@@ -1015,21 +1025,22 @@
           </div>
         </div>
 
-        <!-- Lobby Actions: Host can start, Guest sees waiting -->
+        <!-- Lobby Actions: Host can choose game or quick start, Guest sees waiting -->
         <div class="space-y-2 pt-2">
           <div id="lobby-host-controls" class="space-y-2">
-            <button onclick="startMultiplayerGame()" id="lobby-start-btn" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.5)] transition active:scale-95">
-              <span>Start Game with Squad 🚀</span>
+            <button onclick="goToChooseGame()" id="lobby-start-btn" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.5)] transition active:scale-95 flex items-center justify-center space-x-2">
+              <span>🎮 Choose Game to Play</span>
+              <span>&rarr;</span>
             </button>
-            <p class="text-[10px] text-center text-slate-400">Need at least 2 players in the room to launch.</p>
+            <p class="text-[10px] text-center text-slate-400">Host picks any party game & everyone plays together in real-time!</p>
           </div>
 
-          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.03] border border-cyan-500/30 space-y-2">
             <div class="flex items-center justify-center space-x-2">
               <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span class="text-xs font-bold text-cyan-300">Connected! Waiting for host to launch the game...</span>
+              <span id="lobby-guest-msg" class="text-xs font-bold text-cyan-300">Connected! Waiting for host to choose a game...</span>
             </div>
-            <p class="text-[11px] text-slate-400">Get your drinks ready! 🍺</p>
+            <p class="text-[11px] text-slate-400">Get your drinks and snacks ready! 🍺</p>
           </div>
 
           <button onclick="leaveMultiplayerRoom()" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-bold transition">
@@ -1326,6 +1337,16 @@
         if (screenName === 'carousel') {
           title.innerText = 'Game Deck';
           subtitle.innerText = '1 Card View';
+          const banner = document.getElementById('carousel-mp-banner');
+          if (banner) {
+            if (MP.active && MP.role === 'host') {
+              banner.classList.remove('hidden');
+              banner.classList.add('flex');
+            } else {
+              banner.classList.add('hidden');
+              banner.classList.remove('flex');
+            }
+          }
           render1CardStage();
         }
         if (screenName === 'participants') {
@@ -1916,18 +1937,24 @@
       }
     }
 
-    function completeDareAction() {
+    function completeDareAction(sync = true) {
       playSuccess();
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
-      nextPrompt();
+      if (sync && MP.active) {
+        MP.broadcast({ type: 'GAME_ACTION', action: 'completeDare' });
+      }
+      nextPrompt(sync);
     }
 
-    function forfeitDareAction() {
+    function forfeitDareAction(sync = true) {
       playBeep(200, 'sawtooth', 0.25);
-      changeDrinks(2);
+      changeDrinks(2, false);
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
-      nextPrompt();
+      if (sync && MP.active) {
+        MP.broadcast({ type: 'GAME_ACTION', action: 'forfeitDare' });
+      }
+      nextPrompt(sync);
     }
 
     function updateScrubberPosition() {
@@ -1954,11 +1981,7 @@
       }
 
       if (sync && MP.active) {
-        if (MP.role === 'host') {
-          broadcastToClients({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
-        } else if (MP.role === 'client' && MP.hostConn) {
-          MP.hostConn.send({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
-        }
+        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
       }
     }
 
@@ -1969,11 +1992,7 @@
       renderMockupDrinkScreen();
 
       if (MP.active) {
-        if (MP.role === 'host') {
-          broadcastToClients({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
-        } else if (MP.role === 'client' && MP.hostConn) {
-          MP.hostConn.send({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
-        }
+        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
       }
     }
 
@@ -1993,11 +2012,7 @@
       }
 
       if (sync && MP.active) {
-        if (MP.role === 'host') {
-          broadcastToClients({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
-        } else if (MP.role === 'client' && MP.hostConn) {
-          MP.hostConn.send({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
-        }
+        MP.broadcast({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
       }
     }
 
@@ -2034,7 +2049,7 @@
     /* -------------------------------------------------------------
        TRUTH OR DARE & SPIN THE BOTTLE ENGINES
     ------------------------------------------------------------- */
-    function pickTruthOrDare(type) {
+    function pickTruthOrDare(type, sync = true) {
       playClick();
       STATE.todState.type = type;
 
@@ -2047,6 +2062,10 @@
       const curPlayer = STATE.players[STATE.currentPlayerIndex].name || `Player ${STATE.currentPlayerIndex + 1}`;
       document.getElementById('tod-prompt-text').innerText = `"${randomPrompt}"`;
       document.getElementById('tod-challenge-title').innerText = `${curPlayer}'s ${type.toUpperCase()} Challenge`;
+
+      if (sync && MP.active) {
+        MP.broadcast({ type: 'GAME_ACTION', action: 'todChoice', payload: { choice: type } });
+      }
 
       startTodTimer();
     }
@@ -2175,13 +2194,17 @@
       ctx.restore();
     }
 
-    function spinTheBottle() {
+    function spinTheBottle(sync = true) {
       if (isSpinning) return;
       isSpinning = true;
       playClick();
       
       document.getElementById('spin-result-card').classList.add('hidden');
       bottleSpeed = 0.38 + Math.random() * 0.45;
+
+      if (sync && MP.active) {
+        MP.broadcast({ type: 'GAME_ACTION', action: 'spinBottle' });
+      }
       
       let lastBeep = 0;
       function animate() {
@@ -2252,19 +2275,146 @@
     }
 
     /* -------------------------------------------------------------
-       MULTIPLAYER ENGINE (PeerJS WebRTC Cross-Device Sync)
+       MULTIPLAYER ENGINE (Instant Realtime Room Sync & Cloud Broker)
     ------------------------------------------------------------- */
     const MP = {
       active: false,
       role: 'local', // 'local' | 'host' | 'client'
       roomCode: null,
-      peer: null,
-      hostConn: null,
-      connections: [],
       myId: 'player_' + Math.random().toString(36).substr(2, 6),
       myName: '',
       myAvatar: '😎',
-      players: []
+      players: [],
+      client: null,
+      channel: null,
+      connected: false,
+
+      initTransport(roomCode, onConnect) {
+        // 1. BroadcastChannel for local same-browser / multi-tab syncing
+        try {
+          if (MP.channel) MP.channel.close();
+          MP.channel = new BroadcastChannel('spark_room_' + roomCode);
+          MP.channel.onmessage = (e) => {
+            if (e.data && e.data.senderId !== MP.myId) {
+              MP.handleMessage(e.data);
+            }
+          };
+        } catch (e) {}
+
+        // 2. Global Cloud MQTT over WebSockets for cross-device syncing
+        try {
+          if (typeof mqtt !== 'undefined') {
+            if (MP.client) {
+              try { MP.client.end(true); } catch(e){}
+            }
+            
+            const clientId = 'spark_' + MP.myId;
+            const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
+            
+            MP.client = mqtt.connect(brokerUrl, {
+              clientId: clientId,
+              clean: true,
+              connectTimeout: 5000,
+              reconnectPeriod: 2000
+            });
+
+            const topic = `spark/v2/rooms/${roomCode}`;
+
+            MP.client.on('connect', () => {
+              console.log('⚡ Connected to Spark Room Cloud:', topic);
+              MP.connected = true;
+              MP.client.subscribe(topic + '/#', (err) => {
+                if (!err && onConnect) onConnect();
+              });
+            });
+
+            MP.client.on('message', (t, payload) => {
+              try {
+                const msg = JSON.parse(payload.toString());
+                if (msg && msg.senderId !== MP.myId) {
+                  MP.handleMessage(msg);
+                }
+              } catch(e) {}
+            });
+
+            MP.client.on('error', (err) => {
+              console.warn('MQTT Connection Notice:', err);
+            });
+          }
+        } catch(e) {
+          console.warn('Transport init notice:', e);
+        }
+      },
+
+      broadcast(msg) {
+        msg.senderId = MP.myId;
+        msg.roomCode = MP.roomCode;
+        msg.timestamp = Date.now();
+
+        // Broadcast locally
+        try {
+          if (MP.channel) MP.channel.postMessage(msg);
+        } catch (e) {}
+
+        // Broadcast to cloud
+        try {
+          if (MP.client && MP.client.connected) {
+            const topic = `spark/v2/rooms/${MP.roomCode}/events`;
+            MP.client.publish(topic, JSON.stringify(msg));
+          }
+        } catch (e) {}
+      },
+
+      handleMessage(msg) {
+        console.log('📩 Incoming Multiplayer Message:', msg);
+        if (!MP.active) return;
+
+        if (msg.type === 'JOIN_REQUEST') {
+          if (MP.role === 'host') {
+            const exists = MP.players.some(p => p.id === msg.player.id);
+            if (!exists) {
+              MP.players.push(msg.player);
+              syncLocalStateWithMP();
+              renderLobbyPlayers();
+              playSuccess();
+              confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+            }
+            // Host broadcasts updated roster to everyone
+            MP.broadcast({
+              type: 'ROOM_STATE',
+              players: MP.players,
+              mode: STATE.mode,
+              selectedGame: STATE.selectedGame
+            });
+          }
+        } else if (msg.type === 'ROOM_STATE') {
+          if (msg.players && Array.isArray(msg.players)) {
+            MP.players = msg.players;
+            STATE.mode = msg.mode || STATE.mode;
+            syncLocalStateWithMP();
+            renderLobbyPlayers();
+          }
+        } else if (msg.type === 'CHOOSING_GAME') {
+          const guestMsg = document.getElementById('lobby-guest-msg');
+          if (guestMsg) {
+            guestMsg.innerText = '👑 Host is picking a game from the deck...';
+          }
+        } else if (msg.type === 'START_GAME') {
+          STATE.selectedGame = msg.selectedGame;
+          STATE.mode = msg.mode || STATE.mode;
+          if (msg.players) {
+            MP.players = msg.players;
+            syncLocalStateWithMP();
+          }
+          playSuccess();
+          confetti({ particleCount: 45, spread: 60, origin: { y: 0.5 } });
+          navigate(msg.selectedGame, false);
+        } else if (msg.type === 'GAME_ACTION') {
+          handleRemoteGameAction(msg.action, msg.payload);
+        } else if (msg.type === 'EMOJI_BURST') {
+          renderFloatingEmoji(msg.emoji, msg.fromPlayer);
+        }
+      }
     };
 
     function switchPlayMode(mode) {
@@ -2333,51 +2483,31 @@
       MP.role = 'host';
       MP.active = true;
 
-      // Generate 4-digit code
+      // 1. Generate 4-digit code instantly
       const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
       MP.roomCode = roomCode;
 
-      const peerId = `spark-v1-${roomCode}`;
-      try {
-        if (MP.peer) MP.peer.destroy();
-        MP.peer = new Peer(peerId, { debug: 1 });
+      MP.players = [{
+        id: MP.myId,
+        name: MP.myName,
+        avatar: MP.myAvatar,
+        isHost: true,
+        drinks: 0
+      }];
 
-        MP.peer.on('open', (id) => {
-          console.log('Host Peer opened with ID:', id);
-          MP.players = [{
-            id: MP.myId,
-            name: MP.myName,
-            avatar: MP.myAvatar,
-            isHost: true,
-            isReady: true,
-            drinks: 0
-          }];
-          syncLocalStateWithMP();
-          openLobbyScreen();
-        });
+      // 2. Open lobby screen immediately (0ms delay)
+      openLobbyScreen();
+      syncLocalStateWithMP();
 
-        MP.peer.on('connection', (conn) => {
-          MP.connections.push(conn);
-          conn.on('data', (data) => {
-            handleHostIncomingMessage(conn, data);
-          });
-          conn.on('close', () => {
-            MP.connections = MP.connections.filter(c => c !== conn);
-            MP.players = MP.players.filter(p => p.conn !== conn);
-            syncLocalStateWithMP();
-            broadcastRoomState();
-            renderLobbyPlayers();
-          });
+      // 3. Connect real-time transport and broadcast room presence
+      MP.initTransport(roomCode, () => {
+        MP.broadcast({
+          type: 'ROOM_STATE',
+          players: MP.players,
+          mode: STATE.mode,
+          selectedGame: STATE.selectedGame
         });
-
-        MP.peer.on('error', (err) => {
-          console.error('Peer error:', err);
-          createMultiplayerRoom(); // retry with fresh room code
-        });
-      } catch (e) {
-        console.error('PeerJS init failed:', e);
-        alert('Could not start multiplayer. Please check your internet connection.');
-      }
+      });
     }
 
     function joinMultiplayerRoom() {
@@ -2400,57 +2530,58 @@
       MP.role = 'client';
       MP.active = true;
 
-      const hostPeerId = `spark-v1-${roomCode}`;
-      try {
-        if (MP.peer) MP.peer.destroy();
-        MP.peer = new Peer({ debug: 1 });
+      MP.players = [{
+        id: MP.myId,
+        name: MP.myName,
+        avatar: MP.myAvatar,
+        isHost: false,
+        drinks: 0
+      }];
 
-        MP.peer.on('open', () => {
-          const conn = MP.peer.connect(hostPeerId, { reliable: true });
-          MP.hostConn = conn;
+      // Open lobby screen immediately
+      openLobbyScreen();
 
-          conn.on('open', () => {
-            conn.send({
-              type: 'JOIN_REQUEST',
-              player: {
-                id: MP.myId,
-                name: MP.myName,
-                avatar: MP.myAvatar,
-                isHost: false,
-                isReady: true,
-                drinks: 0
-              }
-            });
-            openLobbyScreen();
-          });
+      // Connect transport and broadcast join
+      MP.initTransport(roomCode, () => {
+        const joinPayload = {
+          type: 'JOIN_REQUEST',
+          player: {
+            id: MP.myId,
+            name: MP.myName,
+            avatar: MP.myAvatar,
+            isHost: false,
+            drinks: 0
+          }
+        };
+        MP.broadcast(joinPayload);
+        setTimeout(() => MP.broadcast(joinPayload), 600);
+        setTimeout(() => MP.broadcast(joinPayload), 1500);
+      });
+    }
 
-          conn.on('data', (data) => {
-            handleClientIncomingMessage(data);
-          });
+    function goToChooseGame() {
+      playClick();
+      syncLocalStateWithMP();
+      MP.broadcast({ type: 'CHOOSING_GAME' });
+      navigate('carousel');
+    }
 
-          conn.on('close', () => {
-            alert('Host disconnected from the room.');
-            leaveMultiplayerRoom();
-          });
-        });
-
-        MP.peer.on('error', (err) => {
-          errEl.innerText = '❌ Room ' + roomCode + ' not found or Host is offline!';
-          errEl.classList.remove('hidden');
-        });
-      } catch (e) {
-        errEl.innerText = '❌ Failed to connect to room.';
-        errEl.classList.remove('hidden');
-      }
+    function startMultiplayerGame() {
+      goToChooseGame();
     }
 
     function openLobbyScreen() {
       navigate('lobby');
-      document.getElementById('lobby-room-code').innerText = MP.roomCode;
-      document.getElementById('lobby-mode-badge').innerText = `🔥 ${STATE.mode.toUpperCase()}`;
+      const codeEl = document.getElementById('lobby-room-code');
+      if (codeEl) codeEl.innerText = MP.roomCode;
 
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getRoomInviteUrl())}`;
-      document.getElementById('lobby-qr-img').src = qrUrl;
+      const modeBadge = document.getElementById('lobby-mode-badge');
+      if (modeBadge) modeBadge.innerText = `🔥 ${STATE.mode.toUpperCase()}`;
+
+      const qrImg = document.getElementById('lobby-qr-img');
+      if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getRoomInviteUrl())}`;
+      }
 
       if (MP.role === 'host') {
         document.getElementById('lobby-host-controls').classList.remove('hidden');
@@ -2458,6 +2589,8 @@
       } else {
         document.getElementById('lobby-host-controls').classList.add('hidden');
         document.getElementById('lobby-guest-controls').classList.remove('hidden');
+        const guestMsg = document.getElementById('lobby-guest-msg');
+        if (guestMsg) guestMsg.innerText = 'Connected! Waiting for host to choose a game...';
       }
 
       renderLobbyPlayers();
@@ -2488,7 +2621,6 @@
       const listEl = document.getElementById('lobby-players-list');
       const countEl = document.getElementById('lobby-player-count');
       const statusEl = document.getElementById('lobby-status-text');
-      const startBtn = document.getElementById('lobby-start-btn');
 
       if (!listEl) return;
       listEl.innerHTML = '';
@@ -2497,33 +2629,25 @@
       if (MP.players.length >= 2) {
         statusEl.innerText = 'Squad is ready! 🚀';
         statusEl.className = 'text-[11px] text-emerald-400 font-bold';
-        if (startBtn) {
-          startBtn.disabled = false;
-          startBtn.className = "w-full py-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.5)] transition active:scale-95";
-        }
       } else {
         statusEl.innerText = 'Waiting for friends to join...';
         statusEl.className = 'text-[11px] text-amber-400 font-medium';
-        if (startBtn && MP.role === 'host') {
-          startBtn.disabled = true;
-          startBtn.className = "w-full py-4 rounded-full bg-slate-700 text-slate-400 font-display font-black text-sm tracking-wider uppercase cursor-not-allowed transition";
-        }
       }
 
       MP.players.forEach((p, idx) => {
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-2 rounded-xl bg-white/[0.02]';
+        row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5';
         row.innerHTML = `
           <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-base">
+            <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-lg shadow">
               ${p.avatar || '😎'}
             </div>
             <div>
               <span class="text-xs font-bold text-white block leading-tight">${p.name}</span>
-              <span class="text-[9px] ${p.isHost ? 'text-amber-400 font-bold' : 'text-slate-400'}">${p.isHost ? '👑 Room Host' : 'Player ' + (idx + 1)}</span>
+              <span class="text-[9px] ${p.isHost ? 'text-amber-400 font-black uppercase' : 'text-slate-400'}">${p.isHost ? '👑 Room Host' : 'Player ' + (idx + 1)}</span>
             </div>
           </div>
-          <div class="flex items-center space-x-1.5">
+          <div class="flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-400/30 px-2 py-1 rounded-full">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-[10px] text-emerald-400 font-bold">Ready</span>
           </div>
@@ -2542,86 +2666,18 @@
       renderHomepageParticipants();
     }
 
-    function handleHostIncomingMessage(conn, msg) {
-      console.log('Host received message:', msg);
-      if (msg.type === 'JOIN_REQUEST') {
-        const newPlayer = { ...msg.player, conn };
-        MP.players = MP.players.filter(p => p.id !== newPlayer.id);
-        MP.players.push(newPlayer);
-        syncLocalStateWithMP();
-        broadcastRoomState();
-        renderLobbyPlayers();
-        playSuccess();
-        confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
-      } else if (msg.type === 'GAME_ACTION') {
-        handleRemoteGameAction(msg.action, msg.payload);
-        broadcastToClients(msg); // echo to other clients
-      }
-    }
-
-    function handleClientIncomingMessage(msg) {
-      console.log('Client received message:', msg);
-      if (msg.type === 'ROOM_STATE') {
-        MP.players = msg.players;
-        STATE.mode = msg.mode;
-        syncLocalStateWithMP();
-        renderLobbyPlayers();
-        if (msg.screen && msg.screen !== 'lobby' && msg.screen !== 'setup') {
-          navigate(msg.screen, false);
-        }
-      } else if (msg.type === 'START_GAME') {
-        STATE.selectedGame = msg.selectedGame;
-        navigate(msg.selectedGame, false);
-      } else if (msg.type === 'GAME_ACTION') {
-        handleRemoteGameAction(msg.action, msg.payload);
-      } else if (msg.type === 'EMOJI_BURST') {
-        renderFloatingEmoji(msg.emoji, msg.fromPlayer);
-      }
-    }
-
-    function broadcastRoomState() {
-      const stateMsg = {
-        type: 'ROOM_STATE',
-        players: MP.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, isHost: p.isHost, drinks: p.drinks })),
-        mode: STATE.mode,
-        screen: STATE.navigationStack[STATE.navigationStack.length - 1]
-      };
-      broadcastToClients(stateMsg);
-    }
-
-    function broadcastToClients(data) {
-      if (MP.role === 'host') {
-        MP.connections.forEach(conn => {
-          if (conn && conn.open) {
-            conn.send(data);
-          }
-        });
-      }
-    }
-
-    function startMultiplayerGame() {
-      if (MP.players.length < 2) {
-        alert('You need at least 2 players in the room to start!');
-        return;
-      }
-      playClick();
-      syncLocalStateWithMP();
-      const firstGame = 'dare-drink';
-      STATE.selectedGame = firstGame;
-      broadcastToClients({ type: 'START_GAME', selectedGame: firstGame });
-      navigate(firstGame);
-    }
-
     function leaveMultiplayerRoom() {
       playClick();
-      if (MP.peer) {
-        MP.peer.destroy();
-        MP.peer = null;
+      if (MP.client) {
+        try { MP.client.end(true); } catch(e){}
+        MP.client = null;
+      }
+      if (MP.channel) {
+        try { MP.channel.close(); } catch(e){}
+        MP.channel = null;
       }
       MP.active = false;
       MP.role = 'local';
-      MP.connections = [];
-      MP.hostConn = null;
       navigate('setup');
       switchPlayMode('local');
     }
@@ -2630,11 +2686,7 @@
       playClick();
       renderFloatingEmoji(emoji, MP.myName || 'Me');
       if (MP.active) {
-        if (MP.role === 'host') {
-          broadcastToClients({ type: 'EMOJI_BURST', emoji, fromPlayer: MP.myName });
-        } else if (MP.role === 'client' && MP.hostConn) {
-          MP.hostConn.send({ type: 'GAME_ACTION', action: 'emojiReaction', payload: { emoji, fromPlayer: MP.myName } });
-        }
+        MP.broadcast({ type: 'EMOJI_BURST', emoji, fromPlayer: MP.myName });
       }
     }
 
@@ -2654,16 +2706,18 @@
       if (action === 'nextPrompt') {
         STATE.promptIndex = payload.promptIndex;
         renderMockupDrinkScreen();
+      } else if (action === 'completeDare') {
+        completeDareAction(false);
+      } else if (action === 'forfeitDare') {
+        forfeitDareAction(false);
       } else if (action === 'spinBottle') {
         spinTheBottle(false);
       } else if (action === 'changeDrinks') {
         STATE.totalDrinks = Math.max(0, STATE.totalDrinks + payload.delta);
-        const countEl = document.getElementById('mockup-drink-count');
+        const countEl = document.getElementById('drink-counter');
         if (countEl) countEl.innerText = STATE.totalDrinks;
       } else if (action === 'todChoice') {
         pickTruthOrDare(payload.choice, false);
-      } else if (action === 'emojiReaction') {
-        renderFloatingEmoji(payload.emoji, payload.fromPlayer);
       }
     }
 
