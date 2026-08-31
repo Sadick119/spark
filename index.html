@@ -1033,9 +1033,15 @@
 
         <!-- Lobby Actions: Host can choose game or quick start, Guest sees waiting -->
         <div class="space-y-2 pt-2">
+          <!-- HOST CONTROLS -->
           <div id="lobby-host-controls" class="space-y-2.5">
+            <button onclick="selectGame('dare-drink')" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.6)] transition active:scale-95 flex items-center justify-center space-x-2 animate-pulse">
+              <span>🚀 START GAME FOR SQUAD</span>
+              <span>&rarr;</span>
+            </button>
+
             <div class="space-y-1.5">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block px-1">Tap a Game to Launch for Squad:</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block px-1">Or Pick Specific Game:</span>
               <div class="grid grid-cols-2 gap-2">
                 <button onclick="selectGame('dare-drink')" class="p-2.5 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">🍺</span>
@@ -1071,18 +1077,31 @@
               </div>
             </div>
 
-            <button onclick="goToChooseGame()" id="lobby-start-btn" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,140,0,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
+            <button onclick="goToChooseGame()" id="lobby-start-btn" class="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-display font-bold text-xs tracking-wider uppercase transition active:scale-95 flex items-center justify-center space-x-2">
               <span>View Full 3D Game Deck 🃏</span>
               <span>&rarr;</span>
             </button>
           </div>
 
-          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.03] border border-cyan-500/30 space-y-2">
-            <div class="flex items-center justify-center space-x-2">
-              <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span id="lobby-guest-msg" class="text-xs font-bold text-cyan-300">Connected! Waiting for host to choose a game...</span>
+          <!-- GUEST CONTROLS -->
+          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.04] border border-cyan-500/40 space-y-3 shadow-[0_0_25px_rgba(0,240,255,0.15)]">
+            <div class="space-y-1">
+              <div class="flex items-center justify-center space-x-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="lobby-guest-msg" class="text-xs font-black text-emerald-400 uppercase tracking-wider">Connected to Room!</span>
+              </div>
+              <p class="text-[11px] text-slate-300">Tap below to signal you are ready for the Host to start:</p>
             </div>
-            <p class="text-[11px] text-slate-400">Get your drinks and snacks ready! 🍺</p>
+
+            <button id="guest-ready-btn" onclick="toggleGuestReadyState()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
+              <span>⚡ I'M READY! (WAIT FOR HOST)</span>
+              <span>⏳</span>
+            </button>
+
+            <div id="guest-waiting-indicator" class="hidden flex items-center justify-center space-x-2 py-1 text-xs text-amber-300 font-bold animate-pulse">
+              <span>👑 Host will start the game in seconds...</span>
+              <span>🍺</span>
+            </div>
           </div>
 
           <button onclick="leaveMultiplayerRoom()" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-bold transition">
@@ -2337,7 +2356,7 @@
     }
 
     /* -------------------------------------------------------------
-       MULTIPLAYER ENGINE (Instant Realtime Room Sync & Cloud Broker)
+       MULTIPLAYER ENGINE (Multi-Layer HTTPS + SSE + MQTT Cloud Sync)
     ------------------------------------------------------------- */
     const MP = {
       active: false,
@@ -2346,16 +2365,23 @@
       myId: 'player_' + Math.random().toString(36).substr(2, 6),
       myName: '',
       myAvatar: '😎',
+      isReady: false,
       players: [],
       client: null,
       channel: null,
+      eventSource: null,
+      pollInterval: null,
       connected: false,
+      processedMsgIds: new Set(),
 
       initTransport(roomCode, onConnect) {
-        // 1. BroadcastChannel for local same-browser / multi-tab syncing
+        const cleanCode = roomCode.toString().trim();
+        MP.roomCode = cleanCode;
+
+        // 1. BroadcastChannel (Instant for same-device/multi-tab testing)
         try {
           if (MP.channel) MP.channel.close();
-          MP.channel = new BroadcastChannel('spark_room_' + roomCode);
+          MP.channel = new BroadcastChannel('spark_room_' + cleanCode);
           MP.channel.onmessage = (e) => {
             if (e.data && e.data.senderId !== MP.myId) {
               MP.handleMessage(e.data);
@@ -2363,43 +2389,72 @@
           };
         } catch (e) {}
 
-        // 2. Global Cloud MQTT over WebSockets for cross-device syncing
+        // 2. HTTPS EventSource (Server-Sent Events) over Port 443 (Zero firewall block)
+        try {
+          if (MP.eventSource) {
+            try { MP.eventSource.close(); } catch(e){}
+          }
+          const sseUrl = `https://ntfy.sh/spark_party_room_${cleanCode}/sse`;
+          MP.eventSource = new EventSource(sseUrl);
+          MP.eventSource.onmessage = (e) => {
+            try {
+              const parsed = JSON.parse(e.data);
+              if (parsed && parsed.event === 'message' && parsed.message) {
+                const msg = JSON.parse(parsed.message);
+                if (msg && msg.senderId !== MP.myId) {
+                  MP.handleMessage(msg);
+                }
+              }
+            } catch(err) {}
+          };
+        } catch(e) {}
+
+        // 3. Fast HTTPS Active Poller (Every 750ms while in room)
+        if (MP.pollInterval) clearInterval(MP.pollInterval);
+        MP.pollInterval = setInterval(async () => {
+          if (!MP.active || !MP.roomCode) return;
+          try {
+            const res = await fetch(`https://ntfy.sh/spark_party_room_${cleanCode}/json?poll=1&since=10s`, { cache: 'no-store' });
+            if (res.ok) {
+              const text = await res.text();
+              const lines = text.trim().split('\n');
+              for (const line of lines) {
+                if (!line) continue;
+                const item = JSON.parse(line);
+                if (item.event === 'message' && item.message && item.id) {
+                  if (MP.processedMsgIds.has(item.id)) continue;
+                  MP.processedMsgIds.add(item.id);
+                  if (MP.processedMsgIds.size > 200) MP.processedMsgIds.clear();
+                  const msg = JSON.parse(item.message);
+                  if (msg && msg.senderId !== MP.myId) {
+                    MP.handleMessage(msg);
+                  }
+                }
+              }
+            }
+          } catch(e) {}
+        }, 750);
+
+        // 4. MQTT WebSockets as parallel real-time accelerator
         try {
           if (typeof mqtt !== 'undefined') {
             if (MP.client) {
               try { MP.client.end(true); } catch(e){}
             }
-            
             const clientId = 'spark_' + MP.myId + '_' + Math.floor(Math.random()*1000);
-            const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
-            
-            MP.client = mqtt.connect(brokerUrl, {
+            MP.client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
               clientId: clientId,
               clean: true,
-              connectTimeout: 7000,
+              connectTimeout: 6000,
               reconnectPeriod: 2000
             });
-
-            const cleanCode = roomCode.toString().trim();
             const topic = `spark/v2/rooms/${cleanCode}`;
-
             MP.client.on('connect', () => {
-              console.log('⚡ Connected to Spark Room Cloud:', topic);
               MP.connected = true;
               MP.client.subscribe(topic + '/#', (err) => {
-                if (!err) {
-                  // Flush queued outbox messages
-                  while (MP.outbox && MP.outbox.length > 0) {
-                    const queuedMsg = MP.outbox.shift();
-                    try {
-                      MP.client.publish(topic + '/events', JSON.stringify(queuedMsg));
-                    } catch(e) {}
-                  }
-                  if (onConnect) onConnect();
-                }
+                if (!err && onConnect) onConnect();
               });
             });
-
             MP.client.on('message', (t, payload) => {
               try {
                 const msg = JSON.parse(payload.toString());
@@ -2408,41 +2463,44 @@
                 }
               } catch(e) {}
             });
-
-            MP.client.on('error', (err) => {
-              console.warn('MQTT Connection Notice:', err);
-            });
           }
-        } catch(e) {
-          console.warn('Transport init notice:', e);
-        }
+        } catch(e) {}
+
+        if (onConnect) onConnect();
       },
 
-      outbox: [],
       broadcast(msg) {
         msg.senderId = MP.myId;
-        msg.roomCode = MP.roomCode.toString().trim();
+        msg.roomCode = (MP.roomCode || '').toString().trim();
         msg.timestamp = Date.now();
+        msg.msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
 
-        // 1. Broadcast locally for multi-tab testing
+        // 1. BroadcastChannel
         try {
           if (MP.channel) MP.channel.postMessage(msg);
         } catch (e) {}
 
-        // 2. Broadcast to cloud MQTT
+        // 2. HTTPS Cloud Pub/Sub
+        try {
+          if (msg.roomCode) {
+            fetch(`https://ntfy.sh/spark_party_room_${msg.roomCode}`, {
+              method: 'POST',
+              headers: { 'Title': msg.type || 'SPARK_EVENT' },
+              body: JSON.stringify(msg)
+            }).catch(() => {});
+          }
+        } catch (e) {}
+
+        // 3. MQTT WebSockets
         try {
           if (MP.client && MP.client.connected) {
-            const topic = `spark/v2/rooms/${msg.roomCode}/events`;
-            MP.client.publish(topic, JSON.stringify(msg));
-          } else {
-            if (!MP.outbox) MP.outbox = [];
-            MP.outbox.push(msg);
+            MP.client.publish(`spark/v2/rooms/${msg.roomCode}/events`, JSON.stringify(msg));
           }
         } catch (e) {}
       },
 
       handleMessage(msg) {
-        console.log('📩 Incoming Multiplayer Message:', msg);
+        console.log('📩 Received Multiplayer Event:', msg.type, msg);
         if (!MP.active) return;
 
         if (msg.type === 'JOIN_REQUEST') {
@@ -2455,7 +2513,7 @@
               playSuccess();
               confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
             }
-            // Host immediately sends ROOM_STATE back so new guest and existing guests are synced
+            // Host responds with ROOM_STATE so guest gets complete squad list
             const stateMsg = {
               type: 'ROOM_STATE',
               players: MP.players,
@@ -2464,6 +2522,31 @@
             };
             MP.broadcast(stateMsg);
             setTimeout(() => MP.broadcast(stateMsg), 400);
+          }
+        } else if (msg.type === 'PLAYER_READY') {
+          const targetPlayer = MP.players.find(p => p.id === msg.playerId);
+          if (targetPlayer) {
+            targetPlayer.isReady = msg.isReady;
+          } else if (msg.playerId) {
+            MP.players.push({
+              id: msg.playerId,
+              name: msg.name || 'Player',
+              avatar: msg.avatar || '😎',
+              isHost: false,
+              isReady: msg.isReady,
+              drinks: 0
+            });
+          }
+          syncLocalStateWithMP();
+          renderLobbyPlayers();
+
+          if (MP.role === 'host') {
+            MP.broadcast({
+              type: 'ROOM_STATE',
+              players: MP.players,
+              mode: STATE.mode,
+              selectedGame: STATE.selectedGame
+            });
           }
         } else if (msg.type === 'ROOM_STATE') {
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
@@ -2478,7 +2561,7 @@
             guestMsg.innerText = '👑 Host is picking a game from the deck...';
           }
         } else if (msg.type === 'START_GAME') {
-          console.log('🚀 Received START_GAME broadcast from Host:', msg);
+          console.log('🚀 Received START_GAME broadcast from Host! Launching:', msg.selectedGame);
           STATE.selectedGame = msg.selectedGame;
           STATE.mode = msg.mode || STATE.mode;
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
@@ -2486,7 +2569,7 @@
             syncLocalStateWithMP();
           }
           playSuccess();
-          confetti({ particleCount: 45, spread: 60, origin: { y: 0.5 } });
+          confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
           navigate(msg.selectedGame, false);
         } else if (msg.type === 'GAME_ACTION') {
           handleRemoteGameAction(msg.action, msg.payload);
@@ -2495,6 +2578,47 @@
         }
       }
     };
+
+    function toggleGuestReadyState() {
+      playClick();
+      MP.isReady = !MP.isReady;
+      
+      const btn = document.getElementById('guest-ready-btn');
+      const indicator = document.getElementById('guest-waiting-indicator');
+
+      if (MP.isReady) {
+        playSuccess();
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
+        if (btn) {
+          btn.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-300 hover:to-green-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_25px_rgba(16,185,129,0.5)] transition active:scale-95 flex items-center justify-center space-x-2";
+          btn.innerHTML = `<span>✅ YOU'RE READY! (WAITING FOR HOST)</span><span>🚀</span>`;
+        }
+        if (indicator) indicator.classList.remove('hidden');
+      } else {
+        if (btn) {
+          btn.className = "w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2";
+          btn.innerHTML = `<span>⚡ I'M READY! (WAIT FOR HOST)</span><span>⏳</span>`;
+        }
+        if (indicator) indicator.classList.add('hidden');
+      }
+
+      // Mark myself as ready in player list
+      const me = MP.players.find(p => p.id === MP.myId);
+      if (me) me.isReady = MP.isReady;
+      renderLobbyPlayers();
+
+      // Broadcast ready state to host and room
+      const readyPayload = {
+        type: 'PLAYER_READY',
+        playerId: MP.myId,
+        name: MP.myName,
+        avatar: MP.myAvatar,
+        isReady: MP.isReady
+      };
+      MP.broadcast(readyPayload);
+      setTimeout(() => MP.broadcast(readyPayload), 400);
+      setTimeout(() => MP.broadcast(readyPayload), 1000);
+    }
 
     function switchPlayMode(mode) {
       playClick();
@@ -2727,6 +2851,14 @@
       }
 
       MP.players.forEach((p, idx) => {
+        const isReady = p.isHost || p.isReady;
+        const badgeHtml = p.isHost 
+          ? `<div class="flex items-center space-x-1.5 bg-amber-500/15 border border-amber-400/40 px-2.5 py-1 rounded-full"><span class="text-xs">👑</span><span class="text-[10px] text-amber-300 font-black">HOST</span></div>`
+          : (isReady 
+              ? `<div class="flex items-center space-x-1.5 bg-emerald-500/15 border border-emerald-400/40 px-2.5 py-1 rounded-full"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-[10px] text-emerald-400 font-bold">READY ✅</span></div>`
+              : `<div class="flex items-center space-x-1.5 bg-cyan-500/10 border border-cyan-400/30 px-2.5 py-1 rounded-full"><span class="w-2 h-2 rounded-full bg-cyan-400"></span><span class="text-[10px] text-cyan-400 font-semibold">JOINED</span></div>`
+            );
+
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5';
         row.innerHTML = `
@@ -2739,10 +2871,7 @@
               <span class="text-[9px] ${p.isHost ? 'text-amber-400 font-black uppercase' : 'text-slate-400'}">${p.isHost ? '👑 Room Host' : 'Player ' + (idx + 1)}</span>
             </div>
           </div>
-          <div class="flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-400/30 px-2 py-1 rounded-full">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[10px] text-emerald-400 font-bold">Ready</span>
-          </div>
+          ${badgeHtml}
         `;
         listEl.appendChild(row);
       });
@@ -2760,6 +2889,14 @@
 
     function leaveMultiplayerRoom() {
       playClick();
+      if (MP.pollInterval) {
+        clearInterval(MP.pollInterval);
+        MP.pollInterval = null;
+      }
+      if (MP.eventSource) {
+        try { MP.eventSource.close(); } catch(e){}
+        MP.eventSource = null;
+      }
       if (MP.client) {
         try { MP.client.end(true); } catch(e){}
         MP.client = null;
@@ -2769,6 +2906,7 @@
         MP.channel = null;
       }
       MP.active = false;
+      MP.isReady = false;
       MP.role = 'local';
       navigate('setup');
       switchPlayMode('local');
