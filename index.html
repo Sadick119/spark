@@ -48,67 +48,65 @@
       animation: floatUp 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
 
-    /* ================= 1. DARE OR DRINK EXACT MOCKUP REPLICA VIBE ================= */
+    /* ================= 1. DARE OR DRINK NEW SLEEK CARD STYLES ================= */
     .mockup-drink-bg {
-      background: radial-gradient(circle at 50% 15%, #220B20 0%, #120516 45%, #050208 100%);
+      background: radial-gradient(circle at 50% 20%, #2A0F25 0%, #140518 50%, #06010A 100%);
       position: relative;
       overflow: hidden;
     }
 
-    /* Ambient party laser beams in background */
-    .mockup-drink-bg::before {
-      content: "";
-      position: absolute;
-      top: -20%;
-      left: -10%;
-      width: 120%;
-      height: 140%;
-      background: 
-        linear-gradient(135deg, transparent 40%, rgba(225, 29, 72, 0.12) 50%, transparent 60%),
-        linear-gradient(45deg, transparent 40%, rgba(147, 51, 234, 0.12) 50%, transparent 60%),
-        linear-gradient(115deg, transparent 45%, rgba(245, 158, 11, 0.08) 50%, transparent 55%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Stacked card shadow layers */
-    .mockup-stacked-deck {
+    .spark-card-deck {
       position: relative;
       z-index: 10;
     }
-    .mockup-card-back-2 {
+
+    .spark-card-layer-2 {
       position: absolute;
-      top: -12px;
-      left: 14px;
-      right: 14px;
+      top: -14px;
+      left: 16px;
+      right: 16px;
       height: 100%;
-      background: rgba(35, 15, 28, 0.6);
-      border: 1.5px solid rgba(245, 158, 11, 0.25);
-      border-radius: 28px;
+      background: rgba(45, 15, 38, 0.5);
+      border: 1.5px solid rgba(255, 140, 0, 0.25);
+      border-radius: 34px;
+      transform: scale(0.93);
       z-index: 1;
-      transform: scale(0.94);
     }
-    .mockup-card-back-1 {
+
+    .spark-card-layer-1 {
       position: absolute;
-      top: -6px;
-      left: 7px;
-      right: 7px;
+      top: -7px;
+      left: 8px;
+      right: 8px;
       height: 100%;
-      background: rgba(30, 12, 24, 0.8);
-      border: 1.5px solid rgba(245, 158, 11, 0.45);
-      border-radius: 28px;
-      z-index: 2;
+      background: rgba(35, 12, 30, 0.75);
+      border: 1.5px solid rgba(255, 140, 0, 0.45);
+      border-radius: 34px;
       transform: scale(0.97);
+      z-index: 2;
     }
-    .mockup-card-main {
+
+    .spark-card-main-glass {
       position: relative;
-      background: rgba(22, 9, 20, 0.95);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 2px solid #FF8C00;
-      box-shadow: 0 0 35px rgba(255, 140, 0, 0.35), inset 0 0 20px rgba(255, 140, 0, 0.12);
-      border-radius: 28px;
+      background: linear-gradient(165deg, rgba(30, 10, 26, 0.95) 0%, rgba(12, 3, 14, 0.98) 100%);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 2px solid #FF9900;
+      box-shadow: 0 0 45px rgba(255, 153, 0, 0.35), inset 0 0 25px rgba(255, 153, 0, 0.15);
+      border-radius: 32px;
       z-index: 3;
+    }
+
+    .btn-action-complete {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border: 1.5px solid #34D399;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-action-drink {
+      background: linear-gradient(135deg, #FF8C00 0%, #EA580C 100%);
+      border: 1.5px solid #FDBA74;
+      box-shadow: 0 0 25px rgba(255, 140, 0, 0.45);
     }
 
     /* Buttons from mockup */
@@ -532,27 +530,29 @@
           <div id="card-stage" class="card-stage">
             
             <!-- Card 0: Dare or Drink (Featured) -->
-            <div id="hero-card-0" onclick="selectGame('dare-drink')" class="game-hero-card mockup-card-main overflow-hidden flex flex-col justify-between p-6">
-              <img src="assets/drink_dare_screen_1787610340317.jpg" class="absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none" alt="Dare or Drink">
-              <div class="absolute inset-0 bg-gradient-to-t from-[#120516] via-transparent to-black/50"></div>
+            <div id="hero-card-0" onclick="selectGame('dare-drink')" class="game-hero-card spark-card-main-glass overflow-hidden flex flex-col justify-between p-6 cursor-pointer">
+              <div class="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-transparent to-rose-950/40 pointer-events-none"></div>
 
               <div class="relative z-10 flex justify-between items-center">
-                <span class="px-3 py-1 rounded-full bg-amber-500/25 border border-amber-400/60 text-[10px] font-black text-amber-300 uppercase tracking-wider shadow">
-                  DARE OR DRINK 🍺
+                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] font-black text-black uppercase tracking-wider shadow-[0_0_15px_rgba(255,140,0,0.5)]">
+                  🍺 DARE OR DRINK
                 </span>
-                <button onclick="openGameRules(event, 'dare-drink')" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 border border-white/25 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
+                <button onclick="openGameRules(event, 'dare-drink')" class="px-2.5 py-1 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-xs flex items-center space-x-1 transition z-30" title="View Game Rules">
                   <span>📖</span>
                   <span>Rules</span>
                 </button>
               </div>
 
               <div class="relative z-10 space-y-2">
-                <h3 class="text-3xl font-display font-black text-white tracking-tight drop-shadow">Dare or Drink</h3>
-                <p class="text-xs text-slate-200 leading-relaxed drop-shadow">The exact glowing amber card interface with live drinks counter, reaction avatars, and spice switcher.</p>
+                <div class="flex items-center space-x-2">
+                  <span class="text-3xl">🔥</span>
+                  <h3 class="text-3xl font-display font-black text-white tracking-tight">Dare or Drink</h3>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">Face thrilling spicy dares or drink the penalty sips! Features live drink tally, streak counters, and multiplayer reaction bursts.</p>
                 
-                <div class="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
-                  <span class="text-amber-200 font-bold">2-20 Players</span>
-                  <span class="font-black text-black bg-amber-400 px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-1">
+                <div class="pt-3 border-t border-white/15 flex items-center justify-between text-xs">
+                  <span class="text-amber-300 font-black">2-20 Players</span>
+                  <span class="font-black text-black bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(255,140,0,0.5)] flex items-center space-x-1">
                     <span>Play Now</span>
                     <span>&rarr;</span>
                   </span>
@@ -737,124 +737,118 @@
       </div>
 
 
-      <!-- ================= SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA OF THE GENERATED CARD) ================= -->
+      <!-- ================= SCREEN 7: DARE OR DRINK (NEW SLEEK CARD DESIGN) ================= -->
       <div id="screen-dare-drink" class="screen mockup-drink-bg flex-col justify-between p-5 pb-5 min-h-full">
         
-        <!-- Top Neon Header: DARE or DRINK 🍺 / NEVER HAVE I EVER (Exact Mockup Match) -->
-        <div class="text-center pt-1 z-20 space-y-0.5">
-          <div class="font-display font-black text-2xl tracking-wide drop-shadow-[0_0_15px_rgba(157,0,255,0.7)] flex items-center justify-center space-x-2">
-            <span class="text-[#B975FF]">DARE</span>
-            <span class="font-serif italic font-normal text-slate-300 text-lg">or</span>
-            <span class="text-[#FF2A6D] drop-shadow-[0_0_12px_rgba(255,42,109,0.8)]">DRINK</span>
-            <span>🍺</span>
+        <!-- Top Turn & Category Bar -->
+        <div class="flex items-center justify-between z-20 pt-1">
+          <!-- Active Player Pill -->
+          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 shadow-[0_0_15px_rgba(255,140,0,0.25)]">
+            <span id="dod-player-avatar" class="text-base">👩</span>
+            <span id="dod-player-turn" class="text-xs font-black text-amber-300 uppercase tracking-wide">Sarah's Turn</span>
           </div>
-          <h3 class="font-display font-bold text-xs tracking-widest text-[#FF7A8A] uppercase">
-            NEVER HAVE I EVER
-          </h3>
+
+          <!-- Mode / Spice Pill -->
+          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-950/70 border border-red-500/50 text-[10px] font-black text-red-400 uppercase tracking-widest shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+            <span>🔥</span>
+            <span id="dod-mode-badge">EXTREME DARE</span>
+          </div>
         </div>
 
-        <!-- Center Stacked Amber Card with Layers (Exact Mockup Match) -->
-        <div class="mockup-stacked-deck my-auto py-2 w-full max-w-[340px] mx-auto">
-          <!-- Back layer 2 -->
-          <div class="mockup-card-back-2"></div>
-          <!-- Back layer 1 -->
-          <div class="mockup-card-back-1"></div>
+        <!-- Center 3D Holographic Card Deck -->
+        <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
+          <!-- Shadow Layers for Depth -->
+          <div class="spark-card-layer-2"></div>
+          <div class="spark-card-layer-1"></div>
 
-          <!-- Main Card Front -->
-          <div id="mockup-card-main-body" class="mockup-card-main p-5 flex flex-col justify-between text-center space-y-3.5">
+          <!-- Main Glass Card Front -->
+          <div id="mockup-card-main-body" class="spark-card-main-glass p-5 flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
             
-            <!-- Card Header inside box -->
-            <span id="dod-question-label" class="text-xs font-semibold text-slate-400">Never Have I Ever...</span>
+            <!-- Card Header: Card Number + Flame Icon -->
+            <div class="flex items-center justify-between text-xs font-bold text-slate-400 pb-1 border-b border-white/10">
+              <div class="flex items-center space-x-1 text-amber-400">
+                <span>⚡</span>
+                <span id="dod-card-num" class="text-[11px] font-black tracking-wider uppercase">Dare #1 of 25</span>
+              </div>
+              <div class="flex items-center space-x-1 text-rose-400 text-[10px] font-black uppercase">
+                <span>⭐⭐⭐</span>
+                <span>Spicy</span>
+              </div>
+            </div>
 
-            <!-- Main Big Question Text -->
-            <div class="py-1 min-h-[72px] flex items-center justify-center">
-              <p id="dod-prompt-text" class="text-xl font-display font-extrabold text-white leading-tight">
-                been caught sneaking out of a early
+            <!-- Big Impact Challenge Prompt Text -->
+            <div class="py-2 min-h-[90px] flex items-center justify-center">
+              <p id="dod-prompt-text" class="text-xl font-display font-extrabold text-white leading-snug drop-shadow-md">
+                "Text your ex or recent crush: 'I still think about that night...' with zero explanation!"
               </p>
             </div>
 
-            <!-- "Take 1 Drink if you did! 🍺" Red Text -->
-            <div id="dod-penalty-callout" class="font-extrabold text-sm text-[#FF4D6D] drop-shadow-[0_0_10px_rgba(255,77,109,0.5)]">
-              Take 1 Drink if you did! 🍺
+            <!-- Penalty Glow Badge -->
+            <div class="p-2.5 rounded-2xl bg-gradient-to-r from-red-950/80 via-amber-950/60 to-red-950/80 border border-amber-400/40 text-xs font-black text-amber-300 flex items-center justify-center space-x-2 shadow-[0_0_15px_rgba(255,140,0,0.2)]">
+              <span>🍺</span>
+              <span>PENALTY: TAKE 2 SIPS IF FORFEITED</span>
+              <span>🔥</span>
             </div>
 
-            <!-- DRINKS TAKEN: [ - 🍺 ] [ 3 ] [ + 🍺 ] (Exact Mockup Match) -->
-            <div class="space-y-1 pt-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">DRINKS TAKEN:</span>
-              <div class="flex items-center justify-center space-x-3">
-                <!-- Minus Drink Button -->
-                <button onclick="changeDrinks(-1)" class="w-16 h-12 rounded-2xl bg-[#2D1220] border border-[#FF3366]/50 hover:border-[#FF3366] text-amber-300 font-black text-sm flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(255,51,102,0.25)] transition active:scale-90">
-                  <span>-</span>
-                  <span>🍺</span>
-                </button>
-                
-                <!-- Center Big Number Box -->
-                <div id="drink-counter-box" class="w-20 h-12 rounded-2xl bg-[#1C0D1C] border border-[#FF9900]/70 text-[#FFB703] font-display font-black text-3xl flex items-center justify-center shadow-[0_0_20px_rgba(255,153,0,0.35)]">
-                  <span id="drink-counter">3</span>
-                </div>
+            <!-- Action Decision Buttons: [ Completed ✅ ] vs [ Forfeit 🍺 ] -->
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+              <button onclick="completeDareAction()" class="py-3 rounded-2xl btn-action-complete text-slate-950 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+                <span>I Did It!</span>
+                <img src="https://emojicdn.elk.sh/✅?style=apple" class="w-4 h-4 apple-emoji" alt="Done">
+              </button>
 
-                <!-- Plus Drink Button -->
-                <button onclick="changeDrinks(1)" class="w-16 h-12 rounded-2xl bg-[#2D1220] border border-[#FF3366]/50 hover:border-[#FF3366] text-amber-300 font-black text-sm flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(255,51,102,0.25)] transition active:scale-90">
-                  <span>+</span>
-                  <span>🍺</span>
-                </button>
-              </div>
+              <button onclick="forfeitDareAction()" class="py-3 rounded-2xl btn-action-drink text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+                <span>Drink! (+2 🍺)</span>
+                <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-4 h-4 apple-emoji" alt="Drink">
+              </button>
             </div>
 
-            <!-- Player Reactions Section: Sarah 🎉, Mike 🤫, Jess 🔥 (Exact Mockup Match) -->
-            <div class="space-y-1.5 pt-1">
-              <span class="text-[10px] font-bold text-slate-400">Player Reactions</span>
-              <div id="mockup-reactions-row" class="flex justify-center items-center space-x-4">
-                <!-- Dynamically filled with typed players or Sarah, Mike, Jess -->
+            <!-- Player Reactions Row -->
+            <div class="space-y-1 pt-1 border-t border-white/10">
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 px-1">
+                <span>Squad Reactions</span>
+                <span>Tap avatar to cheer 🍻</span>
               </div>
-
-              <!-- Little Scrubber Track from Mockup: |<< ━━━━━●━━━━━━━━━ >>| -->
-              <div class="flex items-center space-x-2 pt-2 px-1 text-slate-500">
-                <button onclick="prevPrompt()" class="text-[11px] font-bold hover:text-white transition">|&lt;&lt;</button>
-                <div class="flex-1 mockup-scrubber-track">
-                  <div id="scrubber-fill" class="mockup-scrubber-fill"></div>
-                  <div id="scrubber-thumb" class="mockup-scrubber-thumb"></div>
-                </div>
-                <button onclick="nextPrompt()" class="text-[11px] font-bold hover:text-white transition">&gt;&gt;|</button>
+              <div id="mockup-reactions-row" class="flex justify-center items-center space-x-3.5 pt-1">
+                <!-- Dynamically populated with player avatars -->
               </div>
             </div>
 
           </div>
         </div>
 
-        <!-- Bottom Actions & Spice Level (Exact Mockup Match) -->
-        <div class="space-y-3 z-20 w-full max-w-[340px] mx-auto">
-          <!-- Next Card ➡️ & Skip ⏭️ Button Pair -->
-          <div class="grid grid-cols-5 gap-2.5">
-            <button onclick="nextPrompt()" class="col-span-3 py-3.5 rounded-2xl btn-mockup-next text-white font-display font-extrabold text-sm tracking-wide flex items-center justify-center space-x-2 transition active:scale-95">
+        <!-- Bottom Controls & Drink Counter -->
+        <div class="space-y-2.5 z-20 w-full max-w-[345px] mx-auto">
+          
+          <!-- Drink Tally & Scrubber -->
+          <div class="p-2.5 rounded-2xl bg-black/70 border border-white/10 flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Party Drinks:</span>
+              <div class="flex items-center space-x-1 bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded-lg text-amber-300 font-black">
+                <span>🍺</span>
+                <span id="drink-counter">3</span>
+              </div>
+            </div>
+
+            <!-- Stepper -->
+            <div class="flex items-center space-x-1.5">
+              <button onclick="changeDrinks(-1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center active:scale-90 transition">-</button>
+              <button onclick="changeDrinks(1)" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center active:scale-90 transition">+</button>
+            </div>
+          </div>
+
+          <!-- Next Card & Skip Buttons -->
+          <div class="grid grid-cols-5 gap-2">
+            <button onclick="nextPrompt()" class="col-span-3 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(239,68,68,0.4)] transition active:scale-95">
               <span>Next Card</span>
               <span>➡️</span>
             </button>
-            <button onclick="skipPrompt()" class="col-span-2 py-3.5 rounded-2xl btn-mockup-skip text-slate-300 font-display font-extrabold text-sm tracking-wide flex items-center justify-center space-x-1.5 transition active:scale-95">
+            <button onclick="skipPrompt()" class="col-span-2 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-slate-300 font-display font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95">
               <span>Skip</span>
               <span>⏭️</span>
             </button>
           </div>
 
-          <!-- Spice Level Capsule Selector from Mockup: [ (○) Classic | EXTREME 🔥 | Wild ] -->
-          <div class="space-y-1 text-center">
-            <span class="text-[11px] font-semibold text-slate-400">Spice Level:</span>
-            <div class="p-1 rounded-full bg-black/70 border border-white/15 flex items-center justify-between text-xs font-bold text-slate-400">
-              <button onclick="setSpiceMode('chill')" id="spice-btn-chill" class="flex items-center space-x-1 px-3 py-1 rounded-full transition">
-                <span id="spice-thumb-classic" class="w-3.5 h-3.5 rounded-full bg-slate-600 inline-block"></span>
-                <span>Classic</span>
-              </button>
-
-              <button onclick="setSpiceMode('extreme')" id="spice-btn-extreme" class="px-3.5 py-1 rounded-full bg-red-950/80 border border-red-500 text-red-300 font-black shadow-[0_0_12px_rgba(239,68,68,0.5)] transition">
-                <span>EXTREME</span>
-                <span>🔥</span>
-              </button>
-
-              <button onclick="setSpiceMode('spicy')" id="spice-btn-wild" class="px-3 py-1 rounded-full text-slate-400 hover:text-white transition">
-                <span>Wild</span>
-              </button>
-            </div>
-          </div>
         </div>
 
       </div>
@@ -1871,46 +1865,69 @@
        SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA ENGINE)
     ------------------------------------------------------------- */
     function renderMockupDrinkScreen() {
-      // 1. Render Current Prompt
       const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
       const prompt = list[STATE.promptIndex % list.length];
-      document.getElementById('dod-prompt-text').innerText = `"${prompt}"`;
+      
+      const promptEl = document.getElementById('dod-prompt-text');
+      if (promptEl) promptEl.innerText = `"${prompt}"`;
 
-      // 2. Render Drink Count
-      document.getElementById('drink-counter').innerText = STATE.totalDrinks;
+      const curPlayer = STATE.players[STATE.currentPlayerIndex % STATE.players.length] || { name: 'Player', avatar: '👩' };
+      const avatarEl = document.getElementById('dod-player-avatar');
+      const turnEl = document.getElementById('dod-player-turn');
+      const cardNumEl = document.getElementById('dod-card-num');
+      const modeBadge = document.getElementById('dod-mode-badge');
+      const drinkEl = document.getElementById('drink-counter');
 
-      // 3. Render Reactions Row matching mockup (Sarah, Mike, Jess or typed players)
+      if (avatarEl) avatarEl.innerText = curPlayer.avatar || '👩';
+      if (turnEl) turnEl.innerText = `${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
+      if (cardNumEl) cardNumEl.innerText = `Dare #${(STATE.promptIndex % list.length) + 1} of ${list.length}`;
+      if (modeBadge) modeBadge.innerText = `${STATE.mode.toUpperCase()} DARE`;
+      if (drinkEl) drinkEl.innerText = STATE.totalDrinks;
+
+      // Render Reactions Row
       const reactionsRow = document.getElementById('mockup-reactions-row');
-      reactionsRow.innerHTML = '';
+      if (reactionsRow) {
+        reactionsRow.innerHTML = '';
+        const emojis = ['🔥', '😂', '💀', '👀', '🍺'];
+        const ringBorders = ['border-[#FF9900]', 'border-[#A855F7]', 'border-[#00F0FF]', 'border-[#F43F5E]'];
 
-      const emojis = ['👍', '😆', '😍', '🔥', '🎉'];
-      const ringBorders = ['border-[#A855F7]', 'border-[#F59E0B]', 'border-[#F43F5E]'];
+        STATE.players.slice(0, 4).forEach((p, idx) => {
+          const borderClass = ringBorders[idx % ringBorders.length];
+          const emoji = emojis[idx % emojis.length];
 
-      STATE.players.slice(0, 3).forEach((p, idx) => {
-        const borderClass = ringBorders[idx % ringBorders.length];
-        const emoji = emojis[idx % emojis.length];
-
-        const chip = document.createElement('div');
-        chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
-        chip.innerHTML = `
-          <div class="relative">
-            <div class="w-11 h-11 rounded-full bg-black/60 border-2 ${borderClass} shadow-[0_0_12px_rgba(255,255,255,0.25)] flex items-center justify-center text-lg">
-              ${getAppleEmojiImg(p.avatar, 'w-6 h-6')}
+          const chip = document.createElement('div');
+          chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
+          chip.innerHTML = `
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full bg-black/60 border-2 ${borderClass} shadow-[0_0_12px_rgba(255,140,0,0.3)] flex items-center justify-center text-base">
+                ${getAppleEmojiImg(p.avatar, 'w-5 h-5')}
+              </div>
+              <span class="absolute -top-1 -right-1 text-xs">${emoji}</span>
             </div>
-            <span class="absolute -top-1 -right-1 text-xs">${emoji}</span>
-          </div>
-          <span class="text-[10px] font-bold text-slate-200 mt-0.5">${p.name || 'Player'} ${emoji}</span>
-        `;
-        chip.onclick = () => {
-          playBeep(350, 'sine', 0.1);
-          changeDrinks(1);
-          confetti({ particleCount: 15, spread: 35, origin: { y: 0.7 } });
-        };
-        reactionsRow.appendChild(chip);
-      });
+            <span class="text-[9px] font-bold text-slate-300 max-w-[46px] truncate">${p.name || 'Player'}</span>
+          `;
+          chip.onclick = () => {
+            playBeep(350, 'sine', 0.1);
+            changeDrinks(1);
+            confetti({ particleCount: 15, spread: 35, origin: { y: 0.7 } });
+          };
+          reactionsRow.appendChild(chip);
+        });
+      }
+    }
 
-      // 4. Update Scrubber Track position
-      updateScrubberPosition();
+    function completeDareAction() {
+      playSuccess();
+      confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      nextPrompt();
+    }
+
+    function forfeitDareAction() {
+      playBeep(200, 'sawtooth', 0.25);
+      changeDrinks(2);
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      nextPrompt();
     }
 
     function updateScrubberPosition() {
