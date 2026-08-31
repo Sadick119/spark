@@ -1738,18 +1738,25 @@
       STATE.promptIndex = 0;
 
       if (MP.active) {
+        MP.gameStarted = true;
+        MP.selectedGame = gameId;
         syncLocalStateWithMP();
         const startMsg = {
           type: 'START_GAME',
           selectedGame: gameId,
+          status: 'playing',
+          gameStarted: true,
           mode: STATE.mode,
-          players: MP.players
+          players: MP.players,
+          promptIndex: STATE.promptIndex,
+          totalDrinks: STATE.totalDrinks
         };
-        // Broadcast START_GAME with bursts to ensure all connected devices transition to the game
+        // Broadcast START_GAME with multiple bursts to ensure all connected devices transition immediately
         MP.broadcast(startMsg);
-        setTimeout(() => MP.broadcast(startMsg), 300);
-        setTimeout(() => MP.broadcast(startMsg), 800);
-        setTimeout(() => MP.broadcast(startMsg), 1800);
+        setTimeout(() => MP.broadcast(startMsg), 250);
+        setTimeout(() => MP.broadcast(startMsg), 700);
+        setTimeout(() => MP.broadcast(startMsg), 1500);
+        setTimeout(() => MP.broadcast(startMsg), 3000);
       }
       
       confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
@@ -1967,13 +1974,22 @@
        SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA ENGINE)
     ------------------------------------------------------------- */
     function renderMockupDrinkScreen() {
+      if (!STATE.players || STATE.players.length === 0) {
+        if (MP.players && MP.players.length > 0) {
+          STATE.players = MP.players.map(p => ({ name: p.name, avatar: p.avatar, drinks: p.drinks || 0 }));
+        } else {
+          STATE.players = [{ name: MP.myName || 'Player 1', avatar: MP.myAvatar || '😎', drinks: 0 }];
+        }
+      }
+
       const list = DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme;
       const prompt = list[STATE.promptIndex % list.length];
       
       const promptEl = document.getElementById('dod-prompt-text');
       if (promptEl) promptEl.innerText = `"${prompt}"`;
 
-      const curPlayer = STATE.players[STATE.currentPlayerIndex % STATE.players.length] || { name: 'Player', avatar: '👩' };
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player', avatar: '👩' };
       const avatarEl = document.getElementById('dod-player-avatar');
       const turnEl = document.getElementById('dod-player-turn');
       const cardNumEl = document.getElementById('dod-card-num');
@@ -2518,7 +2534,11 @@
               type: 'ROOM_STATE',
               players: MP.players,
               mode: STATE.mode,
-              selectedGame: STATE.selectedGame
+              selectedGame: STATE.selectedGame,
+              status: MP.gameStarted ? 'playing' : 'lobby',
+              gameStarted: MP.gameStarted || false,
+              promptIndex: STATE.promptIndex,
+              totalDrinks: STATE.totalDrinks
             };
             MP.broadcast(stateMsg);
             setTimeout(() => MP.broadcast(stateMsg), 400);
@@ -2545,7 +2565,9 @@
               type: 'ROOM_STATE',
               players: MP.players,
               mode: STATE.mode,
-              selectedGame: STATE.selectedGame
+              selectedGame: STATE.selectedGame,
+              status: MP.gameStarted ? 'playing' : 'lobby',
+              gameStarted: MP.gameStarted || false
             });
           }
         } else if (msg.type === 'ROOM_STATE') {
@@ -2555,6 +2577,14 @@
             syncLocalStateWithMP();
             renderLobbyPlayers();
           }
+          if (msg.status === 'playing' || msg.gameStarted) {
+            MP.gameStarted = true;
+            const gameToLaunch = msg.selectedGame || 'dare-drink';
+            STATE.selectedGame = gameToLaunch;
+            if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
+            if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
+            navigate(gameToLaunch, false);
+          }
         } else if (msg.type === 'CHOOSING_GAME') {
           const guestMsg = document.getElementById('lobby-guest-msg');
           if (guestMsg) {
@@ -2562,15 +2592,19 @@
           }
         } else if (msg.type === 'START_GAME') {
           console.log('🚀 Received START_GAME broadcast from Host! Launching:', msg.selectedGame);
-          STATE.selectedGame = msg.selectedGame;
+          MP.gameStarted = true;
+          const gameToLaunch = msg.selectedGame || 'dare-drink';
+          STATE.selectedGame = gameToLaunch;
           STATE.mode = msg.mode || STATE.mode;
+          if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
+          if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
             syncLocalStateWithMP();
           }
           playSuccess();
           confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
-          navigate(msg.selectedGame, false);
+          navigate(gameToLaunch, false);
         } else if (msg.type === 'GAME_ACTION') {
           handleRemoteGameAction(msg.action, msg.payload);
         } else if (msg.type === 'EMOJI_BURST') {
