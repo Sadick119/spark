@@ -2372,7 +2372,7 @@
     }
 
     /* -------------------------------------------------------------
-       MULTIPLAYER ENGINE (Multi-Layer HTTPS + SSE + MQTT Cloud Sync)
+       MULTIPLAYER ENGINE (Direct WebRTC P2P + MQTT Cloud Real-Time)
     ------------------------------------------------------------- */
     const MP = {
       active: false,
@@ -2383,18 +2383,21 @@
       myAvatar: '😎',
       isReady: false,
       players: [],
+      peer: null,
+      connections: [],
+      hostConn: null,
       client: null,
       channel: null,
-      eventSource: null,
-      pollInterval: null,
       connected: false,
-      processedMsgIds: new Set(),
+      gameStarted: false,
 
       initTransport(roomCode, onConnect) {
         const cleanCode = roomCode.toString().trim();
         MP.roomCode = cleanCode;
+        MP.connections = [];
+        MP.hostConn = null;
 
-        // 1. BroadcastChannel (Instant for same-device/multi-tab testing)
+        // 1. BroadcastChannel (Instant for multi-tab and same-device testing)
         try {
           if (MP.channel) MP.channel.close();
           MP.channel = new BroadcastChannel('spark_room_' + cleanCode);
@@ -2405,53 +2408,118 @@
           };
         } catch (e) {}
 
-        // 2. HTTPS EventSource (Server-Sent Events) over Port 443 (Zero firewall block)
+        // 2. Direct WebRTC P2P DataChannels (Ultra-fast phone-to-phone realtime connection)
         try {
-          if (MP.eventSource) {
-            try { MP.eventSource.close(); } catch(e){}
-          }
-          const sseUrl = `https://ntfy.sh/spark_party_room_${cleanCode}/sse`;
-          MP.eventSource = new EventSource(sseUrl);
-          MP.eventSource.onmessage = (e) => {
-            try {
-              const parsed = JSON.parse(e.data);
-              if (parsed && parsed.event === 'message' && parsed.message) {
-                const msg = JSON.parse(parsed.message);
-                if (msg && msg.senderId !== MP.myId) {
-                  MP.handleMessage(msg);
-                }
-              }
-            } catch(err) {}
-          };
-        } catch(e) {}
-
-        // 3. Fast HTTPS Active Poller (Every 750ms while in room)
-        if (MP.pollInterval) clearInterval(MP.pollInterval);
-        MP.pollInterval = setInterval(async () => {
-          if (!MP.active || !MP.roomCode) return;
-          try {
-            const res = await fetch(`https://ntfy.sh/spark_party_room_${cleanCode}/json?poll=1&since=10s`, { cache: 'no-store' });
-            if (res.ok) {
-              const text = await res.text();
-              const lines = text.trim().split('\n');
-              for (const line of lines) {
-                if (!line) continue;
-                const item = JSON.parse(line);
-                if (item.event === 'message' && item.message && item.id) {
-                  if (MP.processedMsgIds.has(item.id)) continue;
-                  MP.processedMsgIds.add(item.id);
-                  if (MP.processedMsgIds.size > 200) MP.processedMsgIds.clear();
-                  const msg = JSON.parse(item.message);
-                  if (msg && msg.senderId !== MP.myId) {
-                    MP.handleMessage(msg);
-                  }
-                }
-              }
+          if (typeof Peer !== 'undefined') {
+            if (MP.peer) {
+              try { MP.peer.destroy(); } catch(e){}
             }
-          } catch(e) {}
-        }, 750);
 
-        // 4. MQTT WebSockets as parallel real-time accelerator
+            const peerConfig = {
+              debug: 1,
+              config: {
+                iceServers: [
+                  { urls: 'stun:stun.l.google.com:19302' },
+                  { urls: 'stun:stun1.l.google.com:19302' },
+                  { urls: 'stun:stun2.l.google.com:19302' },
+                  { urls: 'stun:stun3.l.google.com:19302' },
+                  { urls: 'stun:stun4.l.google.com:19302' }
+                ]
+              }
+            };
+
+            if (MP.role === 'host') {
+              MP.peer = new Peer('spark_party_' + cleanCode, peerConfig);
+              MP.peer.on('open', (id) => {
+                console.log('👑 Host WebRTC Room Active:', id);
+                MP.connected = true;
+                if (onConnect) onConnect();
+              });
+
+              MP.peer.on('connection', (conn) => {
+                console.log('🤝 Guest connected to Host WebRTC:', conn.peer);
+                MP.connections.push(conn);
+
+                conn.on('data', (data) => {
+                  if (typeof data === 'string') {
+                    try { data = JSON.parse(data); } catch(e){}
+                  }
+                  if (data && data.senderId !== MP.myId) {
+                    MP.handleMessage(data);
+                    // Host re-broadcasts guest messages to all other guests
+                    MP.connections.forEach(c => {
+                      if (c !== conn && c.open) {
+                        try { c.send(data); } catch(e){}
+                      }
+                    });
+                  }
+                });
+
+                conn.on('open', () => {
+                  // Immediately synchronize state to new guest
+                  const statePayload = {
+                    type: 'ROOM_STATE',
+                    senderId: MP.myId,
+                    players: MP.players,
+                    mode: STATE.mode,
+                    selectedGame: STATE.selectedGame,
+                    status: MP.gameStarted ? 'playing' : 'lobby',
+                    gameStarted: MP.gameStarted || false,
+                    promptIndex: STATE.promptIndex,
+                    totalDrinks: STATE.totalDrinks
+                  };
+                  try { conn.send(statePayload); } catch(e){}
+                });
+              });
+
+              MP.peer.on('error', (err) => console.warn('Host Peer Notice:', err));
+            } else {
+              // Guest Mode
+              MP.peer = new Peer(peerConfig);
+              MP.peer.on('open', (myPeerId) => {
+                const hostPeerId = 'spark_party_' + cleanCode;
+                console.log('📱 Guest WebRTC Ready, connecting to host:', hostPeerId);
+                const conn = MP.peer.connect(hostPeerId, { reliable: true });
+                MP.hostConn = conn;
+
+                conn.on('open', () => {
+                  console.log('⚡ Connected to Host via WebRTC DataChannel!');
+                  MP.connected = true;
+                  const joinPayload = {
+                    type: 'JOIN_REQUEST',
+                    senderId: MP.myId,
+                    player: {
+                      id: MP.myId,
+                      name: MP.myName,
+                      avatar: MP.myAvatar,
+                      isHost: false,
+                      drinks: 0
+                    }
+                  };
+                  try { conn.send(joinPayload); } catch(e){}
+                  if (onConnect) onConnect();
+                });
+
+                conn.on('data', (data) => {
+                  if (typeof data === 'string') {
+                    try { data = JSON.parse(data); } catch(e){}
+                  }
+                  if (data && data.senderId !== MP.myId) {
+                    MP.handleMessage(data);
+                  }
+                });
+
+                conn.on('error', (err) => console.warn('Guest Conn Notice:', err));
+              });
+
+              MP.peer.on('error', (err) => console.warn('Guest Peer Notice:', err));
+            }
+          }
+        } catch(e) {
+          console.warn('WebRTC init error:', e);
+        }
+
+        // 3. MQTT WebSockets as parallel cloud accelerator
         try {
           if (typeof mqtt !== 'undefined') {
             if (MP.client) {
@@ -2464,9 +2532,8 @@
               connectTimeout: 6000,
               reconnectPeriod: 2000
             });
-            const topic = `spark/v2/rooms/${cleanCode}`;
+            const topic = `spark/v3/rooms/${cleanCode}`;
             MP.client.on('connect', () => {
-              MP.connected = true;
               MP.client.subscribe(topic + '/#', (err) => {
                 if (!err && onConnect) onConnect();
               });
@@ -2491,26 +2558,28 @@
         msg.timestamp = Date.now();
         msg.msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
 
-        // 1. BroadcastChannel
+        // 1. BroadcastChannel (Same Device / Multi-Tab)
         try {
           if (MP.channel) MP.channel.postMessage(msg);
         } catch (e) {}
 
-        // 2. HTTPS Cloud Pub/Sub
+        // 2. Direct WebRTC DataChannels
         try {
-          if (msg.roomCode) {
-            fetch(`https://ntfy.sh/spark_party_room_${msg.roomCode}`, {
-              method: 'POST',
-              headers: { 'Title': msg.type || 'SPARK_EVENT' },
-              body: JSON.stringify(msg)
-            }).catch(() => {});
+          if (MP.role === 'host') {
+            MP.connections.forEach(conn => {
+              if (conn && conn.open) {
+                try { conn.send(msg); } catch(e){}
+              }
+            });
+          } else if (MP.hostConn && MP.hostConn.open) {
+            try { MP.hostConn.send(msg); } catch(e){}
           }
         } catch (e) {}
 
-        // 3. MQTT WebSockets
+        // 3. MQTT WebSockets Cloud Broadcast
         try {
           if (MP.client && MP.client.connected) {
-            MP.client.publish(`spark/v2/rooms/${msg.roomCode}/events`, JSON.stringify(msg));
+            MP.client.publish(`spark/v3/rooms/${msg.roomCode}/events`, JSON.stringify(msg));
           }
         } catch (e) {}
       },
@@ -2529,7 +2598,7 @@
               playSuccess();
               confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
             }
-            // Host responds with ROOM_STATE so guest gets complete squad list
+            // Host sends full room state
             const stateMsg = {
               type: 'ROOM_STATE',
               players: MP.players,
@@ -2541,7 +2610,6 @@
               totalDrinks: STATE.totalDrinks
             };
             MP.broadcast(stateMsg);
-            setTimeout(() => MP.broadcast(stateMsg), 400);
           }
         } else if (msg.type === 'PLAYER_READY') {
           const targetPlayer = MP.players.find(p => p.id === msg.playerId);
@@ -2923,14 +2991,12 @@
 
     function leaveMultiplayerRoom() {
       playClick();
-      if (MP.pollInterval) {
-        clearInterval(MP.pollInterval);
-        MP.pollInterval = null;
+      if (MP.peer) {
+        try { MP.peer.destroy(); } catch(e){}
+        MP.peer = null;
       }
-      if (MP.eventSource) {
-        try { MP.eventSource.close(); } catch(e){}
-        MP.eventSource = null;
-      }
+      MP.connections = [];
+      MP.hostConn = null;
       if (MP.client) {
         try { MP.client.end(true); } catch(e){}
         MP.client = null;
@@ -2941,6 +3007,7 @@
       }
       MP.active = false;
       MP.isReady = false;
+      MP.gameStarted = false;
       MP.role = 'local';
       navigate('setup');
       switchPlayMode('local');
