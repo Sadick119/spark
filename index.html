@@ -1338,7 +1338,12 @@
       playClick();
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       
-      const target = document.getElementById(`screen-${screenName}`);
+      let actualScreen = screenName;
+      if (screenName === 'never-ever' || screenName === 'double-dare') {
+        actualScreen = 'dare-drink';
+      }
+
+      const target = document.getElementById(`screen-${actualScreen}`);
       if (target) target.classList.add('active');
 
       const backBtn = document.getElementById('header-back-btn');
@@ -1395,9 +1400,9 @@
           title.innerText = 'Participants';
           subtitle.innerText = 'Type Names';
         }
-        if (screenName === 'dare-drink') {
-          title.innerText = 'Dare or Drink';
-          subtitle.innerText = 'Mockup Match 1:1';
+        if (screenName === 'dare-drink' || screenName === 'never-ever' || screenName === 'double-dare') {
+          title.innerText = screenName === 'never-ever' ? 'Never Have I Ever' : (screenName === 'double-dare' ? 'Double Dare' : 'Dare or Drink');
+          subtitle.innerText = 'Party Night';
           renderMockupDrinkScreen();
         }
         if (screenName === 'truth-dare') {
@@ -1712,6 +1717,21 @@
       STATE.selectedGame = gameId;
       STATE.currentPlayerIndex = 0;
       STATE.promptIndex = 0;
+
+      if (MP.active) {
+        syncLocalStateWithMP();
+        const startMsg = {
+          type: 'START_GAME',
+          selectedGame: gameId,
+          mode: STATE.mode,
+          players: MP.players
+        };
+        // Broadcast START_GAME with bursts to ensure all connected devices transition to the game
+        MP.broadcast(startMsg);
+        setTimeout(() => MP.broadcast(startMsg), 300);
+        setTimeout(() => MP.broadcast(startMsg), 800);
+        setTimeout(() => MP.broadcast(startMsg), 1800);
+      }
       
       confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
       navigate(gameId);
@@ -2350,23 +2370,33 @@
               try { MP.client.end(true); } catch(e){}
             }
             
-            const clientId = 'spark_' + MP.myId;
+            const clientId = 'spark_' + MP.myId + '_' + Math.floor(Math.random()*1000);
             const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
             
             MP.client = mqtt.connect(brokerUrl, {
               clientId: clientId,
               clean: true,
-              connectTimeout: 5000,
+              connectTimeout: 7000,
               reconnectPeriod: 2000
             });
 
-            const topic = `spark/v2/rooms/${roomCode}`;
+            const cleanCode = roomCode.toString().trim();
+            const topic = `spark/v2/rooms/${cleanCode}`;
 
             MP.client.on('connect', () => {
               console.log('⚡ Connected to Spark Room Cloud:', topic);
               MP.connected = true;
               MP.client.subscribe(topic + '/#', (err) => {
-                if (!err && onConnect) onConnect();
+                if (!err) {
+                  // Flush queued outbox messages
+                  while (MP.outbox && MP.outbox.length > 0) {
+                    const queuedMsg = MP.outbox.shift();
+                    try {
+                      MP.client.publish(topic + '/events', JSON.stringify(queuedMsg));
+                    } catch(e) {}
+                  }
+                  if (onConnect) onConnect();
+                }
               });
             });
 
@@ -2388,21 +2418,25 @@
         }
       },
 
+      outbox: [],
       broadcast(msg) {
         msg.senderId = MP.myId;
-        msg.roomCode = MP.roomCode;
+        msg.roomCode = MP.roomCode.toString().trim();
         msg.timestamp = Date.now();
 
-        // Broadcast locally
+        // 1. Broadcast locally for multi-tab testing
         try {
           if (MP.channel) MP.channel.postMessage(msg);
         } catch (e) {}
 
-        // Broadcast to cloud
+        // 2. Broadcast to cloud MQTT
         try {
           if (MP.client && MP.client.connected) {
-            const topic = `spark/v2/rooms/${MP.roomCode}/events`;
+            const topic = `spark/v2/rooms/${msg.roomCode}/events`;
             MP.client.publish(topic, JSON.stringify(msg));
+          } else {
+            if (!MP.outbox) MP.outbox = [];
+            MP.outbox.push(msg);
           }
         } catch (e) {}
       },
@@ -2421,16 +2455,18 @@
               playSuccess();
               confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
             }
-            // Host broadcasts updated roster to everyone
-            MP.broadcast({
+            // Host immediately sends ROOM_STATE back so new guest and existing guests are synced
+            const stateMsg = {
               type: 'ROOM_STATE',
               players: MP.players,
               mode: STATE.mode,
               selectedGame: STATE.selectedGame
-            });
+            };
+            MP.broadcast(stateMsg);
+            setTimeout(() => MP.broadcast(stateMsg), 400);
           }
         } else if (msg.type === 'ROOM_STATE') {
-          if (msg.players && Array.isArray(msg.players)) {
+          if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
             STATE.mode = msg.mode || STATE.mode;
             syncLocalStateWithMP();
@@ -2442,9 +2478,10 @@
             guestMsg.innerText = '👑 Host is picking a game from the deck...';
           }
         } else if (msg.type === 'START_GAME') {
+          console.log('🚀 Received START_GAME broadcast from Host:', msg);
           STATE.selectedGame = msg.selectedGame;
           STATE.mode = msg.mode || STATE.mode;
-          if (msg.players) {
+          if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
             syncLocalStateWithMP();
           }
