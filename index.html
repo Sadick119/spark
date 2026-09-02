@@ -2629,6 +2629,8 @@
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
     }
 
+    function passBottleChallenge() {
+      playClick();
       document.getElementById('spin-result-card').classList.add('hidden');
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
       if (MP.active) {
