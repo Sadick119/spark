@@ -511,6 +511,10 @@
 
           </div>
 
+          <div class="pt-2 text-center">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.3.0 Live ⚡</span>
+          </div>
+
         </div>
 
       </div>
@@ -1863,146 +1867,36 @@
     // Touch & Drag Gesture
     let startX = 0;
     let isDragging = false;
-    const cardStage = document.getElementById('card-stage');
     
-    cardStage.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      isDragging = true;
-    }, { passive: true });
-
-    cardStage.addEventListener('touchend', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      const diffX = e.changedTouches[0].clientX - startX;
-      if (diffX < -45) nextCard();
-      else if (diffX > 45) prevCard();
-    }, { passive: true });
-
-    cardStage.addEventListener('mousedown', (e) => {
-      startX = e.clientX;
-      isDragging = true;
-    });
-
-    window.addEventListener('mouseup', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      const diffX = e.clientX - startX;
-      if (diffX < -45) nextCard();
-      else if (diffX > 45) prevCard();
-    });
-
-    /* -------------------------------------------------------------
-       SCREEN 3: PARTICIPANTS
-    ------------------------------------------------------------- */
-    function selectGame(gameId) {
-      playClick();
-      STATE.selectedGame = gameId;
-
-      const gameTitles = {
-        'dare-drink': 'Dare or Drink',
-        'truth-dare': 'Truth or Dare',
-        'spin-bottle': 'Spin the Bottle',
-        'never-ever': 'Never Have I Ever',
-        'double-dare': 'Double Dare'
-      };
-
-      document.getElementById('part-game-tag').innerText = `${gameTitles[gameId]} • ${STATE.mode.toUpperCase()} MODE`;
-      buildParticipantInputs();
-      navigate('participants');
-    }
-
-    function buildParticipantInputs() {
-      while (STATE.players.length < STATE.playerCount) {
-        const idx = STATE.players.length;
-        const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
-        STATE.players.push({ name: '', avatar: avatar });
-      }
-      if (STATE.players.length > STATE.playerCount) {
-        STATE.players = STATE.players.slice(0, STATE.playerCount);
-      }
-      renderParticipantRows();
-    }
-
-    function renderParticipantRows() {
-      const list = document.getElementById('participants-input-list');
-      list.innerHTML = '';
-
-      STATE.players.forEach((p, idx) => {
-        const row = document.createElement('div');
-        row.className = 'p-3.5 flex items-center space-x-3.5';
-        row.innerHTML = `
-          <button onclick="cycleAvatar(${idx})" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center flex-shrink-0" title="Tap to change avatar">
-            ${getAppleEmojiImg(p.avatar, 'w-6 h-6')}
-          </button>
-          <div class="flex-1">
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Player ${idx + 1} Name</span>
-            <input type="text" id="player-input-${idx}" value="${p.name}" oninput="updatePlayerName(${idx}, this.value)" placeholder="Type name..." class="w-full bg-transparent text-sm font-bold text-white focus:outline-none placeholder-slate-500 border-b border-transparent focus:border-amber-400 py-0.5">
-          </div>
-          ${STATE.players.length > 2 ? `
-            <button onclick="removeParticipant(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-2 py-1">✕</button>
-          ` : ''}
-        `;
-        list.appendChild(row);
-      });
-    }
-
-    function updatePlayerName(idx, val) {
-      STATE.players[idx].name = val;
-      document.getElementById('name-validation-msg').classList.add('hidden');
-    }
-
-    function cycleAvatar(idx) {
-      playClick();
-      const currentAvatar = STATE.players[idx].avatar;
-      const curIndex = AVATAR_POOL.indexOf(currentAvatar);
-      const nextAvatar = AVATAR_POOL[(curIndex + 1) % AVATAR_POOL.length];
-      STATE.players[idx].avatar = nextAvatar;
-      renderParticipantRows();
-    }
-
-    function addParticipantRow() {
-      playClick();
-      const idx = STATE.players.length;
-      const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
-      STATE.players.push({ name: '', avatar: avatar });
-      STATE.playerCount = STATE.players.length;
-      renderParticipantRows();
-    }
-
-    function removeParticipant(idx) {
-      if (STATE.players.length <= 2) return;
-      playClick();
-      STATE.players.splice(idx, 1);
-      STATE.playerCount = STATE.players.length;
-      renderParticipantRows();
-    }
-
-    function fillExampleNames() {
-      playSuccess();
-      const exampleNames = ['Sarah', 'Mike', 'Jess', 'Alex', 'Chris', 'Mia'];
-      const exampleAvatars = ['👩', '🧔', '👱‍♀️', '👨', '🧑', '💃'];
-      STATE.players.forEach((p, idx) => {
-        p.name = exampleNames[idx % exampleNames.length];
-        p.avatar = exampleAvatars[idx % exampleAvatars.length];
-      });
-      renderParticipantRows();
-      document.getElementById('name-validation-msg').classList.add('hidden');
-    }
-
-    function validateAndStartGame() {
-      const hasEmpty = STATE.players.some(p => !p.name.trim());
-      if (hasEmpty) {
-        playBeep(220, 'sawtooth', 0.2);
-        document.getElementById('name-validation-msg').classList.remove('hidden');
-        return;
-      }
-
-      playSuccess();
-      confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
+    function initCardStageGestures() {
+      const cardStage = document.getElementById('card-stage');
+      if (!cardStage) return;
       
-      STATE.currentPlayerIndex = 0;
-      STATE.promptIndex = 0;
-      navigate(STATE.selectedGame);
+      cardStage.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      }, { passive: true });
+
+      cardStage.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = e.changedTouches[0].clientX - startX;
+        if (diffX < -45) nextCard();
+        else if (diffX > 45) prevCard();
+      }, { passive: true });
+
+      cardStage.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = e.clientX - startX;
+        if (diffX < -45) nextCard();
+        else if (diffX > 45) prevCard();
+      });
     }
 
     /* -------------------------------------------------------------
@@ -3503,10 +3397,11 @@
       if (timeEl) timeEl.innerText = `${h}:${m}`;
     }, 1000);
 
-    window.addEventListener('DOMContentLoaded', () => {
+    function initApp() {
       selectInitialMode('extreme');
       renderHomepageParticipants();
       render1CardStage();
+      initCardStageGestures();
 
       // Check URL search params for ?join=1234
       const urlParams = new URLSearchParams(window.location.search);
@@ -3529,7 +3424,13 @@
           });
         }
       }, 350);
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
 
     window.addEventListener('click', () => {
       getAudioCtx();
