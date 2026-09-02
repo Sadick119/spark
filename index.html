@@ -1090,16 +1090,22 @@
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                 <span id="lobby-guest-msg" class="text-xs font-black text-emerald-400 uppercase tracking-wider">Connected to Room!</span>
               </div>
-              <p class="text-[11px] text-slate-300">Tap below to signal you are ready for the Host to start:</p>
+              <p class="text-[11px] text-slate-300">Tap below to signal you are ready or jump straight in:</p>
             </div>
 
-            <button id="guest-ready-btn" onclick="toggleGuestReadyState()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
+            <button id="guest-ready-btn" onclick="toggleGuestReadyState()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
               <span>⚡ I'M READY! (WAIT FOR HOST)</span>
               <span>⏳</span>
             </button>
 
+            <!-- Instant Enter Game Screen Button -->
+            <button id="guest-enter-game-btn" onclick="forceEnterActiveGame()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.6)] transition active:scale-95 flex items-center justify-center space-x-2 animate-pulse">
+              <span>🚀 ENTER GAME SCREEN NOW</span>
+              <span>&rarr;</span>
+            </button>
+
             <div id="guest-waiting-indicator" class="hidden flex items-center justify-center space-x-2 py-1 text-xs text-amber-300 font-bold animate-pulse">
-              <span>👑 Host will start the game in seconds...</span>
+              <span>👑 Host will start the squad game...</span>
               <span>🍺</span>
             </div>
           </div>
@@ -2557,6 +2563,13 @@
         msg.roomCode = (MP.roomCode || '').toString().trim();
         msg.timestamp = Date.now();
         msg.msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+        if (MP.gameStarted) {
+          msg.gameStarted = true;
+          msg.status = 'playing';
+        }
+        if (!msg.selectedGame && STATE.selectedGame) {
+          msg.selectedGame = STATE.selectedGame;
+        }
 
         // 1. BroadcastChannel (Same Device / Multi-Tab)
         try {
@@ -2587,6 +2600,34 @@
       handleMessage(msg) {
         console.log('📩 Received Multiplayer Event:', msg.type, msg);
         if (!MP.active) return;
+
+        // Auto-launch game if game is active in room or received any game event
+        const shouldLaunch = (
+          msg.type === 'START_GAME' || 
+          msg.status === 'playing' || 
+          msg.gameStarted === true || 
+          msg.type === 'GAME_ACTION'
+        );
+
+        if (shouldLaunch) {
+          MP.gameStarted = true;
+          const gameToLaunch = msg.selectedGame || STATE.selectedGame || 'dare-drink';
+          STATE.selectedGame = gameToLaunch;
+          if (msg.mode) STATE.mode = msg.mode;
+          if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
+          if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
+          if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
+            MP.players = msg.players;
+            syncLocalStateWithMP();
+          }
+
+          const currentScreen = document.querySelector('.screen.active');
+          if (!currentScreen || currentScreen.id === 'screen-lobby' || currentScreen.id === 'screen-setup') {
+            playSuccess();
+            confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
+            navigate(gameToLaunch, false);
+          }
+        }
 
         if (msg.type === 'JOIN_REQUEST') {
           if (MP.role === 'host') {
@@ -2645,34 +2686,11 @@
             syncLocalStateWithMP();
             renderLobbyPlayers();
           }
-          if (msg.status === 'playing' || msg.gameStarted) {
-            MP.gameStarted = true;
-            const gameToLaunch = msg.selectedGame || 'dare-drink';
-            STATE.selectedGame = gameToLaunch;
-            if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
-            if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
-            navigate(gameToLaunch, false);
-          }
         } else if (msg.type === 'CHOOSING_GAME') {
           const guestMsg = document.getElementById('lobby-guest-msg');
           if (guestMsg) {
             guestMsg.innerText = '👑 Host is picking a game from the deck...';
           }
-        } else if (msg.type === 'START_GAME') {
-          console.log('🚀 Received START_GAME broadcast from Host! Launching:', msg.selectedGame);
-          MP.gameStarted = true;
-          const gameToLaunch = msg.selectedGame || 'dare-drink';
-          STATE.selectedGame = gameToLaunch;
-          STATE.mode = msg.mode || STATE.mode;
-          if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
-          if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
-          if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
-            MP.players = msg.players;
-            syncLocalStateWithMP();
-          }
-          playSuccess();
-          confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
-          navigate(gameToLaunch, false);
         } else if (msg.type === 'GAME_ACTION') {
           handleRemoteGameAction(msg.action, msg.payload);
         } else if (msg.type === 'EMOJI_BURST') {
@@ -2680,6 +2698,23 @@
         }
       }
     };
+
+    function forceEnterActiveGame() {
+      playSuccess();
+      confetti({ particleCount: 40, spread: 60, origin: { y: 0.5 } });
+      MP.gameStarted = true;
+      const gameToLaunch = STATE.selectedGame || 'dare-drink';
+      navigate(gameToLaunch, false);
+      if (MP.role === 'client') {
+        MP.broadcast({
+          type: 'PLAYER_READY',
+          playerId: MP.myId,
+          name: MP.myName,
+          avatar: MP.myAvatar,
+          isReady: true
+        });
+      }
+    }
 
     function toggleGuestReadyState() {
       playClick();
