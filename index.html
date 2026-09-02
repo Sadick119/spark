@@ -299,7 +299,7 @@
     </header>
 
     <!-- PHONE PREVIEW MODAL -->
-    <div id="phone-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6">
+    <div id="phone-modal" style="display: none;" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] items-center justify-center p-6">
       <div class="bg-[#121422] border border-cyan-400/40 rounded-3xl p-6 max-w-xs w-full text-center space-y-4 shadow-[0_0_50px_rgba(0,240,255,0.3)] animate-scale-up">
         
         <div class="flex items-center justify-between">
@@ -323,7 +323,7 @@
     </div>
 
     <!-- GAME RULES MODAL -->
-    <div id="rules-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] hidden flex items-center justify-center p-5">
+    <div id="rules-modal" style="display: none;" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] items-center justify-center p-5">
       <div class="bg-[#121422] border border-amber-400/50 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-[0_0_50px_rgba(255,153,0,0.3)] animate-scale-up text-left">
         
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
@@ -1252,15 +1252,24 @@
     let beatStep = 0;
 
     function getAudioCtx() {
-      if (!audioCtx) audioCtx = new AudioContextClass();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
+      try {
+        if (!audioCtx && AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+        return audioCtx;
+      } catch (e) {
+        return null;
+      }
     }
 
     function playBeep(freq = 440, type = 'sine', duration = 0.08) {
       if (!STATE.soundEnabled) return;
       try {
         const ctx = getAudioCtx();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = type;
@@ -1274,14 +1283,16 @@
       } catch (e) {}
     }
 
-    function playClick() { playBeep(580, 'sine', 0.04); }
-    function playSwipe() { playBeep(420, 'triangle', 0.05); }
+    function playClick() { try { playBeep(580, 'sine', 0.04); } catch(e){} }
+    function playSwipe() { try { playBeep(420, 'triangle', 0.05); } catch(e){} }
     function playSuccess() { 
-      playBeep(523, 'sine', 0.08); 
-      setTimeout(() => playBeep(659, 'sine', 0.08), 70);
-      setTimeout(() => playBeep(784, 'sine', 0.16), 140);
+      try {
+        playBeep(523, 'sine', 0.08); 
+        setTimeout(() => playBeep(659, 'sine', 0.08), 70);
+        setTimeout(() => playBeep(784, 'sine', 0.16), 140);
+      } catch(e){}
     }
-    function playSpinSound() { playBeep(320, 'square', 0.03); }
+    function playSpinSound() { try { playBeep(320, 'square', 0.03); } catch(e){} }
 
     function startMusicLoop() {
       if (musicInterval) clearInterval(musicInterval);
@@ -1487,19 +1498,13 @@
     function openPhonePreviewModal() {
       playClick();
       const modal = document.getElementById('phone-modal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
+      if (modal) modal.style.display = 'flex';
     }
 
     function closePhonePreviewModal() {
       playClick();
       const modal = document.getElementById('phone-modal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      if (modal) modal.style.display = 'none';
     }
 
     function selectInitialMode(modeKey) {
@@ -1646,19 +1651,13 @@
       `;
 
       const modal = document.getElementById('rules-modal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
+      if (modal) modal.style.display = 'flex';
     }
 
     function closeGameRules() {
       playClick();
       const modal = document.getElementById('rules-modal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      if (modal) modal.style.display = 'none';
     }
 
     function renderHomepageParticipants() {
