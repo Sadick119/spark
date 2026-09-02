@@ -803,17 +803,26 @@
               <span>🔥</span>
             </div>
 
-            <!-- Action Decision Buttons: [ Completed ✅ ] vs [ Forfeit 🍺 ] -->
-            <div class="grid grid-cols-2 gap-2.5 pt-1">
-              <button onclick="completeDareAction()" class="py-3 rounded-2xl btn-action-complete text-slate-950 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+            <!-- Action Decision Buttons (Enabled only when it is YOUR turn) -->
+            <div id="dod-action-buttons-container" class="grid grid-cols-2 gap-2.5 pt-1">
+              <button id="dod-btn-complete" onclick="completeDareAction()" class="py-3.5 rounded-2xl btn-action-complete text-slate-950 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-[0_0_20px_rgba(255,140,0,0.5)]">
                 <span>I Did It!</span>
                 <img src="https://emojicdn.elk.sh/✅?style=apple" class="w-4 h-4 apple-emoji" alt="Done">
               </button>
 
-              <button onclick="forfeitDareAction()" class="py-3 rounded-2xl btn-action-drink text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+              <button id="dod-btn-forfeit" onclick="forfeitDareAction()" class="py-3.5 rounded-2xl btn-action-drink text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-[0_0_20px_rgba(239,68,68,0.5)]">
                 <span>Drink! (+2 🍺)</span>
                 <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-4 h-4 apple-emoji" alt="Drink">
               </button>
+            </div>
+
+            <!-- Spectator Turn Notice (Shown when it's NOT your turn in multiplayer) -->
+            <div id="dod-spectator-turn-notice" class="hidden p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-400/40 text-center space-y-1 shadow-[0_0_20px_rgba(0,240,255,0.15)]">
+              <div class="flex items-center justify-center space-x-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span id="dod-spectator-msg" class="text-xs font-black text-cyan-300">⏳ Waiting for Player to take their turn...</span>
+              </div>
+              <p class="text-[10px] text-slate-400">React with emojis below to cheer or roast them! 🔥🍻</p>
             </div>
 
             <!-- Player Reactions Row -->
@@ -1031,19 +1040,30 @@
           </div>
         </div>
 
-        <!-- Lobby Actions: Host can choose game or quick start, Guest sees waiting -->
-        <div class="space-y-2 pt-2">
+        <!-- Lobby Actions: Host controls game selection & launch; Guest waits -->
+        <div class="space-y-3 pt-1">
           <!-- HOST CONTROLS -->
-          <div id="lobby-host-controls" class="space-y-2.5">
-            <button onclick="selectGame('dare-drink')" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.6)] transition active:scale-95 flex items-center justify-center space-x-2 animate-pulse">
+          <div id="lobby-host-controls" class="space-y-3">
+            <!-- Selected Game Indicator -->
+            <div class="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-between shadow-[0_0_20px_rgba(255,140,0,0.15)]">
+              <div class="space-y-0.5">
+                <span class="text-[9px] font-black uppercase tracking-widest text-amber-400 block">Selected Game for Squad:</span>
+                <span id="lobby-selected-game-label" class="text-sm font-display font-black text-white block">🍺 Dare or Drink</span>
+              </div>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-amber-400 text-black font-black uppercase">Host Choice</span>
+            </div>
+
+            <!-- 1-Click Game Launch for Squad -->
+            <button onclick="hostStartMultiplayerGame()" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.6)] transition active:scale-95 flex items-center justify-center space-x-2 animate-pulse">
               <span>🚀 START GAME FOR SQUAD</span>
               <span>&rarr;</span>
             </button>
 
+            <!-- Quick Game Switcher Grid -->
             <div class="space-y-1.5">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block px-1">Or Pick Specific Game:</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1">Choose Squad Game:</span>
               <div class="grid grid-cols-2 gap-2">
-                <button onclick="selectGame('dare-drink')" class="p-2.5 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                <button onclick="setHostSelectedGame('dare-drink')" class="p-2.5 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">🍺</span>
                   <div>
                     <span class="text-xs font-black text-white block leading-tight">Dare or Drink</span>
@@ -1051,7 +1071,7 @@
                   </div>
                 </button>
 
-                <button onclick="selectGame('truth-dare')" class="p-2.5 rounded-2xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                <button onclick="setHostSelectedGame('truth-dare')" class="p-2.5 rounded-2xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">⚡</span>
                   <div>
                     <span class="text-xs font-black text-white block leading-tight">Truth or Dare</span>
@@ -1059,7 +1079,7 @@
                   </div>
                 </button>
 
-                <button onclick="selectGame('spin-bottle')" class="p-2.5 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                <button onclick="setHostSelectedGame('spin-bottle')" class="p-2.5 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">🍾</span>
                   <div>
                     <span class="text-xs font-black text-white block leading-tight">Spin Bottle</span>
@@ -1067,7 +1087,7 @@
                   </div>
                 </button>
 
-                <button onclick="selectGame('never-ever')" class="p-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                <button onclick="setHostSelectedGame('never-ever')" class="p-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">✋</span>
                   <div>
                     <span class="text-xs font-black text-white block leading-tight">Never Ever</span>
@@ -1083,29 +1103,26 @@
             </button>
           </div>
 
-          <!-- GUEST CONTROLS -->
-          <div id="lobby-guest-controls" class="hidden text-center p-4 rounded-2xl bg-white/[0.04] border border-cyan-500/40 space-y-3 shadow-[0_0_25px_rgba(0,240,255,0.15)]">
-            <div class="space-y-1">
+          <!-- GUEST CONTROLS (Waiting in Lobby) -->
+          <div id="lobby-guest-controls" class="hidden text-center p-5 rounded-3xl bg-white/[0.04] border border-cyan-500/40 space-y-4 shadow-[0_0_25px_rgba(0,240,255,0.15)]">
+            <div class="space-y-1.5">
               <div class="flex items-center justify-center space-x-2">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                 <span id="lobby-guest-msg" class="text-xs font-black text-emerald-400 uppercase tracking-wider">Connected to Room!</span>
               </div>
-              <p class="text-[11px] text-slate-300">Tap below to signal you are ready or jump straight in:</p>
+              <h4 class="text-sm font-display font-black text-white">Waiting in Lobby...</h4>
+              <p class="text-[11px] text-slate-300">The Host is selecting a game. You will automatically be launched into the match when the Host starts!</p>
             </div>
 
-            <button id="guest-ready-btn" onclick="toggleGuestReadyState()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
-              <span>⚡ I'M READY! (WAIT FOR HOST)</span>
+            <!-- Ready Signal Button -->
+            <button id="guest-ready-btn" onclick="toggleGuestReadyState()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95 flex items-center justify-center space-x-2">
+              <span>⚡ I'M READY (WAITING FOR HOST)</span>
               <span>⏳</span>
             </button>
 
-            <!-- Instant Enter Game Screen Button -->
-            <button id="guest-enter-game-btn" onclick="forceEnterActiveGame()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(255,140,0,0.6)] transition active:scale-95 flex items-center justify-center space-x-2 animate-pulse">
-              <span>🚀 ENTER GAME SCREEN NOW</span>
-              <span>&rarr;</span>
-            </button>
-
-            <div id="guest-waiting-indicator" class="hidden flex items-center justify-center space-x-2 py-1 text-xs text-amber-300 font-bold animate-pulse">
-              <span>👑 Host will start the squad game...</span>
+            <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-xs font-bold text-amber-300 flex items-center justify-center space-x-2 animate-pulse">
+              <span>👑</span>
+              <span id="guest-selected-game-label">Host will start the squad match soon...</span>
               <span>🍺</span>
             </div>
           </div>
@@ -1980,6 +1997,15 @@
     /* -------------------------------------------------------------
        SCREEN 7: DARE OR DRINK (EXACT 1:1 REPLICA ENGINE)
     ------------------------------------------------------------- */
+    function isLocalTurnMyTurn() {
+      if (!MP.active) return true;
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : (MP.players.length || 1);
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % numPlayers);
+      const activePlayer = STATE.players[safeIdx] || MP.players[safeIdx];
+      if (!activePlayer) return MP.role === 'host';
+      return (activePlayer.id === MP.myId || activePlayer.name === MP.myName);
+    }
+
     function renderMockupDrinkScreen() {
       if (!STATE.players || STATE.players.length === 0) {
         if (MP.players && MP.players.length > 0) {
@@ -2003,11 +2029,40 @@
       const modeBadge = document.getElementById('dod-mode-badge');
       const drinkEl = document.getElementById('drink-counter');
 
+      const isMyTurn = isLocalTurnMyTurn();
+      const actionBox = document.getElementById('dod-action-buttons-container');
+      const spectatorNotice = document.getElementById('dod-spectator-turn-notice');
+      const spectatorMsg = document.getElementById('dod-spectator-msg');
+
       if (avatarEl) avatarEl.innerText = curPlayer.avatar || '👩';
-      if (turnEl) turnEl.innerText = `${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
       if (cardNumEl) cardNumEl.innerText = `Dare #${(STATE.promptIndex % list.length) + 1} of ${list.length}`;
       if (modeBadge) modeBadge.innerText = `${STATE.mode.toUpperCase()} DARE`;
       if (drinkEl) drinkEl.innerText = STATE.totalDrinks;
+
+      if (isMyTurn) {
+        if (turnEl) {
+          turnEl.innerText = `🔥 YOUR TURN (${(curPlayer.name || 'YOU').toUpperCase()})!`;
+          turnEl.className = "text-xs font-black text-amber-300 uppercase tracking-wide animate-pulse";
+        }
+        if (actionBox) {
+          actionBox.classList.remove('hidden');
+          actionBox.classList.add('grid');
+        }
+        if (spectatorNotice) spectatorNotice.classList.add('hidden');
+      } else {
+        if (turnEl) {
+          turnEl.innerText = `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
+          turnEl.className = "text-xs font-black text-slate-300 uppercase tracking-wide";
+        }
+        if (actionBox) {
+          actionBox.classList.add('hidden');
+          actionBox.classList.remove('grid');
+        }
+        if (spectatorNotice) {
+          spectatorNotice.classList.remove('hidden');
+          if (spectatorMsg) spectatorMsg.innerText = `⏳ Waiting for ${(curPlayer.name || 'Player')} to complete dare or drink...`;
+        }
+      }
 
       // Render Reactions Row
       const reactionsRow = document.getElementById('mockup-reactions-row');
@@ -2042,21 +2097,45 @@
     }
 
     function completeDareAction(sync = true) {
+      if (MP.active && !isLocalTurnMyTurn()) {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       playSuccess();
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'completeDare' });
+        MP.broadcast({ 
+          type: 'GAME_ACTION', 
+          action: 'completeDare',
+          payload: {
+            currentPlayerIndex: STATE.currentPlayerIndex,
+            promptIndex: (STATE.promptIndex + 1) % ((DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme).length),
+            totalDrinks: STATE.totalDrinks
+          }
+        });
       }
       nextPrompt(sync);
     }
 
     function forfeitDareAction(sync = true) {
+      if (MP.active && !isLocalTurnMyTurn()) {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       playBeep(200, 'sawtooth', 0.25);
       changeDrinks(2, false);
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'forfeitDare' });
+        MP.broadcast({ 
+          type: 'GAME_ACTION', 
+          action: 'forfeitDare',
+          payload: {
+            currentPlayerIndex: STATE.currentPlayerIndex,
+            promptIndex: (STATE.promptIndex + 1) % ((DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme).length),
+            totalDrinks: STATE.totalDrinks
+          }
+        });
       }
       nextPrompt(sync);
     }
@@ -2153,7 +2232,29 @@
     /* -------------------------------------------------------------
        TRUTH OR DARE & SPIN THE BOTTLE ENGINES
     ------------------------------------------------------------- */
+    function renderTodPlayerUI() {
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player', avatar: '😎' };
+      const isMyTurn = isLocalTurnMyTurn();
+      const nameEl = document.getElementById('tod-player-name');
+      const avatarEl = document.getElementById('tod-avatar-img');
+      const choiceBox = document.getElementById('tod-choice-container');
+      const promptBox = document.getElementById('tod-prompt-container');
+
+      if (avatarEl) avatarEl.src = `https://emojicdn.elk.sh/${encodeURIComponent(curPlayer.avatar || '😎')}?style=apple`;
+      if (nameEl) {
+        nameEl.innerText = isMyTurn ? `🔥 YOUR TURN (${(curPlayer.name || 'YOU').toUpperCase()})!` : `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
+      }
+      if (choiceBox) choiceBox.classList.remove('hidden');
+      if (promptBox) promptBox.classList.add('hidden');
+      clearInterval(STATE.todState.timerInterval);
+    }
+
     function pickTruthOrDare(type, sync = true) {
+      if (MP.active && !isLocalTurnMyTurn()) {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       playClick();
       STATE.todState.type = type;
 
@@ -2163,12 +2264,21 @@
       const modeList = TOD_PROMPTS[type].extreme;
       const randomPrompt = modeList[Math.floor(Math.random() * modeList.length)];
       
-      const curPlayer = STATE.players[STATE.currentPlayerIndex].name || `Player ${STATE.currentPlayerIndex + 1}`;
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx].name || `Player ${safeIdx + 1}`;
       document.getElementById('tod-prompt-text').innerText = `"${randomPrompt}"`;
       document.getElementById('tod-challenge-title').innerText = `${curPlayer}'s ${type.toUpperCase()} Challenge`;
 
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'todChoice', payload: { choice: type } });
+        MP.broadcast({ 
+          type: 'GAME_ACTION', 
+          action: 'todChoice', 
+          payload: { 
+            choice: type, 
+            prompt: randomPrompt,
+            currentPlayerIndex: STATE.currentPlayerIndex 
+          } 
+        });
       }
 
       startTodTimer();
@@ -2190,26 +2300,47 @@
       }, 1000);
     }
 
-    function finishTodTurn(completed) {
+    function finishTodTurn(completed, sync = true) {
+      if (MP.active && !isLocalTurnMyTurn()) {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       clearInterval(STATE.todState.timerInterval);
       if (completed) {
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
       } else {
         playBeep(200, 'square', 0.2);
-        changeDrinks(2);
+        changeDrinks(2, false);
       }
-      nextPlayer('tod');
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'todFinish',
+          payload: {
+            completed,
+            currentPlayerIndex: (STATE.currentPlayerIndex + 1) % STATE.players.length,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+      nextPlayer('tod', false);
     }
 
-    function nextPlayer(game = 'tod') {
+    function nextPlayer(game = 'tod', sync = true) {
+      if (sync && MP.active && !isLocalTurnMyTurn() && MP.role !== 'host') {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
-      const curPlayer = STATE.players[STATE.currentPlayerIndex];
-      document.getElementById('tod-player-name').innerText = `${curPlayer.name || 'Player'}'s Turn`;
-      document.getElementById('tod-avatar-img').src = `https://emojicdn.elk.sh/${encodeURIComponent(curPlayer.avatar)}?style=apple`;
-      document.getElementById('tod-choice-container').classList.remove('hidden');
-      document.getElementById('tod-prompt-container').classList.add('hidden');
-      clearInterval(STATE.todState.timerInterval);
+      renderTodPlayerUI();
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'nextPlayerTod',
+          payload: { currentPlayerIndex: STATE.currentPlayerIndex }
+        });
+      }
     }
 
     /* -------------------------------------------------------------
@@ -2300,6 +2431,10 @@
 
     function spinTheBottle(sync = true) {
       if (isSpinning) return;
+      if (MP.active && !isLocalTurnMyTurn()) {
+        playBeep(220, 'sawtooth', 0.2);
+        return;
+      }
       isSpinning = true;
       playClick();
       
@@ -2307,7 +2442,14 @@
       bottleSpeed = 0.38 + Math.random() * 0.45;
 
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'spinBottle' });
+        MP.broadcast({ 
+          type: 'GAME_ACTION', 
+          action: 'spinBottle',
+          payload: {
+            speed: bottleSpeed,
+            currentPlayerIndex: STATE.currentPlayerIndex
+          }
+        });
       }
       
       let lastBeep = 0;
@@ -2621,6 +2763,52 @@
         console.log('📩 Received Multiplayer Event:', msg.type, msg);
         if (!MP.active) return;
 
+        if (msg.type === 'ROOM_CLOSED') {
+          console.warn('👑 Host closed the room. Returning to setup.');
+          if (MP.syncInterval) {
+            clearInterval(MP.syncInterval);
+            MP.syncInterval = null;
+          }
+          if (MP.peer) {
+            try { MP.peer.destroy(); } catch(e){}
+            MP.peer = null;
+          }
+          MP.connections = [];
+          MP.hostConn = null;
+          if (MP.client) {
+            try { MP.client.end(true); } catch(e){}
+            MP.client = null;
+          }
+          if (MP.channel) {
+            try { MP.channel.close(); } catch(e){}
+            MP.channel = null;
+          }
+          MP.active = false;
+          MP.isReady = false;
+          MP.gameStarted = false;
+          MP.role = 'local';
+          playBeep(220, 'sawtooth', 0.3);
+          alert('👑 The Host has ended the party room. Returning to Home screen.');
+          navigate('setup');
+          switchPlayMode('local');
+          return;
+        }
+
+        if (msg.type === 'HOST_GAME_CHOSEN') {
+          STATE.selectedGame = msg.selectedGame;
+          const names = {
+            'dare-drink': '🍺 Dare or Drink',
+            'truth-dare': '⚡ Truth or Dare',
+            'spin-bottle': '🍾 Spin the Bottle',
+            'never-ever': '✋ Never Have I Ever',
+            'double-dare': '💥 Double Dare'
+          };
+          const guestLabel = document.getElementById('guest-selected-game-label');
+          if (guestLabel) {
+            guestLabel.innerText = `Host selected: ${names[msg.selectedGame] || msg.selectedGame} (Waiting for start...)`;
+          }
+        }
+
         // Auto-launch game if game is active in room or received any game event
         const isGameActive = (
           msg.type === 'START_GAME' || 
@@ -2650,6 +2838,8 @@
             navigate(gameToLaunch, false);
           } else if (currentScreen.id === 'screen-dare-drink') {
             renderMockupDrinkScreen();
+          } else if (currentScreen.id === 'screen-truth-dare') {
+            renderTodPlayerUI();
           }
         }
 
@@ -2722,6 +2912,33 @@
         }
       }
     };
+
+    function setHostSelectedGame(gameKey) {
+      playClick();
+      STATE.selectedGame = gameKey;
+      const names = {
+        'dare-drink': '🍺 Dare or Drink',
+        'truth-dare': '⚡ Truth or Dare',
+        'spin-bottle': '🍾 Spin the Bottle',
+        'never-ever': '✋ Never Have I Ever',
+        'double-dare': '💥 Double Dare'
+      };
+      const badge = document.getElementById('lobby-selected-game-label');
+      if (badge) badge.innerText = names[gameKey] || gameKey;
+
+      if (MP.active && MP.role === 'host') {
+        MP.broadcast({
+          type: 'HOST_GAME_CHOSEN',
+          selectedGame: gameKey
+        });
+      }
+    }
+
+    function hostStartMultiplayerGame() {
+      playClick();
+      const gameToLaunch = STATE.selectedGame || 'dare-drink';
+      selectGame(gameToLaunch);
+    }
 
     function forceEnterActiveGame() {
       playSuccess();
@@ -3050,6 +3267,14 @@
 
     function leaveMultiplayerRoom() {
       playClick();
+      if (MP.active && MP.role === 'host') {
+        try {
+          MP.broadcast({
+            type: 'ROOM_CLOSED',
+            reason: '👑 The Host has closed the party room.'
+          });
+        } catch(e){}
+      }
       if (MP.syncInterval) {
         clearInterval(MP.syncInterval);
         MP.syncInterval = null;
@@ -3099,19 +3324,55 @@
     function handleRemoteGameAction(action, payload) {
       if (action === 'nextPrompt') {
         STATE.promptIndex = payload.promptIndex;
+        if (payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
         renderMockupDrinkScreen();
       } else if (action === 'completeDare') {
-        completeDareAction(false);
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
+        if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
+        playSuccess();
+        confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
+        renderMockupDrinkScreen();
       } else if (action === 'forfeitDare') {
-        forfeitDareAction(false);
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
+        if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
+        playBeep(200, 'sawtooth', 0.2);
+        const countEl = document.getElementById('drink-counter');
+        if (countEl) countEl.innerText = STATE.totalDrinks;
+        renderMockupDrinkScreen();
       } else if (action === 'spinBottle') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload && payload.speed) bottleSpeed = payload.speed;
         spinTheBottle(false);
       } else if (action === 'changeDrinks') {
         STATE.totalDrinks = Math.max(0, STATE.totalDrinks + payload.delta);
         const countEl = document.getElementById('drink-counter');
         if (countEl) countEl.innerText = STATE.totalDrinks;
       } else if (action === 'todChoice') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         pickTruthOrDare(payload.choice, false);
+        if (payload.prompt) {
+          document.getElementById('tod-prompt-text').innerText = `"${payload.prompt}"`;
+        }
+      } else if (action === 'todFinish') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          const countEl = document.getElementById('drink-counter');
+          if (countEl) countEl.innerText = STATE.totalDrinks;
+        }
+        if (payload.completed) {
+          playSuccess();
+          confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
+        } else {
+          playBeep(200, 'square', 0.2);
+        }
+        renderTodPlayerUI();
+      } else if (action === 'nextPlayerTod') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        renderTodPlayerUI();
       }
     }
 
