@@ -962,25 +962,37 @@
         </div>
 
         <div class="w-full space-y-2.5">
-          <div id="spin-result-card" class="bottle-modal p-4 rounded-2xl hidden space-y-2 animate-bounce-short">
+          <!-- Result Modal / Card -->
+          <div id="spin-result-card" class="bottle-modal p-4 rounded-2xl hidden space-y-2.5 animate-bounce-short">
             <div class="flex items-center justify-between">
               <span class="text-xs font-black text-cyan-300 uppercase tracking-wider drop-shadow" id="spin-chosen-name">The bottle pointed to MIA!</span>
               <img src="https://emojicdn.elk.sh/🎯?style=apple" class="w-4 h-4 apple-emoji" alt="Target">
             </div>
             <p id="spin-chosen-sub" class="text-[11px] text-slate-300 font-semibold">Mia must complete the dare:</p>
-            <div class="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-400/40 text-xs font-bold text-white shadow">
+            <div class="p-3 rounded-xl bg-cyan-950/60 border border-cyan-400/40 text-xs font-bold text-white shadow">
               <span id="spin-dare-text">"Perform a 30-second interpretive dance to the next song! 💃✨"</span>
+            </div>
+
+            <!-- Action buttons for the dare result -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="finishBottleChallenge(true)" class="py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <span>Completed ✅</span>
+              </button>
+              <button onclick="finishBottleChallenge(false)" class="py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-display font-black text-xs uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                <span>Drink! (+2 🍺)</span>
+              </button>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5">
-            <button id="spin-btn" onclick="spinTheBottle()" class="py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(255,0,127,0.5)]">
-              <span>SPIN AGAIN</span>
-              <span>🔄</span>
+          <!-- Spin Buttons -->
+          <div id="spin-controls-row" class="grid grid-cols-2 gap-2.5">
+            <button id="spin-btn" onclick="spinTheBottle()" class="py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(255,0,127,0.5)] transition active:scale-95">
+              <span>SPIN BOTTLE</span>
+              <span>🍾</span>
             </button>
-            <button onclick="passBottleChallenge()" class="py-3.5 rounded-2xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-300 font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(0,240,255,0.4)]">
-              <span>Pass Challenge</span>
-              <span>🎲</span>
+            <button onclick="passBottleChallenge()" class="py-3.5 rounded-2xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-300 font-display font-black text-xs tracking-wider flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95">
+              <span>Next Turn</span>
+              <span>➡️</span>
             </button>
           </div>
         </div>
@@ -2096,19 +2108,40 @@
       }
     }
 
-    function completeDareAction(sync = true) {
-      if (MP.active && !isLocalTurnMyTurn()) {
+    function showGameNotification(text, icon = '⚡') {
+      const container = document.getElementById('floating-emoji-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-black/85 backdrop-blur-md border border-amber-400/60 shadow-[0_0_25px_rgba(255,140,0,0.5)] text-white text-xs font-black flex items-center space-x-2 animate-bounce-short pointer-events-none whitespace-nowrap';
+      toast.innerHTML = `<span class="text-base">${icon}</span><span>${text}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+      }, 2400);
+    }
+
+    function completeDareAction(sync = true, incomingPayload = null) {
+      if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
         return;
       }
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+
       playSuccess();
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      showGameNotification(`${pName} Did the Dare! ✅`, '🎉');
+
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
       if (sync && MP.active) {
         MP.broadcast({ 
           type: 'GAME_ACTION', 
           action: 'completeDare',
           payload: {
+            playerName: curPlayer.name,
             currentPlayerIndex: STATE.currentPlayerIndex,
             promptIndex: (STATE.promptIndex + 1) % ((DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme).length),
             totalDrinks: STATE.totalDrinks
@@ -2118,19 +2151,26 @@
       nextPrompt(sync);
     }
 
-    function forfeitDareAction(sync = true) {
-      if (MP.active && !isLocalTurnMyTurn()) {
+    function forfeitDareAction(sync = true, incomingPayload = null) {
+      if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
         return;
       }
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+
       playBeep(200, 'sawtooth', 0.25);
       changeDrinks(2, false);
+      showGameNotification(`${pName} Took 2 Penalty Drinks! 🍺`, '🍺');
+
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
       if (sync && MP.active) {
         MP.broadcast({ 
           type: 'GAME_ACTION', 
           action: 'forfeitDare',
           payload: {
+            playerName: curPlayer.name,
             currentPlayerIndex: STATE.currentPlayerIndex,
             promptIndex: (STATE.promptIndex + 1) % ((DOD_PROMPTS[STATE.mode] || DOD_PROMPTS.extreme).length),
             totalDrinks: STATE.totalDrinks
@@ -2164,7 +2204,7 @@
       }
 
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex, currentPlayerIndex: STATE.currentPlayerIndex, totalDrinks: STATE.totalDrinks } });
       }
     }
 
@@ -2175,7 +2215,7 @@
       renderMockupDrinkScreen();
 
       if (MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex } });
+        MP.broadcast({ type: 'GAME_ACTION', action: 'nextPrompt', payload: { promptIndex: STATE.promptIndex, currentPlayerIndex: STATE.currentPlayerIndex, totalDrinks: STATE.totalDrinks } });
       }
     }
 
@@ -2250,8 +2290,8 @@
       clearInterval(STATE.todState.timerInterval);
     }
 
-    function pickTruthOrDare(type, sync = true) {
-      if (MP.active && !isLocalTurnMyTurn()) {
+    function pickTruthOrDare(type, sync = true, incomingPayload = null) {
+      if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
         return;
       }
@@ -2262,12 +2302,21 @@
       document.getElementById('tod-prompt-container').classList.remove('hidden');
 
       const modeList = TOD_PROMPTS[type].extreme;
-      const randomPrompt = modeList[Math.floor(Math.random() * modeList.length)];
+      let randomPrompt = "";
+      if (incomingPayload && incomingPayload.prompt) {
+        randomPrompt = incomingPayload.prompt;
+      } else {
+        randomPrompt = modeList[Math.floor(Math.random() * modeList.length)];
+      }
       
       const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
-      const curPlayer = STATE.players[safeIdx].name || `Player ${safeIdx + 1}`;
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+
       document.getElementById('tod-prompt-text').innerText = `"${randomPrompt}"`;
-      document.getElementById('tod-challenge-title').innerText = `${curPlayer}'s ${type.toUpperCase()} Challenge`;
+      document.getElementById('tod-challenge-title').innerText = `${pName}'s ${type.toUpperCase()} Challenge`;
+
+      showGameNotification(`${pName} picked ${type.toUpperCase()}!`, type === 'truth' ? '❓' : '⚡');
 
       if (sync && MP.active) {
         MP.broadcast({ 
@@ -2276,6 +2325,7 @@
           payload: { 
             choice: type, 
             prompt: randomPrompt,
+            playerName: curPlayer.name,
             currentPlayerIndex: STATE.currentPlayerIndex 
           } 
         });
@@ -2300,25 +2350,34 @@
       }, 1000);
     }
 
-    function finishTodTurn(completed, sync = true) {
-      if (MP.active && !isLocalTurnMyTurn()) {
+    function finishTodTurn(completed, sync = true, incomingPayload = null) {
+      if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
         return;
       }
       clearInterval(STATE.todState.timerInterval);
+      
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+
       if (completed) {
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
+        showGameNotification(`${pName} Completed their ${STATE.todState.type.toUpperCase()}!`, '🎉');
       } else {
         playBeep(200, 'square', 0.2);
         changeDrinks(2, false);
+        showGameNotification(`${pName} Chose to Drink (+2 🍺)!`, '🍺');
       }
+
       if (sync && MP.active) {
         MP.broadcast({
           type: 'GAME_ACTION',
           action: 'todFinish',
           payload: {
             completed,
+            playerName: curPlayer.name,
             currentPlayerIndex: (STATE.currentPlayerIndex + 1) % STATE.players.length,
             totalDrinks: STATE.totalDrinks
           }
@@ -2346,10 +2405,22 @@
     /* -------------------------------------------------------------
        SPIN THE BOTTLE ENGINE
     ------------------------------------------------------------- */
+    const BOTTLE_DARES = [
+      "Perform a 30-second interpretive dance to whatever song is playing! 💃✨",
+      "Let the person who spun the bottle draw something on your arm with a pen!",
+      "Confess your most embarrassing high school story right now!",
+      "Do your best impression of someone in this room until they guess who it is!",
+      "Show the last 3 photos in your camera roll to the squad with zero context!",
+      "Take 2 penalty sips and give a 15-second toast to the host!",
+      "Swap seats with the person to your left for the next 2 rounds!"
+    ];
+
     let canvas, ctx;
     let bottleAngle = 0;
     let bottleSpeed = 0;
     let isSpinning = false;
+    let currentBottleDare = "";
+    let currentLandedIndex = 0;
 
     function initBottleArena() {
       canvas = document.getElementById('bottle-canvas');
@@ -2429,9 +2500,9 @@
       ctx.restore();
     }
 
-    function spinTheBottle(sync = true) {
+    function spinTheBottle(sync = true, incomingPayload = null) {
       if (isSpinning) return;
-      if (MP.active && !isLocalTurnMyTurn()) {
+      if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
         return;
       }
@@ -2439,7 +2510,18 @@
       playClick();
       
       document.getElementById('spin-result-card').classList.add('hidden');
-      bottleSpeed = 0.38 + Math.random() * 0.45;
+
+      if (incomingPayload) {
+        bottleSpeed = incomingPayload.speed;
+        if (incomingPayload.dareText) currentBottleDare = incomingPayload.dareText;
+        if (incomingPayload.startAngle !== undefined) bottleAngle = incomingPayload.startAngle;
+      } else {
+        bottleSpeed = 0.42 + Math.random() * 0.38;
+        currentBottleDare = BOTTLE_DARES[Math.floor(Math.random() * BOTTLE_DARES.length)];
+      }
+
+      const activeSpinner = STATE.players[STATE.currentPlayerIndex % STATE.players.length] || { name: 'Player' };
+      showGameNotification(`${activeSpinner.name} is spinning the bottle!`, '🍾');
 
       if (sync && MP.active) {
         MP.broadcast({ 
@@ -2447,6 +2529,8 @@
           action: 'spinBottle',
           payload: {
             speed: bottleSpeed,
+            startAngle: bottleAngle,
+            dareText: currentBottleDare,
             currentPlayerIndex: STATE.currentPlayerIndex
           }
         });
@@ -2455,7 +2539,7 @@
       let lastBeep = 0;
       function animate() {
         bottleAngle += bottleSpeed;
-        bottleSpeed *= 0.982;
+        bottleSpeed *= 0.983;
 
         if (Date.now() - lastBeep > 65 && bottleSpeed > 0.05) {
           playSpinSound();
@@ -2468,13 +2552,13 @@
           requestAnimationFrame(animate);
         } else {
           isSpinning = false;
-          onBottleLanded();
+          onBottleLanded(sync);
         }
       }
       requestAnimationFrame(animate);
     }
 
-    function onBottleLanded() {
+    function onBottleLanded(sync = true) {
       let tipAngle = (bottleAngle - Math.PI / 2) % (2 * Math.PI);
       if (tipAngle < 0) tipAngle += 2 * Math.PI;
 
@@ -2495,7 +2579,8 @@
         }
       });
 
-      const chosen = STATE.players[closestIndex];
+      currentLandedIndex = closestIndex;
+      const chosen = STATE.players[closestIndex] || { name: 'Player' };
 
       playSuccess();
       confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
@@ -2508,15 +2593,52 @@
         targetNode.classList.add('scale-125', 'border-pink-400', 'bg-pink-900/70', 'shadow-[0_0_25px_rgba(255,0,127,0.9)]');
       }
 
+      showGameNotification(`Bottle pointed to ${(chosen.name || 'Player').toUpperCase()}!`, '🎯');
+
       document.getElementById('spin-chosen-name').innerText = `The bottle pointed to ${(chosen.name || 'Player').toUpperCase()}!`;
       document.getElementById('spin-chosen-sub').innerText = `${chosen.name || 'Player'} must complete the dare:`;
-      document.getElementById('spin-dare-text').innerText = `"Perform a 30-second interpretive dance to the next song! 💃✨"`;
+      document.getElementById('spin-dare-text').innerText = `"${currentBottleDare || BOTTLE_DARES[0]}"`;
       document.getElementById('spin-result-card').classList.remove('hidden');
     }
 
-    function passBottleChallenge() {
-      playClick();
+    function finishBottleChallenge(completed, sync = true) {
+      const chosen = STATE.players[currentLandedIndex] || { name: 'Player' };
+      if (completed) {
+        playSuccess();
+        confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
+        showGameNotification(`${chosen.name} completed the dare!`, '🎉');
+      } else {
+        playBeep(200, 'sawtooth', 0.2);
+        changeDrinks(2, false);
+        showGameNotification(`${chosen.name} took 2 Penalty Drinks!`, '🍺');
+      }
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'bottleFinish',
+          payload: {
+            completed,
+            chosenName: chosen.name,
+            totalDrinks: STATE.totalDrinks,
+            currentPlayerIndex: (STATE.currentPlayerIndex + 1) % STATE.players.length
+          }
+        });
+      }
+
       document.getElementById('spin-result-card').classList.add('hidden');
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+    }
+
+      document.getElementById('spin-result-card').classList.add('hidden');
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      if (MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'nextPlayerBottle',
+          payload: { currentPlayerIndex: STATE.currentPlayerIndex }
+        });
+      }
       spinTheBottle();
     }
 
@@ -3331,31 +3453,32 @@
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
         if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
-        playSuccess();
-        confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
-        renderMockupDrinkScreen();
+        completeDareAction(false, payload);
       } else if (action === 'forfeitDare') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
         if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
-        playBeep(200, 'sawtooth', 0.2);
-        const countEl = document.getElementById('drink-counter');
-        if (countEl) countEl.innerText = STATE.totalDrinks;
-        renderMockupDrinkScreen();
+        forfeitDareAction(false, payload);
       } else if (action === 'spinBottle') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
-        if (payload && payload.speed) bottleSpeed = payload.speed;
-        spinTheBottle(false);
+        spinTheBottle(false, payload);
+      } else if (action === 'bottleFinish') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          const countEl = document.getElementById('drink-counter');
+          if (countEl) countEl.innerText = STATE.totalDrinks;
+        }
+        finishBottleChallenge(payload.completed, false);
+      } else if (action === 'nextPlayerBottle') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
       } else if (action === 'changeDrinks') {
         STATE.totalDrinks = Math.max(0, STATE.totalDrinks + payload.delta);
         const countEl = document.getElementById('drink-counter');
         if (countEl) countEl.innerText = STATE.totalDrinks;
       } else if (action === 'todChoice') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
-        pickTruthOrDare(payload.choice, false);
-        if (payload.prompt) {
-          document.getElementById('tod-prompt-text').innerText = `"${payload.prompt}"`;
-        }
+        pickTruthOrDare(payload.choice, false, payload);
       } else if (action === 'todFinish') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.totalDrinks !== undefined) {
@@ -3363,13 +3486,7 @@
           const countEl = document.getElementById('drink-counter');
           if (countEl) countEl.innerText = STATE.totalDrinks;
         }
-        if (payload.completed) {
-          playSuccess();
-          confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
-        } else {
-          playBeep(200, 'square', 0.2);
-        }
-        renderTodPlayerUI();
+        finishTodTurn(payload.completed, false, payload);
       } else if (action === 'nextPlayerTod') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         renderTodPlayerUI();
