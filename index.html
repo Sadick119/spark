@@ -1747,6 +1747,7 @@
         MP.gameStarted = true;
         MP.selectedGame = gameId;
         syncLocalStateWithMP();
+        MP.startSyncHeartbeat();
         const startMsg = {
           type: 'START_GAME',
           selectedGame: gameId,
@@ -2558,6 +2559,25 @@
         if (onConnect) onConnect();
       },
 
+      syncInterval: null,
+      startSyncHeartbeat() {
+        if (MP.syncInterval) clearInterval(MP.syncInterval);
+        MP.syncInterval = setInterval(() => {
+          if (MP.active && MP.role === 'host' && MP.gameStarted) {
+            MP.broadcast({
+              type: 'ROOM_SYNC',
+              status: 'playing',
+              gameStarted: true,
+              selectedGame: STATE.selectedGame || 'dare-drink',
+              promptIndex: STATE.promptIndex,
+              currentPlayerIndex: STATE.currentPlayerIndex,
+              totalDrinks: STATE.totalDrinks,
+              players: MP.players
+            });
+          }
+        }, 1200);
+      },
+
       broadcast(msg) {
         msg.senderId = MP.myId;
         msg.roomCode = (MP.roomCode || '').toString().trim();
@@ -2602,19 +2622,21 @@
         if (!MP.active) return;
 
         // Auto-launch game if game is active in room or received any game event
-        const shouldLaunch = (
+        const isGameActive = (
           msg.type === 'START_GAME' || 
+          msg.type === 'ROOM_SYNC' || 
           msg.status === 'playing' || 
           msg.gameStarted === true || 
           msg.type === 'GAME_ACTION'
         );
 
-        if (shouldLaunch) {
+        if (isGameActive) {
           MP.gameStarted = true;
           const gameToLaunch = msg.selectedGame || STATE.selectedGame || 'dare-drink';
           STATE.selectedGame = gameToLaunch;
           if (msg.mode) STATE.mode = msg.mode;
           if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
+          if (msg.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = msg.currentPlayerIndex;
           if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
@@ -2626,6 +2648,8 @@
             playSuccess();
             confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
             navigate(gameToLaunch, false);
+          } else if (currentScreen.id === 'screen-dare-drink') {
+            renderMockupDrinkScreen();
           }
         }
 
@@ -3026,6 +3050,10 @@
 
     function leaveMultiplayerRoom() {
       playClick();
+      if (MP.syncInterval) {
+        clearInterval(MP.syncInterval);
+        MP.syncInterval = null;
+      }
       if (MP.peer) {
         try { MP.peer.destroy(); } catch(e){}
         MP.peer = null;
