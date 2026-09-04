@@ -184,6 +184,26 @@
       box-shadow: 0 0 18px rgba(0, 255, 255, 0.5);
     }
 
+    /* ================= NEVER HAVE I EVER VIBE ================= */
+    .nhie-bg {
+      background: radial-gradient(circle at 50% 25%, #23124d 0%, #100829 60%, #060212 100%);
+    }
+    .nhie-card {
+      background: rgba(28, 14, 58, 0.9);
+      border: 2.5px solid #A855F7;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.45), inset 0 0 18px rgba(168, 85, 247, 0.2);
+    }
+
+    /* ================= DOUBLE DARE VIBE ================= */
+    .doubledare-bg {
+      background: radial-gradient(circle at 50% 25%, #3d2402 0%, #1d0f01 60%, #0a0500 100%);
+    }
+    .doubledare-card {
+      background: rgba(38, 20, 2, 0.92);
+      border: 2.5px solid #F59E0B;
+      box-shadow: 0 0 32px rgba(245, 158, 11, 0.5), inset 0 0 18px rgba(245, 158, 11, 0.2);
+    }
+
     /* 1-Card Fullscreen Deck */
     .card-stage {
       position: relative;
@@ -1113,15 +1133,24 @@
             </p>
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5 pt-1">
-            <button onclick="finishTodTurn(true)" class="py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+          <div id="tod-action-buttons-container" class="grid grid-cols-2 gap-2.5 pt-1">
+            <button onclick="finishTodTurn(true)" class="py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition active:scale-95">
               <span>Completed</span>
               <img src="https://emojicdn.elk.sh/✅?style=apple" class="w-4 h-4 apple-emoji" alt="Done">
             </button>
-            <button onclick="finishTodTurn(false)" class="py-3 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+            <button onclick="finishTodTurn(false)" class="py-3 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)] transition active:scale-95">
               <span>Forfeit (2 Drinks)</span>
               <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-4 h-4 apple-emoji" alt="Drink">
             </button>
+          </div>
+
+          <!-- Spectator Live Notice -->
+          <div id="tod-spectator-waiting" class="hidden p-3 rounded-2xl bg-cyan-950/60 border border-cyan-400/40 text-center space-y-1">
+            <div class="flex items-center justify-center space-x-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+              <span id="tod-spectator-msg" class="text-xs font-black text-cyan-300">⏳ Waiting for Player to answer...</span>
+            </div>
+            <p class="text-[10px] text-slate-400">Watch them live & react with chat/emojis! 🔥💬</p>
           </div>
         </div>
 
@@ -1184,6 +1213,242 @@
         </div>
 
       </div>
+
+      <!-- ================= SCREEN: NEVER HAVE I EVER ================= -->
+      <div id="screen-never-ever" class="screen nhie-bg flex-col justify-between p-5 pb-5 min-h-full">
+        
+        <!-- Top Turn & Category Bar -->
+        <div class="flex items-center justify-between z-20 pt-1">
+          <!-- Active Player / Confession Pill -->
+          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
+            <span id="nhie-player-avatar" class="text-base">✋</span>
+            <span id="nhie-player-turn" class="text-xs font-black text-purple-300 uppercase tracking-wide">Confession Round</span>
+          </div>
+
+          <!-- Mode / Spice Pill -->
+          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-[10px] font-black text-purple-300 uppercase tracking-widest shadow-[0_0_12px_rgba(168,85,247,0.3)]">
+            <span>🤫</span>
+            <span id="nhie-mode-badge">CONFESSIONS</span>
+          </div>
+        </div>
+
+        <!-- Center 3D Card Deck -->
+        <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
+          <div class="spark-card-layer-2" style="background: rgba(30, 15, 60, 0.4); border-color: rgba(168, 85, 247, 0.2);"></div>
+          <div class="spark-card-layer-1" style="background: rgba(45, 20, 90, 0.5); border-color: rgba(168, 85, 247, 0.3);"></div>
+
+          <!-- Main Glass Card Front -->
+          <div id="nhie-card-main-body" class="nhie-card p-5 rounded-3xl flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
+            
+            <!-- Card Header -->
+            <div class="flex items-center justify-between text-xs font-bold text-purple-300 pb-1 border-b border-purple-500/20">
+              <div class="flex items-center space-x-1 text-purple-400">
+                <span>✋</span>
+                <span id="nhie-card-num" class="text-[11px] font-black tracking-wider uppercase">Statement #1 of 25</span>
+              </div>
+              <div class="flex items-center space-x-1 text-purple-300 text-[10px] font-black uppercase">
+                <span>💜</span>
+                <span>Squad Confession</span>
+              </div>
+            </div>
+
+            <!-- Big Statement Prompt Text -->
+            <div class="py-2 min-h-[95px] flex items-center justify-center">
+              <p id="nhie-prompt-text" class="text-xl font-display font-extrabold text-white leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                "Never have I ever ghosted someone after talking for more than two weeks."
+              </p>
+            </div>
+
+            <!-- Live Voting Buttons (For every participant!) -->
+            <div class="space-y-2 pt-1">
+              <span class="text-[10px] font-bold text-purple-300/80 uppercase tracking-widest block">Have you done this? Be Honest!</span>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button id="nhie-btn-have" onclick="nhieVote('have')" class="py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.5)]">
+                  <span>🍺 I Have! (+1 Sip)</span>
+                </button>
+                <button id="nhie-btn-never" onclick="nhieVote('never')" class="py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-purple-400/40 text-purple-200 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-[0_0_15px_rgba(168,85,247,0.25)]">
+                  <span>😇 Never! (Safe)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Guilty & Safe Summary -->
+            <div id="nhie-vote-summary" class="p-2.5 rounded-2xl bg-purple-950/60 border border-purple-400/30 text-xs font-black text-purple-200 flex items-center justify-around shadow">
+              <span id="nhie-count-have" class="text-amber-300">🍺 0 Guilty</span>
+              <span class="text-purple-400">•</span>
+              <span id="nhie-count-never" class="text-emerald-300">😇 0 Innocent</span>
+            </div>
+
+            <!-- Player Reactions Row -->
+            <div class="space-y-1 pt-1 border-t border-purple-500/20">
+              <div class="flex items-center justify-between text-[10px] font-bold text-purple-300 px-1">
+                <span>Squad Confessions</span>
+                <span>Tap avatar to cheer 🍻</span>
+              </div>
+              <div id="nhie-reactions-row" class="flex justify-center items-center space-x-3.5 pt-1">
+                <!-- Dynamically populated with player avatars and vote badges -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom Controls & Drink Counter -->
+        <div class="space-y-2.5 z-20 w-full max-w-[345px] mx-auto">
+          <!-- Drink Tally -->
+          <div class="p-2.5 rounded-2xl bg-black/70 border border-purple-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="text-purple-300 font-bold text-[10px] uppercase tracking-wider">Party Drinks:</span>
+              <div class="flex items-center space-x-1 bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded-lg text-amber-300 font-black">
+                <span>🍺</span>
+                <span id="nhie-drink-counter">3</span>
+              </div>
+            </div>
+            <!-- Stepper -->
+            <div class="flex items-center space-x-1.5">
+              <button onclick="changeDrinks(-1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center active:scale-90 transition">-</button>
+              <button onclick="changeDrinks(1)" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center active:scale-90 transition">+</button>
+            </div>
+          </div>
+
+          <!-- Next Statement & Skip Buttons -->
+          <div class="grid grid-cols-5 gap-2">
+            <button onclick="nextNhiePrompt()" class="col-span-3 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(168,85,247,0.5)] transition active:scale-95">
+              <span>Next Statement</span>
+              <span>➡️</span>
+            </button>
+            <button onclick="skipNhiePrompt()" class="col-span-2 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-purple-200 font-display font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95">
+              <span>Skip</span>
+              <span>⏭️</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN: DOUBLE DARE ================= -->
+      <div id="screen-double-dare" class="screen doubledare-bg flex-col justify-between p-5 pb-5 min-h-full">
+        
+        <!-- Top Turn & Category Bar -->
+        <div class="flex items-center justify-between z-20 pt-1">
+          <!-- Target Player Pill -->
+          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+            <span id="dd-player-avatar" class="text-base">⚡</span>
+            <span id="dd-player-turn" class="text-xs font-black text-amber-300 uppercase tracking-wide">Sarah's Dare</span>
+          </div>
+
+          <!-- Escalation Multiplier Pill -->
+          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-yellow-950/80 border border-yellow-400/60 text-[10px] font-black text-yellow-300 uppercase tracking-widest shadow-[0_0_15px_rgba(250,204,21,0.4)]">
+            <span>🔥</span>
+            <span id="dd-multiplier-badge">1X BASE DARE</span>
+          </div>
+        </div>
+
+        <!-- Center 3D Card Deck -->
+        <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
+          <div class="spark-card-layer-2" style="background: rgba(40, 20, 5, 0.4); border-color: rgba(245, 158, 11, 0.2);"></div>
+          <div class="spark-card-layer-1" style="background: rgba(60, 30, 8, 0.5); border-color: rgba(245, 158, 11, 0.3);"></div>
+
+          <!-- Main Glass Card Front -->
+          <div id="dd-card-main-body" class="doubledare-card p-5 rounded-3xl flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
+            
+            <!-- Card Header -->
+            <div class="flex items-center justify-between text-xs font-bold text-amber-300 pb-1 border-b border-amber-500/20">
+              <div class="flex items-center space-x-1 text-yellow-400">
+                <span>💥</span>
+                <span id="dd-card-num" class="text-[11px] font-black tracking-wider uppercase">Dare #1 of 20</span>
+              </div>
+              <div class="flex items-center space-x-1 text-orange-400 text-[10px] font-black uppercase">
+                <span id="dd-stakes-label">Stakes: 1x Sip</span>
+              </div>
+            </div>
+
+            <!-- Big Dare Prompt Text -->
+            <div class="py-2 min-h-[90px] flex items-center justify-center">
+              <p id="dd-prompt-text" class="text-xl font-display font-extrabold text-white leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                "Call a random contact in your phone and sing Happy Birthday aggressively before hanging up!"
+              </p>
+            </div>
+
+            <!-- Multiplier Escalation Glow Badge -->
+            <div id="dd-penalty-box" class="p-2.5 rounded-2xl bg-gradient-to-r from-yellow-950/80 via-orange-950/80 to-yellow-950/80 border border-yellow-400/50 text-xs font-black text-yellow-300 flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(250,204,21,0.25)]">
+              <span>🍺</span>
+              <span id="dd-penalty-text">PENALTY: TAKE 1 SIP IF FORFEITED</span>
+              <span>🔥</span>
+            </div>
+
+            <!-- Action Decision Buttons (Enabled only when it is YOUR turn) -->
+            <div id="dd-action-buttons-container" class="space-y-2 pt-1">
+              <div class="grid grid-cols-2 gap-2">
+                <button id="dd-btn-accept" onclick="acceptDoubleDare()" class="py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+                  <span>✅ Accept</span>
+                </button>
+                <button id="dd-btn-pass" onclick="passDoubleDare()" class="py-3.5 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_25px_rgba(245,158,11,0.6)] animate-pulse">
+                  <span id="dd-pass-btn-text">⚡ Double Dare! (2x)</span>
+                </button>
+              </div>
+              <button id="dd-btn-forfeit" onclick="forfeitDoubleDare()" class="w-full py-2.5 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/50 text-red-300 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+                <span id="dd-forfeit-btn-text">💥 Forfeit & Drink (1 Sip)</span>
+                <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-3.5 h-3.5 apple-emoji" alt="Drink">
+              </button>
+            </div>
+
+            <!-- Spectator Turn Notice -->
+            <div id="dd-spectator-turn-notice" class="hidden p-3.5 rounded-2xl bg-yellow-950/40 border border-yellow-400/40 text-center space-y-1 shadow-[0_0_20px_rgba(250,204,21,0.15)]">
+              <div class="flex items-center justify-center space-x-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
+                <span id="dd-spectator-msg" class="text-xs font-black text-yellow-300">⏳ Waiting for Player to Accept, Double Dare, or Drink...</span>
+              </div>
+              <p class="text-[10px] text-slate-400">React with emojis below to cheer or dare them! ⚡🍻</p>
+            </div>
+
+            <!-- Squad Reactions Row -->
+            <div class="space-y-1 pt-1 border-t border-yellow-500/20">
+              <div class="flex items-center justify-between text-[10px] font-bold text-amber-300 px-1">
+                <span>Squad Turn Order</span>
+                <span>Next player in line ➡️</span>
+              </div>
+              <div id="dd-reactions-row" class="flex justify-center items-center space-x-3.5 pt-1">
+                <!-- Dynamically populated with player avatars -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom Controls & Drink Counter -->
+        <div class="space-y-2.5 z-20 w-full max-w-[345px] mx-auto">
+          <!-- Drink Tally -->
+          <div class="p-2.5 rounded-2xl bg-black/70 border border-yellow-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="text-amber-300 font-bold text-[10px] uppercase tracking-wider">Party Drinks:</span>
+              <div class="flex items-center space-x-1 bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded-lg text-amber-300 font-black">
+                <span>🍺</span>
+                <span id="dd-drink-counter">3</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="changeDrinks(-1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center active:scale-90 transition">-</button>
+              <button onclick="changeDrinks(1)" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center active:scale-90 transition">+</button>
+            </div>
+          </div>
+
+          <!-- Next Dare & Skip Buttons -->
+          <div class="grid grid-cols-5 gap-2">
+            <button onclick="nextDoubleDarePrompt()" class="col-span-3 py-3.5 rounded-2xl bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(245,158,11,0.5)] transition active:scale-95">
+              <span>Next Dare</span>
+              <span>➡️</span>
+            </button>
+            <button onclick="skipDoubleDarePrompt()" class="col-span-2 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-amber-200 font-display font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95">
+              <span>Skip</span>
+              <span>⏭️</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
 
       <!-- ================= SCREEN 6: MULTIPLAYER LOBBY ================= -->
       <div id="screen-lobby" class="screen flex-col justify-between p-6 pb-6 min-h-full">
@@ -1292,11 +1557,19 @@
                   </div>
                 </button>
 
-                <button onclick="setHostSelectedGame('never-ever')" class="p-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                <button onclick="setHostSelectedGame('never-ever')" class="p-2.5 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/50 text-left transition active:scale-95 flex items-center space-x-2">
                   <span class="text-xl">✋</span>
                   <div>
                     <span class="text-xs font-black text-white block leading-tight">Never Ever</span>
-                    <span class="text-[9px] text-rose-300 font-semibold">Confessions</span>
+                    <span class="text-[9px] text-purple-300 font-semibold">Confessions</span>
+                  </div>
+                </button>
+
+                <button onclick="setHostSelectedGame('double-dare')" class="col-span-2 p-2.5 rounded-2xl bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/50 text-left transition active:scale-95 flex items-center space-x-2">
+                  <span class="text-xl">💥</span>
+                  <div>
+                    <span class="text-xs font-black text-white block leading-tight">Double Dare</span>
+                    <span class="text-[9px] text-yellow-300 font-semibold">High Voltage Escalation</span>
                   </div>
                 </button>
               </div>
@@ -1343,27 +1616,13 @@
     <!-- REAL-TIME FLOATING EMOJI REACTION CONTAINER -->
     <div id="floating-emoji-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
 
-    <!-- FLOATING REACTION BUTTON BAR (Visible in multiplayer games) -->
-    <div id="mp-reaction-bar" class="fixed bottom-3 right-4 left-4 max-w-[430px] mx-auto z-40 hidden justify-between items-center bg-black/85 backdrop-blur-lg border border-amber-500/40 px-3.5 py-2 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.9)]">
-      
-      <!-- Chat Toggle Button with Unread Badge -->
-      <button onclick="toggleChatModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-300 text-xs font-bold transition active:scale-95 relative shadow-[0_0_15px_rgba(0,240,255,0.3)] flex-shrink-0">
+    <!-- STANDALONE MULTIPLAYER CHAT BUTTON (Top-Right, No Black Container Bar) -->
+    <div id="mp-reaction-bar" class="absolute top-[58px] right-3.5 z-40 hidden pointer-events-auto">
+      <button onclick="toggleChatModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/60 text-cyan-300 text-xs font-black transition active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.4)] backdrop-blur-md relative" title="Squad Chat">
         <span class="text-sm">💬</span>
         <span class="text-[11px] font-black">Chat</span>
         <span id="chat-unread-badge" class="chat-unread-badge hidden px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">0</span>
       </button>
-
-      <div class="h-4 w-[1px] bg-white/20 mx-1"></div>
-
-      <!-- Quick Floating Reaction Emojis -->
-      <div class="flex items-center space-x-2.5">
-        <button onclick="sendEmojiReaction('🔥')" class="text-xl hover:scale-125 transition active:scale-90" title="Fire">🔥</button>
-        <button onclick="sendEmojiReaction('🍺')" class="text-xl hover:scale-125 transition active:scale-90" title="Drink">🍺</button>
-        <button onclick="sendEmojiReaction('💀')" class="text-xl hover:scale-125 transition active:scale-90" title="Dead">💀</button>
-        <button onclick="sendEmojiReaction('👀')" class="text-xl hover:scale-125 transition active:scale-90" title="Eyes">👀</button>
-        <button onclick="sendEmojiReaction('😂')" class="text-xl hover:scale-125 transition active:scale-90" title="Laugh">😂</button>
-      </div>
-
     </div>
 
   </div>
@@ -1391,55 +1650,159 @@
       ],
       currentPlayerIndex: 0,
       todState: { type: null, prompt: null, timerInterval: null },
-      doubleDareLevel: 1,
+      nhieState: { promptIndex: 0, votes: {} },
+      doubleDareState: { promptIndex: 0, multiplier: 1, targetPlayerIndex: 0 },
       navigationStack: ['setup']
     };
 
     const AVATAR_POOL = ['👩', '🧔', '👱‍♀️', '👨', '🧑', '🤠', '🥳', '😎', '💃', '🕺', '🦄', '👑', '🔥'];
 
-    // Rich Question & Challenge Database for Dare or Drink / Never Have I Ever
+    // Genuine Dares & Challenges for Dare or Drink
     const DOD_PROMPTS = {
       chill: [
-        "fallen asleep in a movie theater during a film",
-        "eaten an entire large pizza by myself in one sitting",
-        "re-gifted a present to someone else in this circle",
-        "blamed a pet for something I accidentally broke"
+        "Speak in an exaggerated British or French accent for the next 2 rounds!",
+        "Do your best impression of a cat begging for food until someone laughs!",
+        "Let the person to your left send any emoji they want to your 3rd contact.",
+        "Balance a phone or cup on your head for 20 seconds without dropping it.",
+        "Do 10 slow-motion jumping jacks while making ridiculous sound effects.",
+        "Tell the group the most embarrassing nickname you've ever had."
       ],
       party: [
-        "been caught sneaking out of a party early",
-        "ghosted someone after two or more great dates",
-        "sent a message to the wrong group chat and panicked",
-        "pretended to be on a phone call to avoid someone in public"
+        "Do 15 push-ups in under 30 seconds or take 2 drinks!",
+        "Let the group compose a 1-sentence status/tweet to post for 10 minutes.",
+        "Show the last 3 photos in your camera roll to everyone with zero context!",
+        "Let the player to your right draw a fake mustache on your face with a pen.",
+        "Trade one article of clothing (jacket, shoes, hat) with the person to your left.",
+        "Sing the chorus of your most guilty pleasure pop song at full volume!"
       ],
       spicy: [
-        "kissed someone whose name I didn't know at the time",
-        "looked through a partner’s phone without them knowing",
-        "made out in a public place where we could have been caught",
-        "flirted my way out of getting a ticket or paying for something"
+        "Text your ex or recent crush: 'I still think about that night...' with no explanation!",
+        "Let the player to your right scroll through your DM list for 15 seconds.",
+        "Give a 30-second dramatic slow dance or lap dance to someone in the circle.",
+        "Whisper a scandalous secret into the ear of the player to your right.",
+        "Call a friend and try to keep them on the line for 1 minute speaking only in whispers.",
+        "Let someone in the room send a selfie from your phone to their choice of contact."
       ],
       extreme: [
-        "been caught sneaking out of a early",
-        "had a crush on a close friend's partner or ex",
-        "sent a spicy photo that I immediately regretted",
-        "hooked up with someone in this room or friend group"
+        "Let the squad write a spicy 3-word message and DM it to your 5th follower!",
+        "Take a mystery sip concoction mixed by the two players next to you.",
+        "Let someone in the room blindfold you and feed you a mystery bite from the kitchen.",
+        "Show your search history and screen time breakdown for today to the entire group.",
+        "Swap phones with the person across from you and let them read your last 3 sent texts aloud.",
+        "Do 20 squats while maintaining unbroken eye contact with the person to your right."
       ]
     };
 
+    // Dedicated Confession Database for Never Have I Ever
+    const NHIE_PROMPTS = {
+      chill: [
+        "Never have I ever fallen asleep in a movie theater or during a class.",
+        "Never have I ever re-gifted a present to someone currently in this room.",
+        "Never have I ever eaten food off the floor after the 5-second rule expired.",
+        "Never have I ever pretended to be on a phone call just to avoid someone in public.",
+        "Never have I ever blamed a pet or sibling for something I broke.",
+        "Never have I ever binged an entire TV series in a single weekend without leaving bed."
+      ],
+      party: [
+        "Never have I ever sent a risky message to the completely wrong group chat.",
+        "Never have I ever ghosted someone after talking every single day for weeks.",
+        "Never have I ever sneaked out of a boring party without saying goodbye to anyone.",
+        "Never have I ever drunk texted an ex or someone I swore I was over.",
+        "Never have I ever lost my phone, keys, or ID during a wild night out.",
+        "Never have I ever lied about my age or identity to get into a club or party."
+      ],
+      spicy: [
+        "Never have I ever stalked someone's stories or location on a fake burner account.",
+        "Never have I ever kissed someone whose name I didn't even know at the time.",
+        "Never have I ever had a crush on a close friend's partner or ex.",
+        "Never have I ever made out in a public place where we could have easily been caught.",
+        "Never have I ever lied about my relationship status to someone who was flirting with me.",
+        "Never have I ever sent a spicy photo and immediately panicked with regret."
+      ],
+      extreme: [
+        "Never have I ever hooked up with someone currently in this room or friend group.",
+        "Never have I ever lied during a game of Never Have I Ever to hide a secret.",
+        "Never have I ever walked in on someone or been walked in on during an intimate moment.",
+        "Never have I ever had a secret relationship or situationship nobody in this room knows about.",
+        "Never have I ever stayed the night with an ex after swearing we were 100% finished.",
+        "Never have I ever kissed more than two different people in the exact same night."
+      ]
+    };
+
+    // Dedicated Escalating Challenges for Double Dare
+    const DOUBLE_DARE_PROMPTS = [
+      "Call a random contact in your phone and sing Happy Birthday aggressively before hanging up!",
+      "Eat a spoonful of the spiciest hot sauce or condiment available with a completely straight face!",
+      "Let the group DM your 3rd most recent follower: 'We need to talk 🤐' with zero follow-up!",
+      "Imitate someone in the circle until everyone unanimously guesses who it is, or drink!",
+      "Let the group pick any photo from your camera roll and post it to your story for 10 minutes!",
+      "Show your full screen time and battery usage breakdown for today to the whole squad!",
+      "Put an ice cube down your shirt and keep it there until it completely melts!",
+      "Let the player to your right text anything they want to your 2nd most recent contact!",
+      "Speak only in rhyming sentences for the next 3 rounds of the game!",
+      "Give a passionate 45-second speech about why your ex made the biggest mistake of their life!"
+    ];
+
+    // Dedicated Neon Truth or Dare Database across all intensities
     const TOD_PROMPTS = {
       truth: {
-        extreme: [
-          "Read aloud the last 3 direct messages you sent on Instagram/Snapchat right now!",
-          "What is something you have done that you hope nobody in your family ever finds out?",
+        chill: [
+          "What is the most embarrassing song or artist in your private playlist?",
+          "What is the strangest food combination you secretly love?",
+          "What is the biggest lie you told your parents as a kid that they never found out?",
+          "If you could trade lives with one person in this room for 24 hours, who would it be?",
+          "What is the most awkward text message you have ever sent to the wrong person?"
+        ],
+        party: [
+          "What is the absolute worst date you have ever been on in your entire life?",
+          "Have you ever had a crush on someone currently in this room? Be honest!",
+          "What is the most embarrassing thing you have ever done while tipsy at a party?",
+          "What is a secret talent or weird obsession you have that nobody knows about?",
+          "Who in this room would you trust the least with a life-or-death secret?"
+        ],
+        spicy: [
+          "Read aloud the last 3 direct messages you sent on Instagram or Snapchat right now!",
+          "What is your biggest romantic regret regarding an ex or former crush?",
           "Who in this room would you kiss if you were forced to make a choice right now?",
-          "What is your biggest regret regarding an ex or a former crush?"
+          "What is the most scandalous photo or message currently sitting on your phone?",
+          "What is the fastest you have ever caught feelings for someone?"
+        ],
+        extreme: [
+          "Confess the wildest secret you swore you would take to your grave!",
+          "Have you ever hooked up with an ex while you were in a new relationship or situationship?",
+          "Show your most private deleted or hidden photos folder right now!",
+          "What is something you have done that you hope nobody in your family ever discovers?",
+          "Who is the one person you regret sleeping with or kissing the most?"
         ]
       },
       dare: {
-        extreme: [
-          "Text your ex or recent crush: 'I still think about that night...' with zero explanation for 5 minutes!",
+        chill: [
+          "Speak in an exaggerated French or British accent for the next 3 rounds!",
+          "Do 10 jumping jacks while loudly singing the alphabet backwards.",
+          "Let the person to your left draw a funny smiley face on your forehead with a pen.",
+          "Balance a spoon on your nose for 20 seconds without letting it drop.",
+          "Send a funny voice note singing 'Happy Birthday' to the 3rd contact in your phone."
+        ],
+        party: [
+          "Do your best runway model strut across the room and strike 3 dramatic poses!",
+          "Let the squad compose a 1-sentence status/tweet and post it from your account for 10 minutes.",
+          "Trade an article of clothing (jacket, shoes, hat) with the person to your right.",
+          "Take a selfie with the funniest face possible and make it your profile photo for the night.",
+          "Do 15 push-ups in 30 seconds or take 2 penalty drinks!"
+        ],
+        spicy: [
+          "Text your ex or recent crush: 'I still think about that night...' with zero explanation!",
           "Let the player to your right text anything they want to your 5th phone contact.",
-          "Take a mystery drink concoction created by the two players next to you.",
+          "Give a 30-second passionate slow dance to the person on your left.",
+          "Whisper your most scandalous fantasy into the ear of the person to your right.",
           "Let someone in the room blindfold you and feed you a mystery bite from the kitchen."
+        ],
+        extreme: [
+          "Let the group DM your 3rd most recent follower: 'We need to talk 🤐' with no follow-up!",
+          "Take a mystery drink concoction mixed by the two players sitting next to you.",
+          "Let the player to your left post any photo from your camera roll to your story for 15 minutes.",
+          "Call your crush or ex right now on speakerphone and tell them you miss them.",
+          "Swap phones with the person across from you and let them read your last 3 sent texts aloud."
         ]
       }
     };
@@ -1625,12 +1988,7 @@
       playClick();
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       
-      let actualScreen = screenName;
-      if (screenName === 'never-ever' || screenName === 'double-dare') {
-        actualScreen = 'dare-drink';
-      }
-
-      const target = document.getElementById(`screen-${actualScreen}`);
+      const target = document.getElementById(`screen-${screenName}`);
       if (target) target.classList.add('active');
 
       const backBtn = document.getElementById('header-back-btn');
@@ -1695,14 +2053,25 @@
           }
           render1CardStage();
         }
-        if (screenName === 'dare-drink' || screenName === 'never-ever' || screenName === 'double-dare') {
-          title.innerText = screenName === 'never-ever' ? 'Never Have I Ever' : (screenName === 'double-dare' ? 'Double Dare' : 'Dare or Drink');
+        if (screenName === 'dare-drink') {
+          title.innerText = 'Dare or Drink';
           subtitle.innerText = 'Party Night';
           renderMockupDrinkScreen();
+        }
+        if (screenName === 'never-ever') {
+          title.innerText = 'Never Have I Ever';
+          subtitle.innerText = 'Confession Night';
+          renderNhieScreen();
+        }
+        if (screenName === 'double-dare') {
+          title.innerText = 'Double Dare';
+          subtitle.innerText = 'High Voltage';
+          renderDoubleDareScreen();
         }
         if (screenName === 'truth-dare') {
           title.innerText = 'Truth or Dare';
           subtitle.innerText = 'Neon Edition';
+          renderTodPlayerUI();
         }
         if (screenName === 'spin-bottle') {
           title.innerText = 'Spin the Bottle';
@@ -2357,10 +2726,17 @@
       nextPrompt();
     }
 
+    function updateAllDrinkCounters() {
+      const ids = ['drink-counter', 'nhie-drink-counter', 'dd-drink-counter'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = STATE.totalDrinks;
+      });
+    }
+
     function changeDrinks(delta, sync = true) {
       STATE.totalDrinks = Math.max(0, STATE.totalDrinks + delta);
-      const countEl = document.getElementById('drink-counter');
-      if (countEl) countEl.innerText = STATE.totalDrinks;
+      updateAllDrinkCounters();
       if (delta > 0) {
         playBeep(260, 'sawtooth', 0.15);
       } else {
@@ -2368,7 +2744,7 @@
       }
 
       if (sync && MP.active) {
-        MP.broadcast({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta } });
+        MP.broadcast({ type: 'GAME_ACTION', action: 'changeDrinks', payload: { delta, totalDrinks: STATE.totalDrinks } });
       }
     }
 
@@ -2403,7 +2779,7 @@
     }
 
     /* -------------------------------------------------------------
-       TRUTH OR DARE & SPIN THE BOTTLE ENGINES
+       TRUTH OR DARE ENGINE
     ------------------------------------------------------------- */
     function renderTodPlayerUI() {
       const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
@@ -2431,10 +2807,16 @@
       playClick();
       STATE.todState.type = type;
 
-      document.getElementById('tod-choice-container').classList.add('hidden');
-      document.getElementById('tod-prompt-container').classList.remove('hidden');
+      const choiceBox = document.getElementById('tod-choice-container');
+      const promptBox = document.getElementById('tod-prompt-container');
+      const actionBox = document.getElementById('tod-action-buttons-container');
+      const specWaiting = document.getElementById('tod-spectator-waiting');
+      const specMsg = document.getElementById('tod-spectator-msg');
 
-      const modeList = TOD_PROMPTS[type].extreme;
+      if (choiceBox) choiceBox.classList.add('hidden');
+      if (promptBox) promptBox.classList.remove('hidden');
+
+      const modeList = (TOD_PROMPTS[type] && (TOD_PROMPTS[type][STATE.mode] || TOD_PROMPTS[type].extreme)) || TOD_PROMPTS[type].extreme;
       let randomPrompt = "";
       if (incomingPayload && incomingPayload.prompt) {
         randomPrompt = incomingPayload.prompt;
@@ -2446,8 +2828,22 @@
       const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
       const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
 
-      document.getElementById('tod-prompt-text').innerText = `"${randomPrompt}"`;
-      document.getElementById('tod-challenge-title').innerText = `${pName}'s ${type.toUpperCase()} Challenge`;
+      const promptTextEl = document.getElementById('tod-prompt-text');
+      const challengeTitleEl = document.getElementById('tod-challenge-title');
+      if (promptTextEl) promptTextEl.innerText = `"${randomPrompt}"`;
+      if (challengeTitleEl) challengeTitleEl.innerText = `${pName}'s ${type.toUpperCase()} Challenge`;
+
+      const isMyTurn = isLocalTurnMyTurn();
+      if (isMyTurn) {
+        if (actionBox) { actionBox.classList.remove('hidden'); actionBox.classList.add('grid'); }
+        if (specWaiting) specWaiting.classList.add('hidden');
+      } else {
+        if (actionBox) { actionBox.classList.add('hidden'); actionBox.classList.remove('grid'); }
+        if (specWaiting) {
+          specWaiting.classList.remove('hidden');
+          if (specMsg) specMsg.innerText = `⏳ Waiting for ${pName} to complete or forfeit...`;
+        }
+      }
 
       showGameNotification(`${pName} picked ${type.toUpperCase()}!`, type === 'truth' ? '❓' : '⚡');
       if (typeof CHAT !== 'undefined') {
@@ -2500,11 +2896,17 @@
       if (completed) {
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
-        showGameNotification(`${pName} Completed their ${STATE.todState.type.toUpperCase()}!`, '🎉');
+        showGameNotification(`${pName} Completed their ${(STATE.todState.type || 'challenge').toUpperCase()}!`, '🎉');
+        if (typeof CHAT !== 'undefined') {
+          CHAT.addMessage({ text: `🎉 ${pName} completed their ${(STATE.todState.type || 'challenge').toUpperCase()}!` }, false, true);
+        }
       } else {
         playBeep(200, 'square', 0.2);
         changeDrinks(2, false);
         showGameNotification(`${pName} Chose to Drink (+2 🍺)!`, '🍺');
+        if (typeof CHAT !== 'undefined') {
+          CHAT.addMessage({ text: `🍺 ${pName} forfeited & drank 2 sips!` }, false, true);
+        }
       }
 
       if (sync && MP.active) {
@@ -2536,6 +2938,393 @@
           payload: { currentPlayerIndex: STATE.currentPlayerIndex }
         });
       }
+    }
+
+    /* -------------------------------------------------------------
+       NEVER HAVE I EVER ENGINE
+    ------------------------------------------------------------- */
+    function renderNhieScreen() {
+      if (!STATE.players || STATE.players.length === 0) {
+        if (MP.players && MP.players.length > 0) {
+          STATE.players = MP.players.map(p => ({ name: p.name, avatar: p.avatar, drinks: p.drinks || 0 }));
+        } else {
+          STATE.players = [{ name: MP.myName || 'Player 1', avatar: MP.myAvatar || '😎', drinks: 0 }];
+        }
+      }
+
+      const list = NHIE_PROMPTS[STATE.mode] || NHIE_PROMPTS.extreme;
+      const prompt = list[STATE.nhieState.promptIndex % list.length];
+
+      const promptEl = document.getElementById('nhie-prompt-text');
+      if (promptEl) promptEl.innerText = `"${prompt}"`;
+
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player', avatar: '✋' };
+      const avatarEl = document.getElementById('nhie-player-avatar');
+      const turnEl = document.getElementById('nhie-player-turn');
+      const cardNumEl = document.getElementById('nhie-card-num');
+      const modeBadge = document.getElementById('nhie-mode-badge');
+      const drinkEl = document.getElementById('nhie-drink-counter');
+
+      if (avatarEl) avatarEl.innerText = curPlayer.avatar || '✋';
+      if (cardNumEl) cardNumEl.innerText = `Statement #${(STATE.nhieState.promptIndex % list.length) + 1} of ${list.length}`;
+      if (modeBadge) modeBadge.innerText = `${STATE.mode.toUpperCase()} CONFESSIONS`;
+      if (drinkEl) drinkEl.innerText = STATE.totalDrinks;
+      if (turnEl) turnEl.innerText = `CONFESSION ROUND (${(curPlayer.name || 'SQUAD').toUpperCase()})`;
+
+      // Update vote tallies
+      let haveCount = 0;
+      let neverCount = 0;
+      Object.values(STATE.nhieState.votes || {}).forEach(v => {
+        if (v === 'have') haveCount++;
+        else if (v === 'never') neverCount++;
+      });
+
+      const haveEl = document.getElementById('nhie-count-have');
+      const neverEl = document.getElementById('nhie-count-never');
+      if (haveEl) haveEl.innerText = `🍺 ${haveCount} Guilty`;
+      if (neverEl) neverEl.innerText = `😇 ${neverCount} Innocent`;
+
+      // Render Reactions & Vote indicators Row
+      const reactionsRow = document.getElementById('nhie-reactions-row');
+      if (reactionsRow) {
+        reactionsRow.innerHTML = '';
+        STATE.players.slice(0, 4).forEach((p, idx) => {
+          const vote = (STATE.nhieState.votes && STATE.nhieState.votes[p.name]) || null;
+          const voteEmoji = vote === 'have' ? '🍺' : (vote === 'never' ? '😇' : '❓');
+          const borderClass = vote === 'have' ? 'border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]' : (vote === 'never' ? 'border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.5)]' : 'border-purple-400/40');
+
+          const chip = document.createElement('div');
+          chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
+          chip.innerHTML = `
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full bg-black/60 border-2 ${borderClass} flex items-center justify-center text-base">
+                ${getAppleEmojiImg(p.avatar, 'w-5 h-5')}
+              </div>
+              <span class="absolute -top-1 -right-1 text-xs">${voteEmoji}</span>
+            </div>
+            <span class="text-[9px] font-bold text-purple-200 max-w-[46px] truncate">${p.name || 'Player'}</span>
+          `;
+          reactionsRow.appendChild(chip);
+        });
+      }
+    }
+
+    function nhieVote(voteType, sync = true, incomingPayload = null) {
+      playClick();
+      const pName = (incomingPayload && incomingPayload.playerName) || (MP.active ? MP.myName : (STATE.players[STATE.currentPlayerIndex % STATE.players.length] || {}).name || 'You');
+
+      if (!STATE.nhieState.votes) STATE.nhieState.votes = {};
+      STATE.nhieState.votes[pName] = voteType;
+
+      if (voteType === 'have') {
+        playBeep(260, 'sawtooth', 0.15);
+        changeDrinks(1, false);
+        confetti({ particleCount: 25, spread: 45, origin: { y: 0.65 } });
+        showGameNotification(`${pName} has done this! (+1 🍺)`, '🍺');
+        if (typeof CHAT !== 'undefined') {
+          CHAT.addMessage({ text: `🍺 ${pName} confessed: "I have!" (+1 sip)` }, false, true);
+        }
+      } else {
+        playSuccess();
+        showGameNotification(`${pName} is innocent! 😇`, '😇');
+        if (typeof CHAT !== 'undefined') {
+          CHAT.addMessage({ text: `😇 ${pName} is innocent: "Never!"` }, false, true);
+        }
+      }
+
+      renderNhieScreen();
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'nhieVote',
+          payload: {
+            playerName: pName,
+            voteType: voteType,
+            promptIndex: STATE.nhieState.promptIndex,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function nextNhiePrompt(sync = true, incomingPayload = null) {
+      playClick();
+      STATE.nhieState.votes = {};
+      const list = NHIE_PROMPTS[STATE.mode] || NHIE_PROMPTS.extreme;
+
+      if (incomingPayload && incomingPayload.promptIndex !== undefined) {
+        STATE.nhieState.promptIndex = incomingPayload.promptIndex;
+      } else {
+        STATE.nhieState.promptIndex = (STATE.nhieState.promptIndex + 1) % list.length;
+      }
+
+      STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+
+      const card = document.getElementById('nhie-card-main-body');
+      if (card) {
+        card.style.transform = 'scale(0.97)';
+        setTimeout(() => {
+          renderNhieScreen();
+          card.style.transform = 'scale(1)';
+        }, 120);
+      } else {
+        renderNhieScreen();
+      }
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'nhieNext',
+          payload: {
+            promptIndex: STATE.nhieState.promptIndex,
+            currentPlayerIndex: STATE.currentPlayerIndex,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function skipNhiePrompt() {
+      playSwipe();
+      nextNhiePrompt();
+    }
+
+    /* -------------------------------------------------------------
+       DOUBLE DARE ENGINE
+    ------------------------------------------------------------- */
+    function renderDoubleDareScreen() {
+      if (!STATE.players || STATE.players.length === 0) {
+        if (MP.players && MP.players.length > 0) {
+          STATE.players = MP.players.map(p => ({ name: p.name, avatar: p.avatar, drinks: p.drinks || 0 }));
+        } else {
+          STATE.players = [{ name: MP.myName || 'Player 1', avatar: MP.myAvatar || '😎', drinks: 0 }];
+        }
+      }
+
+      const list = DOUBLE_DARE_PROMPTS;
+      const prompt = list[STATE.doubleDareState.promptIndex % list.length];
+      const mult = STATE.doubleDareState.multiplier || 1;
+
+      const promptEl = document.getElementById('dd-prompt-text');
+      if (promptEl) promptEl.innerText = `"${prompt}"`;
+
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : 1;
+      const targetIdx = Math.max(0, (STATE.doubleDareState.targetPlayerIndex || 0) % numPlayers);
+      const curPlayer = STATE.players[targetIdx] || { name: 'Player', avatar: '⚡' };
+      
+      const avatarEl = document.getElementById('dd-player-avatar');
+      const turnEl = document.getElementById('dd-player-turn');
+      const cardNumEl = document.getElementById('dd-card-num');
+      const multBadge = document.getElementById('dd-multiplier-badge');
+      const stakesLabel = document.getElementById('dd-stakes-label');
+      const penaltyText = document.getElementById('dd-penalty-text');
+      const passBtnText = document.getElementById('dd-pass-btn-text');
+      const forfeitBtnText = document.getElementById('dd-forfeit-btn-text');
+      const drinkEl = document.getElementById('dd-drink-counter');
+
+      if (avatarEl) avatarEl.innerText = curPlayer.avatar || '⚡';
+      if (cardNumEl) cardNumEl.innerText = `Dare #${(STATE.doubleDareState.promptIndex % list.length) + 1} of ${list.length}`;
+      if (drinkEl) drinkEl.innerText = STATE.totalDrinks;
+
+      const multNames = { 1: '1X BASE DARE', 2: '⚡ 2X DOUBLE DARE', 4: '💥 4X REDOUBLE', 8: '🔥 8X MAXIMUM DARE' };
+      if (multBadge) multBadge.innerText = multNames[mult] || `${mult}X DARE`;
+      if (stakesLabel) stakesLabel.innerText = `Stakes: ${mult}x ${mult === 1 ? 'Sip' : 'Sips'}`;
+      if (penaltyText) penaltyText.innerText = `PENALTY: TAKE ${mult} ${mult === 1 ? 'SIP' : 'SIPS'} IF FORFEITED`;
+      if (passBtnText) passBtnText.innerText = `⚡ Double Dare! (${mult * 2}x)`;
+      if (forfeitBtnText) forfeitBtnText.innerText = `💥 Forfeit & Drink (${mult} ${mult === 1 ? 'Sip' : 'Sips'})`;
+
+      const isMyTurn = !MP.active || (curPlayer.id === MP.myId || curPlayer.name === MP.myName || (MP.role === 'host' && !curPlayer.id));
+      const actionBox = document.getElementById('dd-action-buttons-container');
+      const spectatorNotice = document.getElementById('dd-spectator-turn-notice');
+      const spectatorMsg = document.getElementById('dd-spectator-msg');
+
+      if (isMyTurn) {
+        if (turnEl) {
+          turnEl.innerText = `🔥 YOUR DARE (${(curPlayer.name || 'YOU').toUpperCase()})!`;
+          turnEl.className = "text-xs font-black text-amber-300 uppercase tracking-wide animate-pulse";
+        }
+        if (actionBox) actionBox.classList.remove('hidden');
+        if (spectatorNotice) spectatorNotice.classList.add('hidden');
+      } else {
+        if (turnEl) {
+          turnEl.innerText = `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S DARE`;
+          turnEl.className = "text-xs font-black text-slate-300 uppercase tracking-wide";
+        }
+        if (actionBox) actionBox.classList.add('hidden');
+        if (spectatorNotice) {
+          spectatorNotice.classList.remove('hidden');
+          if (spectatorMsg) spectatorMsg.innerText = `⏳ Waiting for ${(curPlayer.name || 'Player')} to Accept, Double Dare, or Drink...`;
+        }
+      }
+
+      // Render Turn Order Row
+      const reactionsRow = document.getElementById('dd-reactions-row');
+      if (reactionsRow) {
+        reactionsRow.innerHTML = '';
+        STATE.players.slice(0, 4).forEach((p, idx) => {
+          const isTarget = idx === targetIdx;
+          const borderClass = isTarget ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)] animate-pulse' : 'border-white/20';
+
+          const chip = document.createElement('div');
+          chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
+          chip.innerHTML = `
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full bg-black/60 border-2 ${borderClass} flex items-center justify-center text-base">
+                ${getAppleEmojiImg(p.avatar, 'w-5 h-5')}
+              </div>
+              <span class="absolute -top-1 -right-1 text-xs">${isTarget ? '⚡' : ''}</span>
+            </div>
+            <span class="text-[9px] font-bold text-amber-200 max-w-[46px] truncate">${p.name || 'Player'}</span>
+          `;
+          reactionsRow.appendChild(chip);
+        });
+      }
+    }
+
+    function acceptDoubleDare(sync = true, incomingPayload = null) {
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : 1;
+      const targetIdx = Math.max(0, (STATE.doubleDareState.targetPlayerIndex || 0) % numPlayers);
+      const curPlayer = STATE.players[targetIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+      const mult = (incomingPayload && incomingPayload.multiplier) || STATE.doubleDareState.multiplier || 1;
+
+      playSuccess();
+      confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      showGameNotification(`${pName} Accepted and Completed the Dare! 🎉`, '🎉');
+      if (typeof CHAT !== 'undefined') {
+        CHAT.addMessage({ text: `🎉 ${pName} conquered the ${mult}x Double Dare!` }, false, true);
+      }
+
+      STATE.doubleDareState.multiplier = 1;
+      STATE.doubleDareState.targetPlayerIndex = (targetIdx + 1) % numPlayers;
+      STATE.doubleDareState.promptIndex = (STATE.doubleDareState.promptIndex + 1) % DOUBLE_DARE_PROMPTS.length;
+
+      renderDoubleDareScreen();
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'ddAccept',
+          payload: {
+            playerName: pName,
+            targetPlayerIndex: STATE.doubleDareState.targetPlayerIndex,
+            promptIndex: STATE.doubleDareState.promptIndex,
+            multiplier: 1,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function passDoubleDare(sync = true, incomingPayload = null) {
+      playSwipe();
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : 1;
+      const targetIdx = Math.max(0, (STATE.doubleDareState.targetPlayerIndex || 0) % numPlayers);
+      const curPlayer = STATE.players[targetIdx] || { name: 'Player' };
+      const nextIdx = (targetIdx + 1) % numPlayers;
+      const nextPlayer = STATE.players[nextIdx] || { name: 'Next Player' };
+
+      const curMult = STATE.doubleDareState.multiplier || 1;
+      const newMult = Math.min(8, curMult * 2);
+
+      STATE.doubleDareState.multiplier = newMult;
+      STATE.doubleDareState.targetPlayerIndex = nextIdx;
+
+      playBeep(480, 'triangle', 0.2);
+      showGameNotification(`⚡ Double Dared to ${nextPlayer.name}! (${newMult}x Stakes)`, '⚡');
+      if (typeof CHAT !== 'undefined') {
+        CHAT.addMessage({ text: `⚡ ${curPlayer.name} passed Double Dare to ${nextPlayer.name} (${newMult}x Sips)!` }, false, true);
+      }
+
+      renderDoubleDareScreen();
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'ddPass',
+          payload: {
+            playerName: curPlayer.name,
+            targetPlayerIndex: nextIdx,
+            multiplier: newMult,
+            promptIndex: STATE.doubleDareState.promptIndex,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function forfeitDoubleDare(sync = true, incomingPayload = null) {
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : 1;
+      const targetIdx = Math.max(0, (STATE.doubleDareState.targetPlayerIndex || 0) % numPlayers);
+      const curPlayer = STATE.players[targetIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+      const mult = (incomingPayload && incomingPayload.multiplier) || STATE.doubleDareState.multiplier || 1;
+
+      playBeep(200, 'sawtooth', 0.3);
+      changeDrinks(mult, false);
+      showGameNotification(`${pName} Forfeited and Drank ${mult} Sips! 🍺`, '🍺');
+      if (typeof CHAT !== 'undefined') {
+        CHAT.addMessage({ text: `🍺 ${pName} forfeited the Double Dare (+${mult} sips)!` }, false, true);
+      }
+
+      STATE.doubleDareState.multiplier = 1;
+      STATE.doubleDareState.targetPlayerIndex = (targetIdx + 1) % numPlayers;
+      STATE.doubleDareState.promptIndex = (STATE.doubleDareState.promptIndex + 1) % DOUBLE_DARE_PROMPTS.length;
+
+      renderDoubleDareScreen();
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'ddForfeit',
+          payload: {
+            playerName: pName,
+            targetPlayerIndex: STATE.doubleDareState.targetPlayerIndex,
+            promptIndex: STATE.doubleDareState.promptIndex,
+            multiplier: 1,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function nextDoubleDarePrompt(sync = true) {
+      playClick();
+      const numPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players.length : 1;
+      STATE.doubleDareState.multiplier = 1;
+      STATE.doubleDareState.targetPlayerIndex = ((STATE.doubleDareState.targetPlayerIndex || 0) + 1) % numPlayers;
+      STATE.doubleDareState.promptIndex = ((STATE.doubleDareState.promptIndex || 0) + 1) % DOUBLE_DARE_PROMPTS.length;
+
+      const card = document.getElementById('dd-card-main-body');
+      if (card) {
+        card.style.transform = 'scale(0.97)';
+        setTimeout(() => {
+          renderDoubleDareScreen();
+          card.style.transform = 'scale(1)';
+        }, 120);
+      } else {
+        renderDoubleDareScreen();
+      }
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'ddNext',
+          payload: {
+            targetPlayerIndex: STATE.doubleDareState.targetPlayerIndex,
+            promptIndex: STATE.doubleDareState.promptIndex,
+            multiplier: 1,
+            totalDrinks: STATE.totalDrinks
+          }
+        });
+      }
+    }
+
+    function skipDoubleDarePrompt() {
+      playSwipe();
+      nextDoubleDarePrompt();
     }
 
     /* -------------------------------------------------------------
@@ -3595,17 +4384,26 @@
       if (action === 'nextPrompt') {
         STATE.promptIndex = payload.promptIndex;
         if (payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
-        if (payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
+        if (payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
         renderMockupDrinkScreen();
       } else if (action === 'completeDare') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
-        if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
         completeDareAction(false, payload);
       } else if (action === 'forfeitDare') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.promptIndex !== undefined) STATE.promptIndex = payload.promptIndex;
-        if (payload && payload.totalDrinks !== undefined) STATE.totalDrinks = payload.totalDrinks;
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
         forfeitDareAction(false, payload);
       } else if (action === 'spinBottle') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
@@ -3614,16 +4412,14 @@
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.totalDrinks !== undefined) {
           STATE.totalDrinks = payload.totalDrinks;
-          const countEl = document.getElementById('drink-counter');
-          if (countEl) countEl.innerText = STATE.totalDrinks;
+          updateAllDrinkCounters();
         }
         finishBottleChallenge(payload.completed, false);
       } else if (action === 'nextPlayerBottle') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
       } else if (action === 'changeDrinks') {
         STATE.totalDrinks = Math.max(0, STATE.totalDrinks + payload.delta);
-        const countEl = document.getElementById('drink-counter');
-        if (countEl) countEl.innerText = STATE.totalDrinks;
+        updateAllDrinkCounters();
       } else if (action === 'todChoice') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         pickTruthOrDare(payload.choice, false, payload);
@@ -3631,13 +4427,50 @@
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.totalDrinks !== undefined) {
           STATE.totalDrinks = payload.totalDrinks;
-          const countEl = document.getElementById('drink-counter');
-          if (countEl) countEl.innerText = STATE.totalDrinks;
+          updateAllDrinkCounters();
         }
         finishTodTurn(payload.completed, false, payload);
       } else if (action === 'nextPlayerTod') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         renderTodPlayerUI();
+      } else if (action === 'nhieVote') {
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        nhieVote(payload.voteType, false, payload);
+      } else if (action === 'nhieNext') {
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        nextNhiePrompt(false, payload);
+      } else if (action === 'ddAccept') {
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        acceptDoubleDare(false, payload);
+      } else if (action === 'ddPass') {
+        if (payload && payload.multiplier !== undefined) STATE.doubleDareState.multiplier = payload.multiplier;
+        if (payload && payload.targetPlayerIndex !== undefined) STATE.doubleDareState.targetPlayerIndex = payload.targetPlayerIndex;
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        passDoubleDare(false, payload);
+      } else if (action === 'ddForfeit') {
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        forfeitDoubleDare(false, payload);
+      } else if (action === 'ddNext') {
+        if (payload && payload.totalDrinks !== undefined) {
+          STATE.totalDrinks = payload.totalDrinks;
+          updateAllDrinkCounters();
+        }
+        nextDoubleDarePrompt(false, payload);
       }
     }
 
