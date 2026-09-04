@@ -1649,7 +1649,7 @@
         { name: '', avatar: '🧔' }
       ],
       currentPlayerIndex: 0,
-      todState: { type: null, prompt: null, timerInterval: null },
+      todState: { step: 'choice', type: null, prompt: null, playerName: null, timerInterval: null },
       nhieState: { promptIndex: 0, votes: {} },
       doubleDareState: { promptIndex: 0, multiplier: 1, targetPlayerIndex: 0 },
       navigationStack: ['setup']
@@ -2782,6 +2782,14 @@
        TRUTH OR DARE ENGINE
     ------------------------------------------------------------- */
     function renderTodPlayerUI() {
+      if (!STATE.players || STATE.players.length === 0) {
+        if (MP.players && MP.players.length > 0) {
+          STATE.players = MP.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, drinks: p.drinks || 0 }));
+        } else {
+          STATE.players = [{ name: MP.myName || 'Player 1', avatar: MP.myAvatar || '😎', drinks: 0 }];
+        }
+      }
+
       const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
       const curPlayer = STATE.players[safeIdx] || { name: 'Player', avatar: '😎' };
       const isMyTurn = isLocalTurnMyTurn();
@@ -2789,32 +2797,54 @@
       const avatarEl = document.getElementById('tod-avatar-img');
       const choiceBox = document.getElementById('tod-choice-container');
       const promptBox = document.getElementById('tod-prompt-container');
+      const actionBox = document.getElementById('tod-action-buttons-container');
+      const specWaiting = document.getElementById('tod-spectator-waiting');
+      const specMsg = document.getElementById('tod-spectator-msg');
+      const promptTextEl = document.getElementById('tod-prompt-text');
+      const challengeTitleEl = document.getElementById('tod-challenge-title');
 
       if (avatarEl) avatarEl.src = `https://emojicdn.elk.sh/${encodeURIComponent(curPlayer.avatar || '😎')}?style=apple`;
       if (nameEl) {
         nameEl.innerText = isMyTurn ? `🔥 YOUR TURN (${(curPlayer.name || 'YOU').toUpperCase()})!` : `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
       }
-      if (choiceBox) choiceBox.classList.remove('hidden');
-      if (promptBox) promptBox.classList.add('hidden');
-      clearInterval(STATE.todState.timerInterval);
+
+      // If a challenge/prompt is active, keep it visible for everyone in the room
+      if (STATE.todState.step === 'prompt' && STATE.todState.prompt) {
+        if (choiceBox) choiceBox.classList.add('hidden');
+        if (promptBox) promptBox.classList.remove('hidden');
+        if (promptTextEl) promptTextEl.innerText = `"${STATE.todState.prompt}"`;
+
+        const pName = STATE.todState.playerName || curPlayer.name || 'Player';
+        const pType = (STATE.todState.type || 'challenge').toUpperCase();
+        if (challengeTitleEl) challengeTitleEl.innerText = `${pName}'s ${pType} Challenge`;
+
+        if (isMyTurn) {
+          if (actionBox) { actionBox.classList.remove('hidden'); actionBox.classList.add('grid'); }
+          if (specWaiting) specWaiting.classList.add('hidden');
+        } else {
+          if (actionBox) { actionBox.classList.add('hidden'); actionBox.classList.remove('grid'); }
+          if (specWaiting) {
+            specWaiting.classList.remove('hidden');
+            if (specMsg) specMsg.innerText = `⏳ Waiting for ${pName} to complete or forfeit...`;
+          }
+        }
+      } else {
+        // Choice selection stage
+        if (choiceBox) choiceBox.classList.remove('hidden');
+        if (promptBox) promptBox.classList.add('hidden');
+        clearInterval(STATE.todState.timerInterval);
+      }
     }
 
     function pickTruthOrDare(type, sync = true, incomingPayload = null) {
       if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
+        const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+        const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+        showGameNotification(`It's ${(curPlayer.name || 'Player')}'s turn to choose!`, '⏳');
         return;
       }
       playClick();
-      STATE.todState.type = type;
-
-      const choiceBox = document.getElementById('tod-choice-container');
-      const promptBox = document.getElementById('tod-prompt-container');
-      const actionBox = document.getElementById('tod-action-buttons-container');
-      const specWaiting = document.getElementById('tod-spectator-waiting');
-      const specMsg = document.getElementById('tod-spectator-msg');
-
-      if (choiceBox) choiceBox.classList.add('hidden');
-      if (promptBox) promptBox.classList.remove('hidden');
 
       const modeList = (TOD_PROMPTS[type] && (TOD_PROMPTS[type][STATE.mode] || TOD_PROMPTS[type].extreme)) || TOD_PROMPTS[type].extreme;
       let randomPrompt = "";
@@ -2828,22 +2858,12 @@
       const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
       const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
 
-      const promptTextEl = document.getElementById('tod-prompt-text');
-      const challengeTitleEl = document.getElementById('tod-challenge-title');
-      if (promptTextEl) promptTextEl.innerText = `"${randomPrompt}"`;
-      if (challengeTitleEl) challengeTitleEl.innerText = `${pName}'s ${type.toUpperCase()} Challenge`;
+      STATE.todState.step = 'prompt';
+      STATE.todState.type = type;
+      STATE.todState.prompt = randomPrompt;
+      STATE.todState.playerName = pName;
 
-      const isMyTurn = isLocalTurnMyTurn();
-      if (isMyTurn) {
-        if (actionBox) { actionBox.classList.remove('hidden'); actionBox.classList.add('grid'); }
-        if (specWaiting) specWaiting.classList.add('hidden');
-      } else {
-        if (actionBox) { actionBox.classList.add('hidden'); actionBox.classList.remove('grid'); }
-        if (specWaiting) {
-          specWaiting.classList.remove('hidden');
-          if (specMsg) specMsg.innerText = `⏳ Waiting for ${pName} to complete or forfeit...`;
-        }
-      }
+      renderTodPlayerUI();
 
       showGameNotification(`${pName} picked ${type.toUpperCase()}!`, type === 'truth' ? '❓' : '⚡');
       if (typeof CHAT !== 'undefined') {
@@ -2857,7 +2877,7 @@
           payload: { 
             choice: type, 
             prompt: randomPrompt,
-            playerName: curPlayer.name,
+            playerName: pName,
             currentPlayerIndex: STATE.currentPlayerIndex 
           } 
         });
@@ -2870,13 +2890,13 @@
       let seconds = 30;
       const timerEl = document.getElementById('tod-timer');
       clearInterval(STATE.todState.timerInterval);
-      timerEl.innerText = `${seconds}s`;
+      if (timerEl) timerEl.innerText = `${seconds}s`;
       STATE.todState.timerInterval = setInterval(() => {
         seconds--;
-        timerEl.innerText = `${seconds}s`;
+        if (timerEl) timerEl.innerText = `${seconds}s`;
         if (seconds <= 0) {
           clearInterval(STATE.todState.timerInterval);
-          timerEl.innerText = '0s';
+          if (timerEl) timerEl.innerText = '0s';
           playBeep(220, 'sawtooth', 0.4);
         }
       }, 1000);
@@ -2891,14 +2911,15 @@
       
       const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
       const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
-      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+      const pName = (incomingPayload && incomingPayload.playerName) || STATE.todState.playerName || curPlayer.name;
+      const typeStr = (STATE.todState.type || 'challenge').toUpperCase();
 
       if (completed) {
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
-        showGameNotification(`${pName} Completed their ${(STATE.todState.type || 'challenge').toUpperCase()}!`, '🎉');
+        showGameNotification(`${pName} Completed their ${typeStr}!`, '🎉');
         if (typeof CHAT !== 'undefined') {
-          CHAT.addMessage({ text: `🎉 ${pName} completed their ${(STATE.todState.type || 'challenge').toUpperCase()}!` }, false, true);
+          CHAT.addMessage({ text: `🎉 ${pName} completed their ${typeStr}!` }, false, true);
         }
       } else {
         playBeep(200, 'square', 0.2);
@@ -2909,19 +2930,27 @@
         }
       }
 
+      const nextIdx = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      STATE.todState.step = 'choice';
+      STATE.todState.type = null;
+      STATE.todState.prompt = null;
+      STATE.todState.playerName = null;
+
       if (sync && MP.active) {
         MP.broadcast({
           type: 'GAME_ACTION',
           action: 'todFinish',
           payload: {
             completed,
-            playerName: curPlayer.name,
-            currentPlayerIndex: (STATE.currentPlayerIndex + 1) % STATE.players.length,
+            playerName: pName,
+            currentPlayerIndex: nextIdx,
             totalDrinks: STATE.totalDrinks
           }
         });
       }
-      nextPlayer('tod', false);
+
+      STATE.currentPlayerIndex = nextIdx;
+      renderTodPlayerUI();
     }
 
     function nextPlayer(game = 'tod', sync = true) {
@@ -2930,6 +2959,12 @@
         return;
       }
       STATE.currentPlayerIndex = (STATE.currentPlayerIndex + 1) % STATE.players.length;
+      STATE.todState.step = 'choice';
+      STATE.todState.type = null;
+      STATE.todState.prompt = null;
+      STATE.todState.playerName = null;
+      clearInterval(STATE.todState.timerInterval);
+
       renderTodPlayerUI();
       if (sync && MP.active) {
         MP.broadcast({
@@ -3769,9 +3804,29 @@
               status: 'playing',
               gameStarted: true,
               selectedGame: STATE.selectedGame || 'dare-drink',
+              mode: STATE.mode,
               promptIndex: STATE.promptIndex,
               currentPlayerIndex: STATE.currentPlayerIndex,
               totalDrinks: STATE.totalDrinks,
+              todState: {
+                step: STATE.todState.step || 'choice',
+                type: STATE.todState.type || null,
+                prompt: STATE.todState.prompt || null,
+                playerName: STATE.todState.playerName || null
+              },
+              nhieState: {
+                promptIndex: STATE.nhieState.promptIndex || 0,
+                votes: STATE.nhieState.votes || {}
+              },
+              doubleDareState: {
+                promptIndex: STATE.doubleDareState.promptIndex || 0,
+                multiplier: STATE.doubleDareState.multiplier || 1,
+                targetPlayerIndex: STATE.doubleDareState.targetPlayerIndex || 0
+              },
+              spinBottleState: {
+                currentBottleDare: currentBottleDare || '',
+                currentLandedIndex: currentLandedIndex || 0
+              },
               players: MP.players
             });
           }
@@ -3883,21 +3938,52 @@
           if (msg.mode) STATE.mode = msg.mode;
           if (msg.promptIndex !== undefined) STATE.promptIndex = msg.promptIndex;
           if (msg.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = msg.currentPlayerIndex;
-          if (msg.totalDrinks !== undefined) STATE.totalDrinks = msg.totalDrinks;
+          if (msg.totalDrinks !== undefined) {
+            STATE.totalDrinks = msg.totalDrinks;
+            updateAllDrinkCounters();
+          }
+
+          // Sync sub-game states if provided
+          if (msg.todState) {
+            STATE.todState.step = msg.todState.step || STATE.todState.step;
+            if (msg.todState.type !== undefined) STATE.todState.type = msg.todState.type;
+            if (msg.todState.prompt !== undefined) STATE.todState.prompt = msg.todState.prompt;
+            if (msg.todState.playerName !== undefined) STATE.todState.playerName = msg.todState.playerName;
+          }
+          if (msg.nhieState) {
+            if (msg.nhieState.promptIndex !== undefined) STATE.nhieState.promptIndex = msg.nhieState.promptIndex;
+            if (msg.nhieState.votes) STATE.nhieState.votes = msg.nhieState.votes;
+          }
+          if (msg.doubleDareState) {
+            if (msg.doubleDareState.promptIndex !== undefined) STATE.doubleDareState.promptIndex = msg.doubleDareState.promptIndex;
+            if (msg.doubleDareState.multiplier !== undefined) STATE.doubleDareState.multiplier = msg.doubleDareState.multiplier;
+            if (msg.doubleDareState.targetPlayerIndex !== undefined) STATE.doubleDareState.targetPlayerIndex = msg.doubleDareState.targetPlayerIndex;
+          }
+          if (msg.spinBottleState) {
+            if (msg.spinBottleState.currentBottleDare) currentBottleDare = msg.spinBottleState.currentBottleDare;
+            if (msg.spinBottleState.currentLandedIndex !== undefined) currentLandedIndex = msg.spinBottleState.currentLandedIndex;
+          }
+
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
             syncLocalStateWithMP();
           }
 
           const currentScreen = document.querySelector('.screen.active');
-          if (!currentScreen || currentScreen.id === 'screen-lobby' || currentScreen.id === 'screen-setup') {
+          if (!currentScreen || currentScreen.id === 'screen-lobby' || currentScreen.id === 'screen-setup' || currentScreen.id === 'screen-carousel') {
             playSuccess();
             confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
             navigate(gameToLaunch, false);
-          } else if (currentScreen.id === 'screen-dare-drink') {
-            renderMockupDrinkScreen();
-          } else if (currentScreen.id === 'screen-truth-dare') {
-            renderTodPlayerUI();
+          } else {
+            if (currentScreen.id === 'screen-dare-drink') {
+              renderMockupDrinkScreen();
+            } else if (currentScreen.id === 'screen-truth-dare') {
+              renderTodPlayerUI();
+            } else if (currentScreen.id === 'screen-never-ever') {
+              renderNhieScreen();
+            } else if (currentScreen.id === 'screen-double-dare') {
+              renderDoubleDareScreen();
+            }
           }
         }
 
@@ -4317,6 +4403,7 @@
 
     function syncLocalStateWithMP() {
       STATE.players = MP.players.map(p => ({
+        id: p.id,
         name: p.name,
         avatar: p.avatar,
         drinks: p.drinks || 0
@@ -4432,6 +4519,10 @@
         finishTodTurn(payload.completed, false, payload);
       } else if (action === 'nextPlayerTod') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        STATE.todState.step = 'choice';
+        STATE.todState.type = null;
+        STATE.todState.prompt = null;
+        STATE.todState.playerName = null;
         renderTodPlayerUI();
       } else if (action === 'nhieVote') {
         if (payload && payload.totalDrinks !== undefined) {
