@@ -349,42 +349,122 @@
     </div>
 
     <!-- MAIN VIEW CONTAINER -->
-    <main class="flex-1 overflow-y-auto relative flex flex-col">
-
-      <!-- ================= SCREEN 1: INITIAL SETUP & MODE SELECTION ================= -->
-      <div id="screen-setup" class="screen active flex-col justify-between p-6 pb-8 min-h-full">
+    <main class="flex-1 overflow-y-auto re      <!-- ================= SCREEN 0: MODE SELECTION LANDING ================= -->
+      <div id="screen-mode-select" class="screen active flex-col justify-between p-6 pb-8 min-h-full">
         
-        <div class="space-y-5">
-          <div class="pt-2 space-y-1">
-            <div class="flex items-center space-x-2">
-              <span class="text-xs font-black tracking-wider text-amber-400 uppercase">SPARK PARTY</span>
-              <span class="text-xs">⚡</span>
-            </div>
-            <h2 class="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-rose-500 tracking-tight">
-              Let's Partyyyy! 🎉🔥
-            </h2>
-            <p class="text-xs text-slate-400">Choose intensity mode & type player names below to begin.</p>
+        <!-- Header / Logo section -->
+        <div class="space-y-4 pt-2 text-center">
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-widest animate-pulse mx-auto">
+            <span>🔥</span>
+            <span>THE ULTIMATE PARTY GAME</span>
+            <span>⚡</span>
           </div>
 
-          <!-- Play Mode Switcher: Single Phone vs Live Multiplayer -->
-          <div class="p-1 rounded-2xl bg-white/[0.06] border border-white/10 grid grid-cols-2 gap-1 text-xs font-bold shadow-inner">
-            <button id="mode-tab-local" onclick="switchPlayMode('local')" class="py-2.5 rounded-xl bg-white text-black shadow-md flex items-center justify-center space-x-1.5 transition">
-              <span>📱 Pass & Play</span>
-            </button>
-            <button id="mode-tab-multiplayer" onclick="switchPlayMode('multiplayer')" class="py-2.5 rounded-xl text-slate-400 hover:text-white flex items-center justify-center space-x-1.5 transition">
-              <span>🌐 Room Multiplayer</span>
-              <span class="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-500 text-black font-black uppercase tracking-wider">Live</span>
-            </button>
+          <div class="space-y-1">
+            <h2 class="text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-rose-500 tracking-tight">
+              SPARK PARTY
+            </h2>
+            <p class="text-xs text-slate-300 font-medium">How do you want to play tonight?</p>
+          </div>
+        </div>
+
+        <!-- Two Big Interactive Hero Mode Cards -->
+        <div class="space-y-4 my-auto py-2">
+
+          <!-- OPTION 1: PASS & PLAY -->
+          <div onclick="goToPassAndPlay()" class="p-5 rounded-3xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-amber-500/40 hover:border-amber-400 shadow-[0_0_30px_rgba(255,140,0,0.2)] hover:shadow-[0_0_40px_rgba(255,140,0,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl pointer-events-none"></div>
+
+            <div class="flex items-start justify-between">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(255,140,0,0.4)]">
+                📱
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-400/40">
+                1 Phone
+              </span>
+            </div>
+
+            <div class="mt-4 space-y-1">
+              <h3 class="font-display font-black text-xl text-white group-hover:text-amber-300 transition">
+                Pass & Play
+              </h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Pass a single phone around the circle with custom player names, forfeit sips, and 3D games!
+              </p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold">
+              <span class="text-slate-400">2–20 Players</span>
+              <span class="text-amber-400 flex items-center space-x-1 group-hover:translate-x-1 transition font-black">
+                <span>Start Setup</span>
+                <span>&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- OPTION 2: ROOM MULTIPLAYER -->
+          <div onclick="goToMultiplayer()" class="p-5 rounded-3xl bg-gradient-to-br from-cyan-950/40 to-purple-950/30 border border-cyan-400/40 hover:border-cyan-300 shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:shadow-[0_0_40px_rgba(0,240,255,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-cyan-500/15 blur-2xl pointer-events-none"></div>
+
+            <div class="flex items-start justify-between">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+                🌐
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider border border-emerald-400/40 flex items-center space-x-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Multi-Device</span>
+              </span>
+            </div>
+
+            <div class="mt-4 space-y-1">
+              <h3 class="font-display font-black text-xl text-white group-hover:text-cyan-300 transition">
+                Room Multiplayer
+              </h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Connect multiple phones with a 4-digit code. Live synchronized spins, dare broadcasts & emoji reactions!
+              </p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold">
+              <span class="text-cyan-300">Host or Join</span>
+              <span class="text-cyan-400 flex items-center space-x-1 group-hover:translate-x-1 transition font-black">
+                <span>Enter Rooms</span>
+                <span>&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pt-2 text-center">
+          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.4.0 Live ⚡</span>
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN 1A: PASS & PLAY SETUP ================= -->
+      <div id="screen-pass-play" class="screen flex-col justify-between p-6 pb-8 min-h-full">
+        
+        <div class="space-y-4">
+          <div class="pt-1 space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black tracking-wider text-amber-400 uppercase">PASS & PLAY</span>
+              <span class="text-xs">📱</span>
+            </div>
+            <h2 class="text-2xl font-display font-black text-white">
+              Squad Setup 👥
+            </h2>
+            <p class="text-xs text-slate-400">Pick intensity & player names, then choose your game.</p>
           </div>
 
           <!-- Mode Selector with Intensity Color Transition -->
-          <div class="space-y-2.5">
+          <div class="space-y-2">
             <div class="flex justify-between items-center px-0.5">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Intensity Level</span>
               <span id="setup-mode-tag" class="text-xs font-black text-rose-400 transition-colors duration-300">Extreme & unfiltered dares 🔥</span>
             </div>
 
-            <!-- Segmented Control with dynamic intensity border glow -->
             <div id="mode-selector-box" class="p-1 rounded-2xl bg-white/5 border border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.2)] grid grid-cols-4 gap-1 transition-all duration-300">
               <button onclick="selectInitialMode('chill')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-sky-300 hover:bg-sky-500/10 flex flex-col items-center space-y-0.5" data-mode="chill">
                 <img src="https://emojicdn.elk.sh/🍦?style=apple" class="w-4 h-4 apple-emoji" alt="Chill">
@@ -405,11 +485,10 @@
             </div>
           </div>
 
-          <!-- LOCAL PASS & PLAY PANEL -->
-          <div id="panel-local-setup" class="space-y-3">
+          <!-- Participants Input Section -->
+          <div class="space-y-3">
             <div class="flex justify-between items-center px-0.5">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Participants (<span id="setup-player-num">2</span>)</span>
-              <!-- Stepper Controls -->
               <div class="flex items-center space-x-2 bg-white/10 p-1 rounded-full border border-white/10">
                 <button onclick="changePlayerCount(-1)" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center transition">-</button>
                 <span id="setup-player-badge" class="w-6 text-center font-display font-bold text-xs text-white">2</span>
@@ -417,7 +496,7 @@
               </div>
             </div>
 
-            <!-- Dynamic Player Name Inputs directly on Homepage -->
+            <!-- Dynamic Player Name Inputs -->
             <div class="space-y-2">
               <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[200px] overflow-y-auto">
                 <!-- Dynamically populated -->
@@ -434,85 +513,96 @@
               </div>
             </div>
 
-            <!-- Validation Warning on Homepage -->
+            <!-- Validation Warning -->
             <div id="homepage-name-validation" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-xs font-bold text-center">
               ⚠️ Please type names for all players before continuing!
             </div>
 
-            <!-- Continue CTA Button for Local Pass & Play -->
+            <!-- Continue CTA Button -->
             <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-3 transition active:scale-95">
               <span>Continue to Game Deck</span>
               <span>&rarr;</span>
             </button>
           </div>
 
-          <!-- MULTIPLAYER ROOM SETUP PANEL (Hidden by default) -->
-          <div id="panel-multiplayer-setup" class="hidden space-y-4">
-            
-            <!-- Host / Join Sub-Tabs -->
-            <div class="p-1 rounded-xl bg-white/5 border border-white/10 grid grid-cols-2 gap-1 text-xs font-bold">
-              <button id="mp-subtab-host" onclick="switchMPSubTab('host')" class="py-2 rounded-lg bg-amber-500 text-black shadow-md flex items-center justify-center space-x-1 transition">
-                <span>👑 Host Game</span>
-              </button>
-              <button id="mp-subtab-join" onclick="switchMPSubTab('join')" class="py-2 rounded-lg text-slate-400 hover:text-white flex items-center justify-center space-x-1 transition">
-                <span>🔗 Join Room</span>
-              </button>
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN 1B: ROOM MULTIPLAYER ================= -->
+      <div id="screen-multiplayer" class="screen flex-col justify-between p-6 pb-8 min-h-full">
+        
+        <div class="space-y-4">
+          <div class="pt-1 space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black tracking-wider text-cyan-400 uppercase">ROOM MULTIPLAYER</span>
+              <span class="text-xs">🌐</span>
             </div>
-
-            <!-- HOST VIEW -->
-            <div id="mp-host-view" class="space-y-3 bg-white/[0.03] border border-amber-500/30 rounded-2xl p-4">
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Step 1: Your Host Profile</span>
-                <div class="flex items-center space-x-2">
-                  <button type="button" onclick="cycleMyAvatar()" id="mp-host-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
-                    👑
-                  </button>
-                  <input type="text" id="mp-host-name-input" placeholder="Enter your name (Host)..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400" />
-                </div>
-              </div>
-
-              <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 space-y-1">
-                <div class="font-bold flex items-center space-x-1">
-                  <span>💡 How it works:</span>
-                </div>
-                <p class="text-slate-300">You will get a 4-digit Room Code. Friends can scan your QR code or type the code on their phones to play with you!</p>
-              </div>
-
-              <button onclick="createMultiplayerRoom()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,140,0,0.5)] transition active:scale-95">
-                <span>Create Game Room ⚡</span>
-              </button>
-            </div>
-
-            <!-- JOIN VIEW -->
-            <div id="mp-join-view" class="hidden space-y-3 bg-white/[0.03] border border-cyan-500/30 rounded-2xl p-4">
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Room Code (4-Digits)</span>
-                <input type="text" id="mp-join-code-input" maxlength="4" placeholder="e.g. 7429" class="w-full text-center font-mono font-black text-2xl tracking-[0.3em] uppercase bg-white/5 border border-cyan-400/40 rounded-xl py-2.5 text-cyan-300 placeholder:text-slate-600 focus:outline-none focus:border-cyan-300" />
-              </div>
-
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Your Player Name</span>
-                <div class="flex items-center space-x-2">
-                  <button type="button" onclick="cycleMyAvatar()" id="mp-join-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
-                    😎
-                  </button>
-                  <input type="text" id="mp-join-name-input" placeholder="Enter your nickname..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400" />
-                </div>
-              </div>
-
-              <div id="mp-join-error" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-[11px] font-bold text-center">
-                <!-- Error msg -->
-              </div>
-
-              <button onclick="joinMultiplayerRoom()" id="mp-join-submit-btn" class="w-full py-3.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95">
-                <span>Enter Room 🎮</span>
-              </button>
-            </div>
-
+            <h2 class="text-2xl font-display font-black text-white">
+              Connect Phones 🎮
+            </h2>
+            <p class="text-xs text-slate-400">Host a room or enter a 4-digit code to join your squad.</p>
           </div>
 
-          <div class="pt-2 text-center">
-            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.3.0 Live ⚡</span>
+          <!-- Host / Join Sub-Tabs -->
+          <div class="p-1 rounded-xl bg-white/5 border border-white/10 grid grid-cols-2 gap-1 text-xs font-bold">
+            <button id="mp-subtab-host" onclick="switchMPSubTab('host')" class="py-2.5 rounded-lg bg-amber-500 text-black shadow-md flex items-center justify-center space-x-1 transition">
+              <span>👑 Host Game</span>
+            </button>
+            <button id="mp-subtab-join" onclick="switchMPSubTab('join')" class="py-2.5 rounded-lg text-slate-400 hover:text-white flex items-center justify-center space-x-1 transition">
+              <span>🔗 Join Room</span>
+            </button>
+          </div>
+
+          <!-- HOST VIEW -->
+          <div id="mp-host-view" class="space-y-3 bg-white/[0.03] border border-amber-500/30 rounded-2xl p-4">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Step 1: Your Host Profile</span>
+              <div class="flex items-center space-x-2">
+                <button type="button" onclick="cycleMyAvatar()" id="mp-host-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
+                  👑
+                </button>
+                <input type="text" id="mp-host-name-input" placeholder="Enter your name (Host)..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400" />
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 space-y-1">
+              <div class="font-bold flex items-center space-x-1">
+                <span>💡 How it works:</span>
+              </div>
+              <p class="text-slate-300">You will get a 4-digit Room Code. Friends can scan your QR code or type the code on their phones to play with you!</p>
+            </div>
+
+            <button onclick="createMultiplayerRoom()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,140,0,0.5)] transition active:scale-95">
+              <span>Create Game Room ⚡</span>
+            </button>
+          </div>
+
+          <!-- JOIN VIEW -->
+          <div id="mp-join-view" class="hidden space-y-3 bg-white/[0.03] border border-cyan-500/30 rounded-2xl p-4">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Room Code (4-Digits)</span>
+              <input type="text" id="mp-join-code-input" maxlength="4" placeholder="e.g. 7429" class="w-full text-center font-mono font-black text-2xl tracking-[0.3em] uppercase bg-white/5 border border-cyan-400/40 rounded-xl py-2.5 text-cyan-300 placeholder:text-slate-600 focus:outline-none focus:border-cyan-300" />
+            </div>
+
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Your Player Name</span>
+              <div class="flex items-center space-x-2">
+                <button type="button" onclick="cycleMyAvatar()" id="mp-join-avatar-btn" class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl flex-shrink-0">
+                  😎
+                </button>
+                <input type="text" id="mp-join-name-input" placeholder="Enter your nickname..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400" />
+              </div>
+            </div>
+
+            <div id="mp-join-error" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-[11px] font-bold text-center">
+              <!-- Error msg -->
+            </div>
+
+            <button onclick="joinMultiplayerRoom()" id="mp-join-submit-btn" class="w-full py-3.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)] transition active:scale-95">
+              <span>Enter Room 🎮</span>
+            </button>
           </div>
 
         </div>
@@ -712,44 +802,6 @@
             &rarr;
           </button>
         </div>
-
-      </div>
-
-
-      <!-- ================= SCREEN 3: ENTER PARTICIPANT NAMES (MANDATORY TYPING) ================= -->
-      <div id="screen-participants" class="screen flex-col justify-between p-6 pb-6 min-h-full">
-        
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <span id="part-game-tag" class="text-xs font-bold uppercase tracking-wider text-amber-400">Dare or Drink</span>
-            <h2 class="text-2xl font-display font-black text-white">Enter Player Names</h2>
-            <p class="text-xs text-slate-400">Type each participant's name to personalize the game:</p>
-          </div>
-
-          <!-- Dynamic List of Empty Name Inputs -->
-          <div id="participants-input-list" class="bg-white/[0.03] border border-white/10 rounded-3xl divide-y divide-white/[0.08] max-h-[420px] overflow-y-auto">
-            <!-- Populated by JS -->
-          </div>
-
-          <!-- Validation Warning -->
-          <div id="name-validation-msg" class="hidden p-2.5 rounded-xl bg-red-950/70 border border-red-500/50 text-red-300 text-xs font-bold text-center">
-            ⚠️ Please type names for all players before starting!
-          </div>
-
-          <div class="flex space-x-2.5 pt-1">
-            <button onclick="addParticipantRow()" class="flex-1 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold text-white transition">
-              + Add Player
-            </button>
-            <button onclick="fillExampleNames()" class="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs text-amber-300 font-bold transition" title="Fill names like Sarah, Mike, Jess from the mockup">
-              ⚡ Fill Sarah, Mike, Jess
-            </button>
-          </div>
-        </div>
-
-        <button onclick="validateAndStartGame()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-4 transition active:scale-95">
-          <span>Start The Game</span>
-          <img src="https://emojicdn.elk.sh/✨?style=apple" class="w-4 h-4 apple-emoji" alt="Sparkles">
-        </button>
 
       </div>
 
@@ -1403,6 +1455,21 @@
     /* -------------------------------------------------------------
        NAVIGATION ROUTER
     ------------------------------------------------------------- */
+    function goToPassAndPlay() {
+      playClick();
+      MP.role = 'local';
+      MP.active = false;
+      navigate('pass-play');
+    }
+
+    function goToMultiplayer() {
+      playClick();
+      MP.role = 'host';
+      MP.active = true;
+      navigate('multiplayer');
+      switchMPSubTab('host');
+    }
+
     function navigate(screenName, addToStack = true) {
       playClick();
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1425,7 +1492,7 @@
 
       const logoThumb = document.getElementById('header-logo-thumb');
 
-      if (screenName === 'setup') {
+      if (screenName === 'mode-select' || screenName === 'setup') {
         backBtn.classList.add('hidden');
         if (logoThumb) logoThumb.classList.remove('hidden');
         title.innerHTML = '<span>SPARK</span><span class="text-xs text-amber-400">⚡</span>';
@@ -1446,13 +1513,21 @@
           }
         }
 
+        if (screenName === 'pass-play') {
+          title.innerText = 'Pass & Play';
+          subtitle.innerText = 'Squad Setup';
+        }
+        if (screenName === 'multiplayer') {
+          title.innerText = 'Room Multiplayer';
+          subtitle.innerText = 'Connect Phones';
+        }
         if (screenName === 'lobby') {
           title.innerText = 'Lobby Room';
           subtitle.innerText = 'Waiting Squad';
         }
         if (screenName === 'carousel') {
           title.innerText = 'Game Deck';
-          subtitle.innerText = '1 Card View';
+          subtitle.innerText = 'Pick a Game';
           const banner = document.getElementById('carousel-mp-banner');
           if (banner) {
             if (MP.active && MP.role === 'host') {
@@ -1464,10 +1539,6 @@
             }
           }
           render1CardStage();
-        }
-        if (screenName === 'participants') {
-          title.innerText = 'Participants';
-          subtitle.innerText = 'Type Names';
         }
         if (screenName === 'dare-drink' || screenName === 'never-ever' || screenName === 'double-dare') {
           title.innerText = screenName === 'never-ever' ? 'Never Have I Ever' : (screenName === 'double-dare' ? 'Double Dare' : 'Dare or Drink');
@@ -1492,7 +1563,7 @@
         const previous = STATE.navigationStack[STATE.navigationStack.length - 1];
         navigate(previous, false);
       } else {
-        navigate('setup', false);
+        navigate('mode-select', false);
       }
     }
 
@@ -3314,8 +3385,7 @@
       MP.isReady = false;
       MP.gameStarted = false;
       MP.role = 'local';
-      navigate('setup');
-      switchPlayMode('local');
+      navigate('mode-select');
     }
 
     function sendEmojiReaction(emoji) {
@@ -3398,6 +3468,8 @@
     }, 1000);
 
     function initApp() {
+      STATE.navigationStack = ['mode-select'];
+      navigate('mode-select', false);
       selectInitialMode('extreme');
       renderHomepageParticipants();
       render1CardStage();
@@ -3407,7 +3479,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const joinCode = urlParams.get('join');
       if (joinCode) {
-        switchPlayMode('multiplayer');
+        goToMultiplayer();
         switchMPSubTab('join');
         const codeInput = document.getElementById('mp-join-code-input');
         if (codeInput) codeInput.value = joinCode;
