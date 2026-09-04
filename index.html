@@ -349,7 +349,9 @@
     </div>
 
     <!-- MAIN VIEW CONTAINER -->
-    <main class="flex-1 overflow-y-auto re      <!-- ================= SCREEN 0: MODE SELECTION LANDING ================= -->
+    <main class="flex-1 overflow-y-auto relative flex flex-col">
+
+      <!-- ================= SCREEN 0: MODE SELECTION LANDING ================= -->
       <div id="screen-mode-select" class="screen active flex-col justify-between p-6 pb-8 min-h-full">
         
         <!-- Header / Logo section -->
@@ -396,7 +398,7 @@
             <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold">
               <span class="text-slate-400">2–20 Players</span>
               <span class="text-amber-400 flex items-center space-x-1 group-hover:translate-x-1 transition font-black">
-                <span>Start Setup</span>
+                <span>Choose Modes</span>
                 <span>&rarr;</span>
               </span>
             </div>
@@ -437,58 +439,130 @@
         </div>
 
         <div class="pt-2 text-center">
-          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.4.0 Live ⚡</span>
+          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.5.0 Live ⚡</span>
         </div>
 
       </div>
 
 
-      <!-- ================= SCREEN 1A: PASS & PLAY SETUP ================= -->
-      <div id="screen-pass-play" class="screen flex-col justify-between p-6 pb-8 min-h-full">
+      <!-- ================= SCREEN 1: DEDICATED INTENSITY MODES PAGE ================= -->
+      <div id="screen-modes" class="screen flex-col justify-between p-6 pb-6 min-h-full">
         
         <div class="space-y-4">
-          <div class="pt-1 space-y-1">
-            <div class="flex items-center space-x-2">
-              <span class="text-xs font-black tracking-wider text-amber-400 uppercase">PASS & PLAY</span>
-              <span class="text-xs">📱</span>
+          <div class="pt-1 space-y-1 text-center">
+            <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-widest mx-auto">
+              <span>🌶️</span>
+              <span>CHOOSE INTENSITY</span>
+              <span>🔥</span>
             </div>
             <h2 class="text-2xl font-display font-black text-white">
-              Squad Setup 👥
+              Pick Your Vibe ✨
             </h2>
-            <p class="text-xs text-slate-400">Pick intensity & player names, then choose your game.</p>
+            <p class="text-xs text-slate-400">Select an intensity level to tailor your dares & questions.</p>
           </div>
 
-          <!-- Mode Selector with Intensity Color Transition -->
-          <div class="space-y-2">
-            <div class="flex justify-between items-center px-0.5">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Intensity Level</span>
-              <span id="setup-mode-tag" class="text-xs font-black text-rose-400 transition-colors duration-300">Extreme & unfiltered dares 🔥</span>
+          <!-- 4 Full Mode Cards -->
+          <div class="space-y-3 pt-1">
+
+            <!-- 1. CHILL MODE -->
+            <div onclick="pickIntensityModeAndProceed('chill')" class="p-4 rounded-2xl bg-gradient-to-r from-sky-950/40 to-blue-950/20 border border-sky-500/30 hover:border-sky-400 shadow-[0_0_20px_rgba(14,165,233,0.15)] hover:shadow-[0_0_25px_rgba(14,165,233,0.3)] transition cursor-pointer active:scale-[0.98] group flex items-center justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                  🍦
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-display font-black text-sm text-white group-hover:text-sky-300 transition">Chill Mode</h3>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 uppercase">Relaxed</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-tight">Lighthearted icebreakers, funny questions, and gentle fun.</p>
+                </div>
+              </div>
+              <span class="text-sky-400 text-lg group-hover:translate-x-1 transition font-black ml-2">&rarr;</span>
             </div>
 
-            <div id="mode-selector-box" class="p-1 rounded-2xl bg-white/5 border border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.2)] grid grid-cols-4 gap-1 transition-all duration-300">
-              <button onclick="selectInitialMode('chill')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-sky-300 hover:bg-sky-500/10 flex flex-col items-center space-y-0.5" data-mode="chill">
-                <img src="https://emojicdn.elk.sh/🍦?style=apple" class="w-4 h-4 apple-emoji" alt="Chill">
-                <span>Chill</span>
-              </button>
-              <button onclick="selectInitialMode('party')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-purple-300 hover:bg-purple-500/10 flex flex-col items-center space-y-0.5" data-mode="party">
-                <img src="https://emojicdn.elk.sh/🎉?style=apple" class="w-4 h-4 apple-emoji" alt="Party">
-                <span>Party</span>
-              </button>
-              <button onclick="selectInitialMode('spicy')" class="mode-tab py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 flex flex-col items-center space-y-0.5" data-mode="spicy">
-                <img src="https://emojicdn.elk.sh/🌶️?style=apple" class="w-4 h-4 apple-emoji" alt="Spicy">
-                <span>Spicy</span>
-              </button>
-              <button onclick="selectInitialMode('extreme')" class="mode-tab py-2.5 rounded-xl text-xs font-bold transition bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_25px_rgba(239,68,68,0.7)] border border-red-500/60 flex flex-col items-center space-y-0.5" data-mode="extreme">
-                <img src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Extreme">
-                <span>Extreme</span>
-              </button>
+            <!-- 2. PARTY MODE -->
+            <div onclick="pickIntensityModeAndProceed('party')" class="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-fuchsia-950/20 border border-purple-500/30 hover:border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition cursor-pointer active:scale-[0.98] group flex items-center justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                  🎉
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-display font-black text-sm text-white group-hover:text-purple-300 transition">Party Mode</h3>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 uppercase">Crowd Fav</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-tight">Energetic group forfeits, hilarious challenges, and chaos.</p>
+                </div>
+              </div>
+              <span class="text-purple-400 text-lg group-hover:translate-x-1 transition font-black ml-2">&rarr;</span>
             </div>
+
+            <!-- 3. SPICY MODE -->
+            <div onclick="pickIntensityModeAndProceed('spicy')" class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 to-orange-950/20 border border-amber-500/30 hover:border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:shadow-[0_0_25px_rgba(245,158,11,0.3)] transition cursor-pointer active:scale-[0.98] group flex items-center justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                  🌶️
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-display font-black text-sm text-white group-hover:text-amber-300 transition">Spicy Mode</h3>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 uppercase">Flirty</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-tight">Flirty dares, juicy secrets, and hot confessions.</p>
+                </div>
+              </div>
+              <span class="text-amber-400 text-lg group-hover:translate-x-1 transition font-black ml-2">&rarr;</span>
+            </div>
+
+            <!-- 4. EXTREME MODE -->
+            <div onclick="pickIntensityModeAndProceed('extreme')" class="p-4 rounded-2xl bg-gradient-to-r from-red-950/50 to-rose-950/30 border border-red-500/40 hover:border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.2)] hover:shadow-[0_0_30px_rgba(239,68,68,0.4)] transition cursor-pointer active:scale-[0.98] group flex items-center justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                  🔥
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-display font-black text-sm text-white group-hover:text-red-300 transition">Extreme Mode</h3>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/30 uppercase">18+ Wild</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-tight">Hardcore unfiltered dares and wild penalties. No limits!</p>
+                </div>
+              </div>
+              <span class="text-red-400 text-lg group-hover:translate-x-1 transition font-black ml-2">&rarr;</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= SCREEN 1A: PASS & PLAY SQUAD SETUP ================= -->
+      <div id="screen-pass-play" class="screen flex-col justify-between p-6 pb-6 min-h-full">
+        
+        <div class="space-y-4">
+          <div class="pt-1 flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] font-black tracking-wider text-amber-400 uppercase">PASS & PLAY</span>
+              <h2 class="text-2xl font-display font-black text-white">
+                Squad Setup 👥
+              </h2>
+            </div>
+
+            <!-- Compact Clickable Intensity Pill that opens the Modes Screen -->
+            <button onclick="navigate('modes')" id="passplay-mode-pill" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-amber-500/40 text-xs font-bold text-amber-300 transition active:scale-95 shadow-[0_0_15px_rgba(255,140,0,0.15)]">
+              <span id="passplay-mode-emoji">🔥</span>
+              <span id="passplay-mode-label" class="capitalize">Extreme</span>
+              <span class="text-slate-400 text-[10px]">✏️</span>
+            </button>
           </div>
 
           <!-- Participants Input Section -->
           <div class="space-y-3">
             <div class="flex justify-between items-center px-0.5">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Participants (<span id="setup-player-num">2</span>)</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Number of Players</span>
               <div class="flex items-center space-x-2 bg-white/10 p-1 rounded-full border border-white/10">
                 <button onclick="changePlayerCount(-1)" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center transition">-</button>
                 <span id="setup-player-badge" class="w-6 text-center font-display font-bold text-xs text-white">2</span>
@@ -498,7 +572,7 @@
 
             <!-- Dynamic Player Name Inputs -->
             <div class="space-y-2">
-              <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[200px] overflow-y-auto">
+              <div id="homepage-participants-list" class="bg-white/[0.04] border border-white/10 rounded-2xl divide-y divide-white/[0.08] max-h-[220px] overflow-y-auto">
                 <!-- Dynamically populated -->
               </div>
 
@@ -519,7 +593,7 @@
             </div>
 
             <!-- Continue CTA Button -->
-            <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-3 transition active:scale-95">
+            <button onclick="validateAndGoToGameDeck()" class="w-full py-4 rounded-full bg-white hover:bg-slate-100 text-black font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-xl shadow-white/10 mt-2 transition active:scale-95">
               <span>Continue to Game Deck</span>
               <span>&rarr;</span>
             </button>
@@ -1459,7 +1533,7 @@
       playClick();
       MP.role = 'local';
       MP.active = false;
-      navigate('pass-play');
+      navigate('modes');
     }
 
     function goToMultiplayer() {
@@ -1468,6 +1542,12 @@
       MP.active = true;
       navigate('multiplayer');
       switchMPSubTab('host');
+    }
+
+    function pickIntensityModeAndProceed(modeKey) {
+      playSuccess();
+      selectInitialMode(modeKey);
+      navigate('pass-play');
     }
 
     function navigate(screenName, addToStack = true) {
@@ -1513,6 +1593,10 @@
           }
         }
 
+        if (screenName === 'modes') {
+          title.innerText = 'Intensity Mode';
+          subtitle.innerText = 'Pick Your Vibe';
+        }
         if (screenName === 'pass-play') {
           title.innerText = 'Pass & Play';
           subtitle.innerText = 'Squad Setup';
@@ -1588,6 +1672,14 @@
 
       const tagEl = document.getElementById('setup-mode-tag');
       const boxEl = document.getElementById('mode-selector-box');
+      const emojiEl = document.getElementById('passplay-mode-emoji');
+      const labelEl = document.getElementById('passplay-mode-label');
+
+      const emojis = { chill: '🍦', party: '🎉', spicy: '🌶️', extreme: '🔥' };
+      const labels = { chill: 'Chill Mode', party: 'Party Mode', spicy: 'Spicy Mode', extreme: 'Extreme Mode' };
+
+      if (emojiEl) emojiEl.innerText = emojis[modeKey] || '🔥';
+      if (labelEl) labelEl.innerText = labels[modeKey] || 'Extreme';
 
       const modeStyles = {
         chill: {
