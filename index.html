@@ -1761,6 +1761,7 @@
       ],
       currentPlayerIndex: 0,
       todState: { step: 'choice', type: null, prompt: null, playerName: null, answer: null, timerInterval: null },
+      todUsedPrompts: {},
       nhieState: { promptIndex: 0, votes: {} },
       doubleDareState: { promptIndex: 0, multiplier: 1, targetPlayerIndex: 0 },
       customPrompts: [],
@@ -2248,6 +2249,7 @@
         if (screenName === 'truth-dare') {
           title.innerText = 'Truth or Dare';
           subtitle.innerText = 'Neon Edition';
+          STATE.todUsedPrompts = {}; // reset per-player history on fresh game start
           renderTodPlayerUI();
         }
         if (screenName === 'spin-bottle') {
@@ -3072,16 +3074,32 @@
       const customMatching = (STATE.customPrompts || []).filter(cp => cp.type === type).map(cp => cp.text);
       const combinedList = [...customMatching, ...defaultList];
 
+      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
+
       let randomPrompt = "";
       if (incomingPayload && incomingPayload.prompt) {
         randomPrompt = incomingPayload.prompt;
       } else {
-        randomPrompt = combinedList[Math.floor(Math.random() * combinedList.length)];
+        // Per-player no-repeat logic: track what each player has already seen
+        if (!STATE.todUsedPrompts) STATE.todUsedPrompts = {};
+        const playerKey = pName || 'Player';
+        if (!STATE.todUsedPrompts[playerKey]) STATE.todUsedPrompts[playerKey] = { truth: [], dare: [] };
+        const usedForPlayer = STATE.todUsedPrompts[playerKey][type] || [];
+
+        // Filter out prompts already seen by this player
+        let freshList = combinedList.filter(p => !usedForPlayer.includes(p));
+
+        // If all prompts exhausted for this player+type, reset their history
+        if (freshList.length === 0) {
+          STATE.todUsedPrompts[playerKey][type] = [];
+          freshList = combinedList;
+        }
+
+        randomPrompt = freshList[Math.floor(Math.random() * freshList.length)];
+        STATE.todUsedPrompts[playerKey][type].push(randomPrompt);
       }
-      
-      const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
-      const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
-      const pName = (incomingPayload && incomingPayload.playerName) || curPlayer.name;
 
       STATE.todState.step = 'prompt';
       STATE.todState.type = type;
@@ -4217,6 +4235,7 @@
                 currentLandedIndex: currentLandedIndex || 0
               },
               customPrompts: STATE.customPrompts || [],
+              todUsedPrompts: STATE.todUsedPrompts || {},
               players: MP.players
             });
           }
@@ -4357,6 +4376,9 @@
           if (msg.customPrompts && Array.isArray(msg.customPrompts)) {
             STATE.customPrompts = msg.customPrompts;
             updateLobbyCustomBadge();
+          }
+          if (msg.todUsedPrompts && typeof msg.todUsedPrompts === 'object') {
+            STATE.todUsedPrompts = msg.todUsedPrompts;
           }
 
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
