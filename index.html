@@ -347,6 +347,52 @@
       </div>
     </div>
 
+    <!-- HOST CUSTOM PROMPTS MODAL (Max 7 Custom Questions/Dares) -->
+    <div id="custom-prompts-modal" style="display: none;" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[115] items-center justify-center p-4">
+      <div class="bg-[#121424] border border-purple-500/50 rounded-3xl p-5 max-w-sm w-full space-y-4 shadow-[0_0_50px_rgba(168,85,247,0.35)] animate-scale-up max-h-[85vh] flex flex-col">
+        <div class="flex items-center justify-between pb-2 border-b border-white/10 flex-shrink-0">
+          <div class="flex items-center space-x-2">
+            <span class="text-xl">✍️</span>
+            <div>
+              <h3 class="font-display font-black text-sm text-white">Custom Party Prompts</h3>
+              <span class="text-[10px] text-purple-300 font-bold">Add up to 7 custom questions or dares</span>
+            </div>
+          </div>
+          <button onclick="closeCustomPromptsModal()" class="w-7 h-7 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center text-xs">✕</button>
+        </div>
+
+        <!-- Add New Prompt Form -->
+        <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-purple-400/25 space-y-2.5 flex-shrink-0">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-300 text-[11px]">Type:</span>
+            <div class="flex items-center space-x-1">
+              <button id="custom-type-truth-btn" onclick="setCustomPromptType('truth')" class="px-3 py-1 rounded-lg bg-cyan-500 text-black text-[10px] font-black shadow transition">Truth ❓</button>
+              <button id="custom-type-dare-btn" onclick="setCustomPromptType('dare')" class="px-3 py-1 rounded-lg bg-white/10 text-slate-400 hover:text-white text-[10px] font-black transition">Dare ⚡</button>
+            </div>
+          </div>
+          <input type="text" id="custom-prompt-input" placeholder="Type your custom truth or dare..." onkeydown="if(event.key === 'Enter') addCustomPromptFromUI()" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-400 transition" />
+          <button id="custom-prompt-add-btn" onclick="addCustomPromptFromUI()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-display font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center space-x-1">
+            <span>➕ Add to Game Deck</span>
+          </button>
+        </div>
+
+        <!-- Added Prompts List -->
+        <div class="flex-1 overflow-y-auto space-y-2 min-h-[90px] pr-1">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 px-1">
+            <span>Active Custom Deck:</span>
+            <span id="custom-prompts-count-label" class="text-purple-300 font-mono font-bold">0 / 7</span>
+          </div>
+          <div id="custom-prompts-list" class="space-y-1.5">
+            <!-- Dynamically Rendered by JS -->
+          </div>
+        </div>
+
+        <button onclick="closeCustomPromptsModal()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-display font-black text-xs uppercase tracking-wider flex-shrink-0 transition">
+          Done & Save Deck ✅
+        </button>
+      </div>
+    </div>
+
     <!-- IN-GAME CHAT MINI PREVIEW TOAST -->
     <div id="chat-preview-toast" onclick="toggleChatModal()" class="fixed top-12 left-4 right-4 max-w-[390px] mx-auto z-[95] hidden p-3 rounded-2xl bg-black/90 backdrop-blur-xl border border-cyan-400/50 shadow-[0_0_30px_rgba(0,240,255,0.4)] cursor-pointer animate-slide-down transition">
       <!-- Populated dynamically by JS -->
@@ -354,7 +400,7 @@
 
     <!-- IN-GAME SQUAD CHAT MODAL / DRAWER -->
     <div id="chat-modal" style="display: none;" class="fixed inset-0 bg-black/75 backdrop-blur-md z-[120] flex flex-col justify-end sm:items-center sm:justify-center p-0 sm:p-4">
-      <div class="bg-[#0e111f] border border-cyan-500/40 rounded-t-3xl sm:rounded-3xl max-w-md w-full h-[520px] max-h-[82vh] flex flex-col shadow-[0_0_50px_rgba(0,240,255,0.35)] overflow-hidden">
+      <div class="bg-[#0e111f] border border-cyan-500/40 rounded-t-3xl sm:rounded-3xl max-w-md w-full h-[540px] max-h-[85vh] flex flex-col shadow-[0_0_50px_rgba(0,240,255,0.35)] overflow-hidden">
         
         <!-- Chat Header -->
         <div class="px-5 py-3.5 bg-white/[0.04] border-b border-white/10 flex items-center justify-between flex-shrink-0">
@@ -367,7 +413,7 @@
                 <h3 class="font-display font-black text-sm text-white">Squad Live Chat</h3>
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               </div>
-              <span class="text-[10px] text-cyan-300 font-mono font-bold uppercase tracking-wider">Real-time Sync ⚡</span>
+              <span class="text-[10px] text-cyan-300 font-mono font-bold uppercase tracking-wider">Voice 🎙️ & Media 📷 Live</span>
             </div>
           </div>
           <button onclick="closeChatModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center text-xs transition active:scale-90">
@@ -376,7 +422,7 @@
         </div>
 
         <!-- Chat Messages Container -->
-        <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto space-y-2 bg-[#080913]/60">
+        <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto space-y-2.5 bg-[#080913]/60">
           <!-- Dynamically Populated by CHAT.renderMessages() -->
         </div>
 
@@ -390,16 +436,55 @@
           <button onclick="sendQuickChatEmoji('😱')" class="px-2 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-sm transition active:scale-90 flex-shrink-0">😱</button>
           <button onclick="sendQuickChatEmoji('💯')" class="px-2 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-sm transition active:scale-90 flex-shrink-0">💯</button>
           <button onclick="sendQuickChatEmoji('❤️')" class="px-2 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-sm transition active:scale-90 flex-shrink-0">❤️</button>
+          <button onclick="sendQuickChatEmoji('😈')" class="px-2 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-sm transition active:scale-90 flex-shrink-0">😈</button>
         </div>
 
-        <!-- Input Bar -->
-        <div class="p-3 bg-white/[0.04] border-t border-white/10 flex items-center space-x-2 flex-shrink-0">
-          <input type="text" id="chat-input-text" onkeydown="if(event.key === 'Enter') sendChatMessageFromUI()" placeholder="React or chat with squad..." class="flex-1 bg-white/10 border border-white/15 rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition" />
-          <button onclick="sendChatMessageFromUI()" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.4)] flex-shrink-0">
+        <!-- Audio Recording Status Bar (Shown while recording voice note) -->
+        <div id="chat-recording-bar" class="hidden px-4 py-2.5 bg-red-950/90 border-t border-red-500/50 flex items-center justify-between flex-shrink-0 animate-pulse">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+            <span class="text-xs font-black text-red-300 uppercase tracking-wider">Recording Voice Note...</span>
+            <span id="chat-recording-timer" class="text-xs font-mono font-bold text-white bg-black/60 px-2 py-0.5 rounded-md">0:00</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="cancelVoiceRecording()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-bold transition">Cancel</button>
+            <button onclick="stopAndSendVoiceRecording()" class="px-3 py-1 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 text-white text-xs font-black shadow transition active:scale-95 flex items-center space-x-1">
+              <span>Send</span>
+              <span>🎙️</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Bar with Photo Upload & Voice Note -->
+        <div class="p-3 bg-white/[0.04] border-t border-white/10 flex items-center space-x-1.5 flex-shrink-0">
+          <!-- Gallery / Camera Photo Upload -->
+          <input type="file" id="chat-media-file-input" accept="image/*" class="hidden" onchange="handleChatMediaSelected(event)">
+          <button onclick="document.getElementById('chat-media-file-input').click()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 transition active:scale-90 flex-shrink-0" title="Upload Photo from Gallery">
+            <span class="text-base">📷</span>
+          </button>
+
+          <!-- Voice Note Mic Button -->
+          <button id="chat-mic-btn" onclick="startVoiceRecording()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-pink-400/30 flex items-center justify-center text-pink-300 transition active:scale-90 flex-shrink-0" title="Record Voice Note">
+            <span class="text-base">🎤</span>
+          </button>
+
+          <!-- Text Input -->
+          <input type="text" id="chat-input-text" onkeydown="if(event.key === 'Enter') sendChatMessageFromUI()" placeholder="Chat with squad..." class="flex-1 bg-white/10 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition" />
+          
+          <!-- Send Button -->
+          <button onclick="sendChatMessageFromUI()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-display font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.4)] flex-shrink-0">
             <span>Send ⚡</span>
           </button>
         </div>
 
+      </div>
+    </div>
+
+    <!-- FULL SCREEN MEDIA LIGHTBOX MODAL -->
+    <div id="media-lightbox-modal" style="display: none;" onclick="closeMediaLightbox()" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[150] flex items-center justify-center p-4 cursor-pointer">
+      <div class="relative max-w-sm w-full max-h-[85vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+        <img id="lightbox-img" src="" class="max-w-full max-h-[80vh] rounded-2xl object-contain border border-cyan-400/40 shadow-[0_0_50px_rgba(0,240,255,0.4)]" alt="Full Image" />
+        <button onclick="closeMediaLightbox()" class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-black/80 border border-white/30 text-white flex items-center justify-center text-sm font-bold shadow-lg">✕</button>
       </div>
     </div>
 
@@ -1112,6 +1197,44 @@
             </p>
           </div>
 
+          <!-- IN-PLACE TRUTH CONFESSION BOX (Multiplayer & Live In-Card Answering) -->
+          <div id="tod-inline-answer-box" class="hidden space-y-2 pt-2 border-t border-cyan-500/25">
+            <!-- Active Player Input View -->
+            <div id="tod-answer-input-container" class="space-y-1.5">
+              <label class="text-[10px] font-black uppercase text-cyan-300 tracking-wider flex items-center justify-between">
+                <span>💬 Type Your Honest Truth:</span>
+                <span class="text-slate-400 font-normal lowercase text-[9px]">(visible to room)</span>
+              </label>
+              <div class="flex space-x-1.5">
+                <input type="text" id="tod-answer-input" onkeydown="if(event.key === 'Enter') submitTodAnswer()" placeholder="Type your honest confession here..." class="flex-1 bg-black/60 border border-cyan-400/40 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-300 transition shadow-inner" />
+                <button onclick="submitTodAnswer()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 text-black font-display font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_12px_rgba(0,240,255,0.4)] flex-shrink-0 flex items-center space-x-1">
+                  <span>Reveal</span>
+                  <span>💬</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Spectator Waiting for Typed Confession -->
+            <div id="tod-spectator-typing-notice" class="hidden p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-400/30 text-center space-y-0.5 animate-pulse">
+              <div class="flex items-center justify-center space-x-1.5 text-cyan-300 text-xs font-black">
+                <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span id="tod-spectator-typing-label">Waiting for player to type confession...</span>
+              </div>
+              <p class="text-[9px] text-slate-400">Their answer will reveal live on your card right here!</p>
+            </div>
+
+            <!-- Live Submitted Answer Card (Visible to everyone once submitted) -->
+            <div id="tod-submitted-answer-display" class="hidden p-3 rounded-2xl bg-gradient-to-r from-cyan-950/80 via-purple-950/70 to-pink-950/80 border border-cyan-400/60 shadow-[0_0_20px_rgba(0,240,255,0.3)] space-y-1 text-left animate-scale-up">
+              <div class="flex items-center justify-between text-[10px] font-black uppercase text-cyan-300 pb-1 border-b border-white/10">
+                <span id="tod-submitted-author-label">Sarah's Honest Truth:</span>
+                <span class="px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 text-[9px] font-bold">CONFESSED ✅</span>
+              </div>
+              <p id="tod-submitted-answer-text" class="text-xs font-bold text-white italic leading-snug break-words drop-shadow">
+                "My confession text here..."
+              </p>
+            </div>
+          </div>
+
           <div id="tod-action-buttons-container" class="grid grid-cols-2 gap-2.5 pt-1">
             <button onclick="finishTodTurn(true)" class="py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition active:scale-95">
               <span>Completed</span>
@@ -1554,6 +1677,15 @@
               </div>
             </div>
 
+            <!-- Host Custom Truth & Dares Button -->
+            <button onclick="openCustomPromptsModal()" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-900/60 to-pink-900/60 hover:from-purple-800/60 hover:to-pink-800/60 border border-purple-400/50 text-purple-200 text-xs font-black flex items-center justify-between px-4 transition active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.25)]">
+              <div class="flex items-center space-x-2">
+                <span class="text-base">✍️</span>
+                <span>Custom Truths & Dares</span>
+              </div>
+              <span id="lobby-custom-badge" class="px-2.5 py-0.5 rounded-full bg-purple-400/20 border border-purple-400/40 text-purple-300 text-[10px] font-bold">0/7 Added</span>
+            </button>
+
             <button onclick="goToChooseGame()" id="lobby-start-btn" class="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-display font-bold text-xs tracking-wider uppercase transition active:scale-95 flex items-center justify-center space-x-2">
               <span>View Full 3D Game Deck 🃏</span>
               <span>&rarr;</span>
@@ -1628,9 +1760,10 @@
         { name: '', avatar: '🧔' }
       ],
       currentPlayerIndex: 0,
-      todState: { step: 'choice', type: null, prompt: null, playerName: null, timerInterval: null },
+      todState: { step: 'choice', type: null, prompt: null, playerName: null, answer: null, timerInterval: null },
       nhieState: { promptIndex: 0, votes: {} },
       doubleDareState: { promptIndex: 0, multiplier: 1, targetPlayerIndex: 0 },
+      customPrompts: [],
       navigationStack: ['setup']
     };
 
@@ -1722,7 +1855,7 @@
       "Give a passionate 45-second speech about why your ex made the biggest mistake of their life!"
     ];
 
-    // Dedicated Neon Truth or Dare Database across all intensities
+    // Dedicated Neon Truth or Dare Database across all intensities (Expanded 70+ 18+ & Spicy Prompts)
     const TOD_PROMPTS = {
       truth: {
         chill: [
@@ -1730,28 +1863,64 @@
           "What is the strangest food combination you secretly love?",
           "What is the biggest lie you told your parents as a kid that they never found out?",
           "If you could trade lives with one person in this room for 24 hours, who would it be?",
-          "What is the most awkward text message you have ever sent to the wrong person?"
+          "What is the most awkward text message you have ever sent to the wrong person?",
+          "What is your most useless hidden talent?",
+          "Who in this room would you bring with you to a deserted island?",
+          "What is the most childish thing you still do on a regular basis?",
+          "What is the worst movie you secretly loved from start to finish?"
         ],
         party: [
           "What is the absolute worst date you have ever been on in your entire life?",
           "Have you ever had a crush on someone currently in this room? Be honest!",
           "What is the most embarrassing thing you have ever done while tipsy at a party?",
           "What is a secret talent or weird obsession you have that nobody knows about?",
-          "Who in this room would you trust the least with a life-or-death secret?"
+          "Who in this room would you trust the least with a life-or-death secret?",
+          "What is the biggest lie you've ever told to get out of a social event or date?",
+          "Have you ever stalked an ex or crush from a fake burner account?",
+          "What is the most ridiculous rumor that was ever spread about you?",
+          "Who was your very first celebrity or TV character crush?",
+          "What is the most petty reason you ever stopped talking to someone?"
         ],
         spicy: [
           "Read aloud the last 3 direct messages you sent on Instagram or Snapchat right now!",
           "What is your biggest romantic regret regarding an ex or former crush?",
           "Who in this room would you kiss if you were forced to make a choice right now?",
           "What is the most scandalous photo or message currently sitting on your phone?",
-          "What is the fastest you have ever caught feelings for someone?"
+          "What is the fastest you have ever caught feelings for someone?",
+          "What is your biggest turn-on that most people would find unexpected?",
+          "Have you ever slid into a mutual friend's DMs with flirty intentions?",
+          "What is the most adventurous thing you have ever done on a first date?",
+          "Have you ever stayed in a situationship purely for the physical chemistry?",
+          "Who in this room do you think is the best kisser?",
+          "What is the dirtiest text message currently sitting in your phone inbox?",
+          "Have you ever kissed someone within 10 minutes of meeting them at a party?",
+          "What is your go-to move when you want someone to know you're interested?",
+          "Have you ever had a romantic dream about someone sitting in this room?",
+          "If you had to rate your own bedroom game from 1 to 10, what number are you giving yourself?"
         ],
         extreme: [
           "Confess the wildest secret you swore you would take to your grave!",
           "Have you ever hooked up with an ex while you were in a new relationship or situationship?",
           "Show your most private deleted or hidden photos folder right now!",
           "What is something you have done that you hope nobody in your family ever discovers?",
-          "Who is the one person you regret sleeping with or kissing the most?"
+          "Who is the one person you regret sleeping with or kissing the most?",
+          "What is your biggest NSFW fantasy that you've never told anyone in this room?",
+          "Who is the most inappropriate or forbidden person you've ever had thoughts about?",
+          "What is the wildest place outside of a bedroom where you have hooked up?",
+          "Have you ever faked feelings or intimacy just to not hurt someone's ego?",
+          "What is the highest number of people you have had romantic things with in a single month?",
+          "Have you ever hooked up with someone whose name you forgot the next morning?",
+          "If you were handcuffed to someone in this room for 24 hours, who would you pick?",
+          "Have you ever sent a spicy photo or video to the wrong contact? Tell the story!",
+          "What is the most scandalous thing you have ever done at a party or festival?",
+          "Have you ever had a crush on a friend's partner or ex?",
+          "What is the longest you have ever gone without physical intimacy, and why?",
+          "Have you ever gone skinny dipping or been completely nude in a public setting?",
+          "What is your biggest guilty pleasure in the bedroom?",
+          "If you had to do a 1-night stand with someone in this room right now, who is it?",
+          "What is the most toxic relationship you stayed in solely because the chemistry was unreal?",
+          "Have you ever lied about your body count or relationship history to impress someone?",
+          "Have you ever hooked up in a car, beach, or club bathroom? Give the details!"
         ]
       },
       dare: {
@@ -1760,28 +1929,57 @@
           "Do 10 jumping jacks while loudly singing the alphabet backwards.",
           "Let the person to your left draw a funny smiley face on your forehead with a pen.",
           "Balance a spoon on your nose for 20 seconds without letting it drop.",
-          "Send a funny voice note singing 'Happy Birthday' to the 3rd contact in your phone."
+          "Send a funny voice note singing 'Happy Birthday' to the 3rd contact in your phone.",
+          "Do your best impression of a dinosaur for 15 seconds.",
+          "Let someone in the room style your hair however they want for the rest of the game."
         ],
         party: [
           "Do your best runway model strut across the room and strike 3 dramatic poses!",
           "Let the squad compose a 1-sentence status/tweet and post it from your account for 10 minutes.",
           "Trade an article of clothing (jacket, shoes, hat) with the person to your right.",
           "Take a selfie with the funniest face possible and make it your profile photo for the night.",
-          "Do 15 push-ups in 30 seconds or take 2 penalty drinks!"
+          "Do 15 push-ups in 30 seconds or take 2 penalty drinks!",
+          "Let the player to your left call any restaurant on speaker and ask if they sell raw onions.",
+          "Sing the chorus of your favorite pop song at the top of your lungs!",
+          "Do 20 squats while staring into the eyes of the host with zero emotion."
         ],
         spicy: [
           "Text your ex or recent crush: 'I still think about that night...' with zero explanation!",
           "Let the player to your right text anything they want to your 5th phone contact.",
           "Give a 30-second passionate slow dance to the person on your left.",
           "Whisper your most scandalous fantasy into the ear of the person to your right.",
-          "Let someone in the room blindfold you and feed you a mystery bite from the kitchen."
+          "Let someone in the room blindfold you and feed you a mystery bite from the kitchen.",
+          "Hold an intense 30-second eye contact lock with the person across from you while biting your lip.",
+          "Let the player to your left gently run their fingers through your hair for 45 seconds.",
+          "Send a flirty voice note saying 'You've been on my mind all day 😏' to your crush or recent DM.",
+          "Show your last 5 searched accounts on Instagram or TikTok to the squad.",
+          "Trade shirts or jackets with the person sitting opposite you for the next 3 rounds.",
+          "Give a 30-second seductive shoulder massage to the player on your left.",
+          "Send a fire emoji 🔥 to the 3rd story on your Instagram feed right now, no matter who it is!",
+          "Let the player to your right inspect your DM message requests folder out loud.",
+          "Demonstrate your best kissing technique on the back of the hand of the player to your right.",
+          "Post a selfie with the caption 'Feeling dangerous tonight 😈' on your story for 15 minutes."
         ],
         extreme: [
           "Let the group DM your 3rd most recent follower: 'We need to talk 🤐' with no follow-up!",
           "Take a mystery drink concoction mixed by the two players sitting next to you.",
           "Let the player to your left post any photo from your camera roll to your story for 15 minutes.",
           "Call your crush or ex right now on speakerphone and tell them you miss them.",
-          "Swap phones with the person across from you and let them read your last 3 sent texts aloud."
+          "Swap phones with the person across from you and let them read your last 3 sent texts aloud.",
+          "Give a 30-second seductive lap dance or slow dance to the player of the squad's choice!",
+          "Whisper the dirtiest thing you can think of into the ear of the person to your right!",
+          "Take off two items of clothing (accessories excluded) for the next 2 rounds!",
+          "Let the player to your right send a spicy DM to your 4th Instagram follower!",
+          "Do your best provocative bedroom moan for 5 seconds without laughing or take 3 sips!",
+          "Let the person to your left slowly feed you an ice cube using only their mouth!",
+          "Let the squad write a spicy word on your collarbone or neck with a pen!",
+          "Take a penalty drink off the collarbone or hand of the person to your left!",
+          "Text your best friend 'I think I'm in love with someone in this room' with zero context for 5 minutes!",
+          "Let the squad record a 5-second video of you doing your best flirty wink and post it to the Squad Chat!",
+          "Swap seats and sit on the lap of the person to your right for the next round!",
+          "Let the player on your left smell your neck and rate your scent from 1 to 10 out loud!",
+          "Take a spicy selfie with the person to your left and send it straight to the Squad Chat!",
+          "Call someone on your contacts and tell them with a straight face: 'I have a huge confession... you are unforgettable.'"
         ]
       }
     };
@@ -2758,7 +2956,7 @@
     }
 
     /* -------------------------------------------------------------
-       TRUTH OR DARE ENGINE
+       TRUTH OR DARE ENGINE & IN-PLACE CONFESSION LOGIC
     ------------------------------------------------------------- */
     function renderTodPlayerUI() {
       if (!STATE.players || STATE.players.length === 0) {
@@ -2782,6 +2980,15 @@
       const promptTextEl = document.getElementById('tod-prompt-text');
       const challengeTitleEl = document.getElementById('tod-challenge-title');
 
+      // In-Place Answer UI elements
+      const inlineAnswerBox = document.getElementById('tod-inline-answer-box');
+      const answerInputContainer = document.getElementById('tod-answer-input-container');
+      const spectatorTypingNotice = document.getElementById('tod-spectator-typing-notice');
+      const spectatorTypingLabel = document.getElementById('tod-spectator-typing-label');
+      const submittedAnswerDisplay = document.getElementById('tod-submitted-answer-display');
+      const submittedAuthorLabel = document.getElementById('tod-submitted-author-label');
+      const submittedAnswerText = document.getElementById('tod-submitted-answer-text');
+
       if (avatarEl) avatarEl.src = `https://emojicdn.elk.sh/${encodeURIComponent(curPlayer.avatar || '😎')}?style=apple`;
       if (nameEl) {
         nameEl.innerText = isMyTurn ? `🔥 YOUR TURN (${(curPlayer.name || 'YOU').toUpperCase()})!` : `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
@@ -2797,6 +3004,38 @@
         const pType = (STATE.todState.type || 'challenge').toUpperCase();
         if (challengeTitleEl) challengeTitleEl.innerText = `${pName}'s ${pType} Challenge`;
 
+        // Handle In-Place Truth Answer Area
+        if (STATE.todState.type === 'truth') {
+          if (inlineAnswerBox) inlineAnswerBox.classList.remove('hidden');
+          
+          if (STATE.todState.answer) {
+            // Answer has been submitted! Reveal to everyone live
+            if (submittedAnswerDisplay) {
+              submittedAnswerDisplay.classList.remove('hidden');
+              if (submittedAuthorLabel) submittedAuthorLabel.innerText = `${pName}'s Honest Truth:`;
+              if (submittedAnswerText) submittedAnswerText.innerText = `"${STATE.todState.answer}"`;
+            }
+            if (answerInputContainer) answerInputContainer.classList.add('hidden');
+            if (spectatorTypingNotice) spectatorTypingNotice.classList.add('hidden');
+          } else {
+            // Not submitted yet
+            if (submittedAnswerDisplay) submittedAnswerDisplay.classList.add('hidden');
+            if (isMyTurn) {
+              if (answerInputContainer) answerInputContainer.classList.remove('hidden');
+              if (spectatorTypingNotice) spectatorTypingNotice.classList.add('hidden');
+            } else {
+              if (answerInputContainer) answerInputContainer.classList.add('hidden');
+              if (spectatorTypingNotice) {
+                spectatorTypingNotice.classList.remove('hidden');
+                if (spectatorTypingLabel) spectatorTypingLabel.innerText = `Waiting for ${pName} to type confession...`;
+              }
+            }
+          }
+        } else {
+          // Dare: Hide truth inline answer box
+          if (inlineAnswerBox) inlineAnswerBox.classList.add('hidden');
+        }
+
         if (isMyTurn) {
           if (actionBox) { actionBox.classList.remove('hidden'); actionBox.classList.add('grid'); }
           if (specWaiting) specWaiting.classList.add('hidden');
@@ -2811,6 +3050,10 @@
         // Choice selection stage
         if (choiceBox) choiceBox.classList.remove('hidden');
         if (promptBox) promptBox.classList.add('hidden');
+        if (inlineAnswerBox) inlineAnswerBox.classList.add('hidden');
+        if (submittedAnswerDisplay) submittedAnswerDisplay.classList.add('hidden');
+        const inputEl = document.getElementById('tod-answer-input');
+        if (inputEl) inputEl.value = '';
         clearInterval(STATE.todState.timerInterval);
       }
     }
@@ -2825,12 +3068,15 @@
       }
       playClick();
 
-      const modeList = (TOD_PROMPTS[type] && (TOD_PROMPTS[type][STATE.mode] || TOD_PROMPTS[type].extreme)) || TOD_PROMPTS[type].extreme;
+      const defaultList = (TOD_PROMPTS[type] && (TOD_PROMPTS[type][STATE.mode] || TOD_PROMPTS[type].extreme)) || TOD_PROMPTS[type].extreme;
+      const customMatching = (STATE.customPrompts || []).filter(cp => cp.type === type).map(cp => cp.text);
+      const combinedList = [...customMatching, ...defaultList];
+
       let randomPrompt = "";
       if (incomingPayload && incomingPayload.prompt) {
         randomPrompt = incomingPayload.prompt;
       } else {
-        randomPrompt = modeList[Math.floor(Math.random() * modeList.length)];
+        randomPrompt = combinedList[Math.floor(Math.random() * combinedList.length)];
       }
       
       const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
@@ -2841,6 +3087,10 @@
       STATE.todState.type = type;
       STATE.todState.prompt = randomPrompt;
       STATE.todState.playerName = pName;
+      STATE.todState.answer = null;
+
+      const inputEl = document.getElementById('tod-answer-input');
+      if (inputEl) inputEl.value = '';
 
       renderTodPlayerUI();
 
@@ -2863,6 +3113,48 @@
       }
 
       startTodTimer();
+    }
+
+    function submitTodAnswer(sync = true, incomingPayload = null) {
+      let answerText = "";
+      let pName = "";
+      if (incomingPayload && incomingPayload.answer) {
+        answerText = incomingPayload.answer;
+        pName = incomingPayload.playerName || "Player";
+      } else {
+        const input = document.getElementById('tod-answer-input');
+        if (!input || !input.value.trim()) {
+          playBeep(220, 'sawtooth', 0.2);
+          return;
+        }
+        answerText = input.value.trim();
+        const safeIdx = Math.max(0, STATE.currentPlayerIndex % (STATE.players.length || 1));
+        const curPlayer = STATE.players[safeIdx] || { name: 'Player' };
+        pName = MP.myName || curPlayer.name || 'Player';
+      }
+
+      playSuccess();
+      confetti({ particleCount: 40, spread: 55, origin: { y: 0.6 } });
+      STATE.todState.answer = answerText;
+
+      showGameNotification(`${pName} Revealed their Truth! 💬`, '💬');
+      if (typeof CHAT !== 'undefined') {
+        CHAT.addMessage({ text: `💬 ${pName} answered Truth: "${answerText}"` }, false, true);
+      }
+
+      if (sync && MP.active) {
+        MP.broadcast({
+          type: 'GAME_ACTION',
+          action: 'todAnswer',
+          payload: {
+            answer: answerText,
+            playerName: pName,
+            currentPlayerIndex: STATE.currentPlayerIndex
+          }
+        });
+      }
+
+      renderTodPlayerUI();
     }
 
     function startTodTimer() {
@@ -2914,6 +3206,10 @@
       STATE.todState.type = null;
       STATE.todState.prompt = null;
       STATE.todState.playerName = null;
+      STATE.todState.answer = null;
+
+      const inputEl = document.getElementById('tod-answer-input');
+      if (inputEl) inputEl.value = '';
 
       if (sync && MP.active) {
         MP.broadcast({
@@ -2942,6 +3238,11 @@
       STATE.todState.type = null;
       STATE.todState.prompt = null;
       STATE.todState.playerName = null;
+      STATE.todState.answer = null;
+
+      const inputEl = document.getElementById('tod-answer-input');
+      if (inputEl) inputEl.value = '';
+
       clearInterval(STATE.todState.timerInterval);
 
       renderTodPlayerUI();
@@ -2952,6 +3253,114 @@
           payload: { currentPlayerIndex: STATE.currentPlayerIndex }
         });
       }
+    }
+
+    /* -------------------------------------------------------------
+       HOST CUSTOM TRUTHS & DARES MANAGER (MAX 7)
+    ------------------------------------------------------------- */
+    let customPromptType = 'truth';
+
+    function openCustomPromptsModal() {
+      playClick();
+      const modal = document.getElementById('custom-prompts-modal');
+      if (modal) modal.style.display = 'flex';
+      renderCustomPromptsUI();
+    }
+
+    function closeCustomPromptsModal() {
+      playClick();
+      const modal = document.getElementById('custom-prompts-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function setCustomPromptType(type) {
+      playClick();
+      customPromptType = type;
+      const truthBtn = document.getElementById('custom-type-truth-btn');
+      const dareBtn = document.getElementById('custom-type-dare-btn');
+      if (type === 'truth') {
+        if (truthBtn) truthBtn.className = "px-3 py-1 rounded-lg bg-cyan-500 text-black text-[10px] font-black shadow transition";
+        if (dareBtn) dareBtn.className = "px-3 py-1 rounded-lg bg-white/10 text-slate-400 hover:text-white text-[10px] font-black transition";
+      } else {
+        if (truthBtn) truthBtn.className = "px-3 py-1 rounded-lg bg-white/10 text-slate-400 hover:text-white text-[10px] font-black transition";
+        if (dareBtn) dareBtn.className = "px-3 py-1 rounded-lg bg-pink-500 text-white text-[10px] font-black shadow transition";
+      }
+    }
+
+    function addCustomPromptFromUI() {
+      if (!STATE.customPrompts) STATE.customPrompts = [];
+      if (STATE.customPrompts.length >= 7) {
+        playBeep(220, 'sawtooth', 0.2);
+        alert('⚠️ Maximum of 7 custom prompts allowed!');
+        return;
+      }
+      const input = document.getElementById('custom-prompt-input');
+      if (!input || !input.value.trim()) return;
+      const text = input.value.trim();
+      playSuccess();
+      STATE.customPrompts.push({
+        id: 'cp_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        type: customPromptType,
+        text: text
+      });
+      input.value = '';
+      renderCustomPromptsUI();
+      updateLobbyCustomBadge();
+
+      if (MP.active && MP.role === 'host') {
+        MP.broadcast({
+          type: 'ROOM_CUSTOM_PROMPTS',
+          customPrompts: STATE.customPrompts
+        });
+      }
+    }
+
+    function removeCustomPrompt(id) {
+      playClick();
+      STATE.customPrompts = (STATE.customPrompts || []).filter(cp => cp.id !== id);
+      renderCustomPromptsUI();
+      updateLobbyCustomBadge();
+
+      if (MP.active && MP.role === 'host') {
+        MP.broadcast({
+          type: 'ROOM_CUSTOM_PROMPTS',
+          customPrompts: STATE.customPrompts
+        });
+      }
+    }
+
+    function updateLobbyCustomBadge() {
+      const badge = document.getElementById('lobby-custom-badge');
+      const countLabel = document.getElementById('custom-prompts-count-label');
+      const count = (STATE.customPrompts || []).length;
+      if (badge) badge.innerText = `${count}/7 Added`;
+      if (countLabel) countLabel.innerText = `${count} / 7`;
+    }
+
+    function renderCustomPromptsUI() {
+      updateLobbyCustomBadge();
+      const listEl = document.getElementById('custom-prompts-list');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      if (!STATE.customPrompts || STATE.customPrompts.length === 0) {
+        listEl.innerHTML = `<p class="text-[11px] text-slate-500 italic py-4 text-center">No custom prompts added yet. Add up to 7 above!</p>`;
+        return;
+      }
+      STATE.customPrompts.forEach((cp, idx) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-white/[0.04] border border-white/10 text-xs space-x-2';
+        const isTruth = cp.type === 'truth';
+        item.innerHTML = `
+          <div class="flex items-center space-x-2 flex-1 min-w-0">
+            <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase flex-shrink-0 ${isTruth ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40' : 'bg-pink-500/20 text-pink-300 border border-pink-400/40'}">
+              ${isTruth ? 'Truth ❓' : 'Dare ⚡'}
+            </span>
+            <span class="text-white text-[11px] font-medium truncate">${escapeHtml(cp.text)}</span>
+          </div>
+          <button onclick="removeCustomPrompt('${cp.id}')" class="text-slate-400 hover:text-red-400 px-1.5 py-0.5 rounded-lg hover:bg-white/10 text-xs transition flex-shrink-0" title="Delete Prompt">✕</button>
+        `;
+        listEl.appendChild(item);
+      });
     }
 
     /* -------------------------------------------------------------
@@ -3791,7 +4200,8 @@
                 step: STATE.todState.step || 'choice',
                 type: STATE.todState.type || null,
                 prompt: STATE.todState.prompt || null,
-                playerName: STATE.todState.playerName || null
+                playerName: STATE.todState.playerName || null,
+                answer: STATE.todState.answer || null
               },
               nhieState: {
                 promptIndex: STATE.nhieState.promptIndex || 0,
@@ -3806,6 +4216,7 @@
                 currentBottleDare: currentBottleDare || '',
                 currentLandedIndex: currentLandedIndex || 0
               },
+              customPrompts: STATE.customPrompts || [],
               players: MP.players
             });
           }
@@ -3928,6 +4339,7 @@
             if (msg.todState.type !== undefined) STATE.todState.type = msg.todState.type;
             if (msg.todState.prompt !== undefined) STATE.todState.prompt = msg.todState.prompt;
             if (msg.todState.playerName !== undefined) STATE.todState.playerName = msg.todState.playerName;
+            if (msg.todState.answer !== undefined) STATE.todState.answer = msg.todState.answer;
           }
           if (msg.nhieState) {
             if (msg.nhieState.promptIndex !== undefined) STATE.nhieState.promptIndex = msg.nhieState.promptIndex;
@@ -3941,6 +4353,10 @@
           if (msg.spinBottleState) {
             if (msg.spinBottleState.currentBottleDare) currentBottleDare = msg.spinBottleState.currentBottleDare;
             if (msg.spinBottleState.currentLandedIndex !== undefined) currentLandedIndex = msg.spinBottleState.currentLandedIndex;
+          }
+          if (msg.customPrompts && Array.isArray(msg.customPrompts)) {
+            STATE.customPrompts = msg.customPrompts;
+            updateLobbyCustomBadge();
           }
 
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
@@ -3985,7 +4401,8 @@
               status: MP.gameStarted ? 'playing' : 'lobby',
               gameStarted: MP.gameStarted || false,
               promptIndex: STATE.promptIndex,
-              totalDrinks: STATE.totalDrinks
+              totalDrinks: STATE.totalDrinks,
+              customPrompts: STATE.customPrompts || []
             };
             MP.broadcast(stateMsg);
           }
@@ -4013,15 +4430,26 @@
               mode: STATE.mode,
               selectedGame: STATE.selectedGame,
               status: MP.gameStarted ? 'playing' : 'lobby',
-              gameStarted: MP.gameStarted || false
+              gameStarted: MP.gameStarted || false,
+              customPrompts: STATE.customPrompts || []
             });
           }
         } else if (msg.type === 'ROOM_STATE') {
           if (msg.players && Array.isArray(msg.players) && msg.players.length > 0) {
             MP.players = msg.players;
             STATE.mode = msg.mode || STATE.mode;
+            if (msg.customPrompts && Array.isArray(msg.customPrompts)) {
+              STATE.customPrompts = msg.customPrompts;
+              updateLobbyCustomBadge();
+            }
             syncLocalStateWithMP();
             renderLobbyPlayers();
+          }
+        } else if (msg.type === 'ROOM_CUSTOM_PROMPTS') {
+          if (msg.customPrompts && Array.isArray(msg.customPrompts)) {
+            STATE.customPrompts = msg.customPrompts;
+            updateLobbyCustomBadge();
+            renderCustomPromptsUI();
           }
         } else if (msg.type === 'CHOOSING_GAME') {
           const guestMsg = document.getElementById('lobby-guest-msg');
@@ -4489,6 +4917,9 @@
       } else if (action === 'todChoice') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         pickTruthOrDare(payload.choice, false, payload);
+      } else if (action === 'todAnswer') {
+        if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
+        submitTodAnswer(false, payload);
       } else if (action === 'todFinish') {
         if (payload && payload.currentPlayerIndex !== undefined) STATE.currentPlayerIndex = payload.currentPlayerIndex;
         if (payload && payload.totalDrinks !== undefined) {
@@ -4502,6 +4933,7 @@
         STATE.todState.type = null;
         STATE.todState.prompt = null;
         STATE.todState.playerName = null;
+        STATE.todState.answer = null;
         renderTodPlayerUI();
       } else if (action === 'nhieVote') {
         if (payload && payload.totalDrinks !== undefined) {
@@ -4545,6 +4977,159 @@
     }
 
     /* -------------------------------------------------------------
+       VOICE AUDIO NOTES & MEDIA SHARING CONTROLLER
+    ------------------------------------------------------------- */
+    let voiceMediaRecorder = null;
+    let voiceAudioChunks = [];
+    let voiceRecordingInterval = null;
+    let voiceRecordingStartTime = 0;
+    let voiceStream = null;
+
+    function startVoiceRecording() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Microphone recording is not supported on this device/browser.');
+        return;
+      }
+      playClick();
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          voiceStream = stream;
+          voiceAudioChunks = [];
+          const options = { mimeType: 'audio/webm' };
+          try {
+            voiceMediaRecorder = new MediaRecorder(stream, options);
+          } catch (e) {
+            voiceMediaRecorder = new MediaRecorder(stream);
+          }
+          voiceMediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) {
+              voiceAudioChunks.push(e.data);
+            }
+          };
+          voiceMediaRecorder.start();
+          voiceRecordingStartTime = Date.now();
+          
+          const recordingBar = document.getElementById('chat-recording-bar');
+          const micBtn = document.getElementById('chat-mic-btn');
+          if (recordingBar) recordingBar.classList.remove('hidden');
+          if (micBtn) micBtn.classList.add('hidden');
+
+          const timerEl = document.getElementById('chat-recording-timer');
+          if (voiceRecordingInterval) clearInterval(voiceRecordingInterval);
+          voiceRecordingInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - voiceRecordingStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            if (timerEl) timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          }, 500);
+        })
+        .catch(err => {
+          console.error('Mic access error:', err);
+          alert('Could not access microphone. Please grant microphone permission in your browser settings.');
+        });
+    }
+
+    function stopAndSendVoiceRecording() {
+      if (!voiceMediaRecorder || voiceMediaRecorder.state === 'inactive') return;
+      playSuccess();
+      if (voiceRecordingInterval) {
+        clearInterval(voiceRecordingInterval);
+        voiceRecordingInterval = null;
+      }
+      voiceMediaRecorder.onstop = () => {
+        if (voiceStream) {
+          voiceStream.getTracks().forEach(track => track.stop());
+          voiceStream = null;
+        }
+        const audioBlob = new Blob(voiceAudioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result;
+          if (base64Audio) {
+            CHAT.sendAudioMessage(base64Audio);
+          }
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+      voiceMediaRecorder.stop();
+
+      const recordingBar = document.getElementById('chat-recording-bar');
+      const micBtn = document.getElementById('chat-mic-btn');
+      if (recordingBar) recordingBar.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('hidden');
+    }
+
+    function cancelVoiceRecording() {
+      playClick();
+      if (voiceRecordingInterval) {
+        clearInterval(voiceRecordingInterval);
+        voiceRecordingInterval = null;
+      }
+      if (voiceMediaRecorder && voiceMediaRecorder.state !== 'inactive') {
+        voiceMediaRecorder.onstop = () => {
+          if (voiceStream) {
+            voiceStream.getTracks().forEach(track => track.stop());
+            voiceStream = null;
+          }
+        };
+        voiceMediaRecorder.stop();
+      }
+      voiceAudioChunks = [];
+      const recordingBar = document.getElementById('chat-recording-bar');
+      const micBtn = document.getElementById('chat-mic-btn');
+      if (recordingBar) recordingBar.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('hidden');
+    }
+
+    function handleChatMediaSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      playClick();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          CHAT.sendImageMessage(compressedBase64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function openMediaLightbox(url) {
+      playClick();
+      const modal = document.getElementById('media-lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      if (img) img.src = url;
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeMediaLightbox() {
+      playClick();
+      const modal = document.getElementById('media-lightbox-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    /* -------------------------------------------------------------
        REAL-TIME MULTIPLAYER IN-GAME SQUAD CHAT CONTROLLER
     ------------------------------------------------------------- */
     const CHAT = {
@@ -4565,6 +5150,8 @@
           sender: msg.sender || (isMe ? (MP.myName || 'Me') : 'Player'),
           avatar: msg.avatar || (isMe ? (MP.myAvatar || '😎') : '😎'),
           text: msg.text || '',
+          audio: msg.audio || null,
+          image: msg.image || null,
           time: msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isMe: isMe,
           isSystem: isSystem
@@ -4611,6 +5198,42 @@
         if (input) {
           input.value = '';
           input.focus();
+        }
+      },
+
+      sendAudioMessage(audioDataUrl) {
+        if (!audioDataUrl) return;
+        playSuccess();
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgPayload = {
+          type: 'CHAT_MSG',
+          id: 'chat_audio_' + Date.now() + Math.random().toString(36).substr(2, 6),
+          sender: MP.myName || 'Player',
+          avatar: MP.myAvatar || '😎',
+          audio: audioDataUrl,
+          time: timeStr
+        };
+        this.addMessage(msgPayload, true, false);
+        if (MP.active) {
+          MP.broadcast(msgPayload);
+        }
+      },
+
+      sendImageMessage(imageDataUrl) {
+        if (!imageDataUrl) return;
+        playSuccess();
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgPayload = {
+          type: 'CHAT_MSG',
+          id: 'chat_img_' + Date.now() + Math.random().toString(36).substr(2, 6),
+          sender: MP.myName || 'Player',
+          avatar: MP.myAvatar || '😎',
+          image: imageDataUrl,
+          time: timeStr
+        };
+        this.addMessage(msgPayload, true, false);
+        if (MP.active) {
+          MP.broadcast(msgPayload);
         }
       },
 
@@ -4663,6 +5286,11 @@
       showPreviewToast(item) {
         const toast = document.getElementById('chat-preview-toast');
         if (!toast) return;
+
+        let previewText = escapeHtml(item.text);
+        if (item.audio) previewText = "🎙️ [Voice Note]";
+        if (item.image) previewText = "📷 [Photo Shared]";
+
         toast.innerHTML = `
           <div class="flex items-center space-x-2.5">
             <span class="text-xl flex-shrink-0">${item.avatar}</span>
@@ -4671,7 +5299,7 @@
                 <span class="text-[10px] font-black text-cyan-400 uppercase tracking-wider block truncate">${escapeHtml(item.sender)}</span>
                 <span class="text-[9px] text-slate-400">just now</span>
               </div>
-              <span class="text-xs text-white truncate block font-medium mt-0.5">${escapeHtml(item.text)}</span>
+              <span class="text-xs text-white truncate block font-medium mt-0.5">${previewText}</span>
             </div>
             <span class="text-[10px] font-bold text-cyan-300 bg-cyan-500/20 border border-cyan-400/40 px-2 py-0.5 rounded-full flex-shrink-0">Reply 💬</span>
           </div>
@@ -4695,7 +5323,7 @@
             <div class="text-center py-10 text-slate-500 text-xs space-y-1.5">
               <span class="text-3xl block">💬</span>
               <span class="font-bold text-slate-300 text-sm">Squad Chat is Live!</span>
-              <p class="text-[11px] text-slate-400">React to dares, laugh at answers, and message your squad in real-time.</p>
+              <p class="text-[11px] text-slate-400">Share voice notes 🎙️, upload photos 📷, react to dares, and message your squad in real-time.</p>
             </div>
           `;
           return;
@@ -4712,12 +5340,31 @@
             `;
           }
 
+          let bubbleContent = '';
+          if (m.audio) {
+            bubbleContent = `
+              <div class="flex items-center space-x-2 py-0.5">
+                <span class="text-sm">🎙️</span>
+                <audio controls src="${m.audio}" class="max-w-[210px] h-8 rounded-lg outline-none" preload="metadata"></audio>
+              </div>
+            `;
+          } else if (m.image) {
+            bubbleContent = `
+              <div class="space-y-1">
+                <img src="${m.image}" onclick="openMediaLightbox('${m.image}')" class="max-w-[190px] max-h-[190px] rounded-xl object-cover cursor-pointer hover:opacity-90 border border-white/20 transition shadow" alt="Photo" />
+                <span class="text-[9px] text-slate-400 block text-right font-medium">Tap to enlarge 🔍</span>
+              </div>
+            `;
+          } else {
+            bubbleContent = escapeHtml(m.text);
+          }
+
           if (m.isMe) {
             return `
               <div class="flex flex-col items-end space-y-0.5 my-1.5">
-                <div class="flex items-end space-x-1.5 max-w-[82%]">
+                <div class="flex items-end space-x-1.5 max-w-[85%]">
                   <div class="p-2.5 px-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/40 text-white text-xs font-medium shadow-md break-words">
-                    ${escapeHtml(m.text)}
+                    ${bubbleContent}
                   </div>
                   <span class="text-sm flex-shrink-0 mb-0.5">${m.avatar}</span>
                 </div>
@@ -4728,10 +5375,10 @@
             return `
               <div class="flex flex-col items-start space-y-0.5 my-1.5">
                 <span class="text-[9px] font-bold text-amber-400 pl-6">${escapeHtml(m.sender)}</span>
-                <div class="flex items-end space-x-1.5 max-w-[82%]">
+                <div class="flex items-end space-x-1.5 max-w-[85%]">
                   <span class="text-sm flex-shrink-0 mb-0.5">${m.avatar}</span>
                   <div class="p-2.5 px-3 rounded-2xl rounded-tl-none bg-white/10 border border-white/15 text-white text-xs font-medium shadow-md break-words">
-                    ${escapeHtml(m.text)}
+                    ${bubbleContent}
                   </div>
                 </div>
                 <span class="text-[9px] text-slate-400 font-mono pl-6">${m.time}</span>
