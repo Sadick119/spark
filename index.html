@@ -1151,8 +1151,8 @@
         <div class="space-y-3">
           <div class="flex justify-center">
             <span class="px-4 py-1 rounded-full bg-gradient-to-r from-red-600/90 to-orange-600/90 border border-red-400/60 shadow-[0_0_15px_rgba(255,0,0,0.5)] text-xs font-black text-white uppercase tracking-widest flex items-center space-x-1.5">
-              <span>EXTREME MODE</span>
-              <img src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Fire">
+              <span id="tod-mode-badge">EXTREME MODE</span>
+              <img id="tod-mode-emoji" src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Fire">
             </span>
           </div>
 
@@ -3222,6 +3222,15 @@
       if (nameEl) {
         nameEl.innerText = isMyTurn ? `🔥 YOUR TURN (${(curPlayer.name || 'YOU').toUpperCase()})!` : `👀 ${(curPlayer.name || 'Player').toUpperCase()}'S TURN`;
       }
+
+      // Update mode badge to reflect the actual selected mode
+      const todModeBadge = document.getElementById('tod-mode-badge');
+      const todModeEmoji = document.getElementById('tod-mode-emoji');
+      const todModeLabels = { chill: 'CHILL MODE', party: 'PARTY MODE', spicy: 'SPICY MODE', extreme: 'EXTREME MODE' };
+      const todModeEmojis = { chill: '🍦', party: '🎉', spicy: '🌶️', extreme: '🔥' };
+      const currentMode = STATE.mode || 'extreme';
+      if (todModeBadge) todModeBadge.innerText = todModeLabels[currentMode] || `${currentMode.toUpperCase()} MODE`;
+      if (todModeEmoji) todModeEmoji.src = `https://emojicdn.elk.sh/${encodeURIComponent(todModeEmojis[currentMode] || '🔥')}?style=apple`;
 
       // If a challenge/prompt is active, keep it visible for everyone in the room
       if (STATE.todState.step === 'prompt' && STATE.todState.prompt) {
