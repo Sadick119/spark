@@ -76,6 +76,7 @@
       border-radius: 34px;
       transform: scale(0.93);
       z-index: 1;
+      pointer-events: none;
     }
 
     .spark-card-layer-1 {
@@ -89,6 +90,7 @@
       border-radius: 34px;
       transform: scale(0.97);
       z-index: 2;
+      pointer-events: none;
     }
 
     .spark-card-main-glass {
@@ -1856,7 +1858,22 @@
         "Never have I ever eaten food off the floor after the 5-second rule expired.",
         "Never have I ever pretended to be on a phone call just to avoid someone in public.",
         "Never have I ever blamed a pet or sibling for something I broke.",
-        "Never have I ever binged an entire TV series in a single weekend without leaving bed."
+        "Never have I ever binged an entire TV series in a single weekend without leaving bed.",
+        "Never have I ever sung loudly to a song in the car and thought I sounded amazing.",
+        "Never have I ever pretended I hadn't seen a message to avoid replying immediately.",
+        "Never have I ever laughed so hard at the wrong moment that I made things awkward.",
+        "Never have I ever stayed in a conversation I desperately wanted to leave.",
+        "Never have I ever accidentally walked into the wrong bathroom and played it cool.",
+        "Never have I ever memorized the wrong person's name and used it the entire time.",
+        "Never have I ever purchased something just because it was on sale and never used it.",
+        "Never have I ever replied 'I'm 5 minutes away' while still being at home.",
+        "Never have I ever liked a very old post while stalking someone's profile.",
+        "Never have I ever secretly skipped a social event and watched TV instead.",
+        "Never have I ever set multiple alarms and still slept through all of them.",
+        "Never have I ever waved back at someone who wasn't actually waving at me.",
+        "Never have I ever rehearsed what I was going to say before making a phone call.",
+        "Never have I ever sent a voice note and immediately regretted the tone I used.",
+        "Never have I ever eaten someone else's food in the fridge and said nothing."
       ],
       party: [
         "Never have I ever sent a risky message to the completely wrong group chat.",
@@ -1864,7 +1881,21 @@
         "Never have I ever sneaked out of a boring party without saying goodbye to anyone.",
         "Never have I ever drunk texted an ex or someone I swore I was over.",
         "Never have I ever lost my phone, keys, or ID during a wild night out.",
-        "Never have I ever lied about my age or identity to get into a club or party."
+        "Never have I ever lied about my age or identity to get into a club or party.",
+        "Never have I ever woken up from a night out with zero memory of how I got home.",
+        "Never have I ever done something embarrassing at a party and hoped nobody noticed.",
+        "Never have I ever cried at a party when I didn't expect to.",
+        "Never have I ever kissed someone at midnight on New Year's Eve.",
+        "Never have I ever called someone the wrong name in a group setting and kept going.",
+        "Never have I ever made a promise at a party I had zero intention of keeping.",
+        "Never have I ever pretended to know a song at a party and just mouthed random words.",
+        "Never have I ever left a party early by faking an emergency.",
+        "Never have I ever stolen someone's food or drink at a party.",
+        "Never have I ever sent a risky snap to the wrong person and panicked.",
+        "Never have I ever told two different people at the same party two completely different stories.",
+        "Never have I ever started a rumor just to see if it would come back to me.",
+        "Never have I ever ignored a call from a friend at a party to avoid drama.",
+        "Never have I ever cringed so hard at a photo from a past party that I deleted it instantly."
       ],
       spicy: [
         "Never have I ever stalked someone's stories or location on a fake burner account.",
@@ -1872,7 +1903,21 @@
         "Never have I ever had a crush on a close friend's partner or ex.",
         "Never have I ever made out in a public place where we could have easily been caught.",
         "Never have I ever lied about my relationship status to someone who was flirting with me.",
-        "Never have I ever sent a spicy photo and immediately panicked with regret."
+        "Never have I ever sent a spicy photo and immediately panicked with regret.",
+        "Never have I ever been in a love triangle and enjoyed every second of it.",
+        "Never have I ever slid into someone's DMs with full romantic intentions.",
+        "Never have I ever developed feelings for someone I was just supposed to be friends with.",
+        "Never have I ever been caught staring at someone I wasn't supposed to be staring at.",
+        "Never have I ever flirted with someone knowing I had zero intentions of following through.",
+        "Never have I ever kept talking to an ex in secret after promising I had moved on.",
+        "Never have I ever kissed more than one person on the same night at the same event.",
+        "Never have I ever had a dream about someone in this room that I'd never admit.",
+        "Never have I ever saved someone in my phone under a fake name to hide them.",
+        "Never have I ever chosen someone for their looks first and personality second.",
+        "Never have I ever spent hours texting someone and then pretended to be busy when they called.",
+        "Never have I ever been genuinely jealous of a friend's relationship.",
+        "Never have I ever kissed someone I had been friend-zoning on purpose.",
+        "Never have I ever replied to an old flame's story just to see what would happen."
       ],
       extreme: [
         "Never have I ever hooked up with someone currently in this room or friend group.",
@@ -1880,7 +1925,21 @@
         "Never have I ever walked in on someone or been walked in on during an intimate moment.",
         "Never have I ever had a secret relationship or situationship nobody in this room knows about.",
         "Never have I ever stayed the night with an ex after swearing we were 100% finished.",
-        "Never have I ever kissed more than two different people in the exact same night."
+        "Never have I ever kissed more than two different people in the exact same night.",
+        "Never have I ever had feelings for someone in this room that I never said out loud.",
+        "Never have I ever hooked up with someone and immediately regretted it the next morning.",
+        "Never have I ever been in a friends-with-benefits situation that went sideways.",
+        "Never have I ever slept over somewhere I definitely should not have.",
+        "Never have I ever deleted messages from my phone before someone could read them.",
+        "Never have I ever had a situationship with someone in our mutual friend group.",
+        "Never have I ever ended something real because I was scared it was actually going somewhere.",
+        "Never have I ever kissed someone purely because I was bored and they were there.",
+        "Never have I ever pretended a hookup meant nothing when it actually did.",
+        "Never have I ever done something physically intimate in a place that was not a bedroom.",
+        "Never have I ever kept a secret from my best friend about someone in our circle.",
+        "Never have I ever drunk called someone I had feelings for and said more than I meant to.",
+        "Never have I ever told someone 'I love you' when I wasn't completely sure I meant it.",
+        "Never have I ever woken up next to someone and immediately started planning my exit."
       ]
     };
 
@@ -4190,7 +4249,71 @@
       "Do your best impression of someone in this room until they guess who it is!",
       "Show the last 3 photos in your camera roll to the squad with zero context!",
       "Take 2 penalty sips and give a 15-second toast to the host!",
-      "Swap seats with the person to your left for the next 2 rounds!"
+      "Swap seats with the person to your left for the next 2 rounds!",
+      "Sing the chorus of the last song you listened to at the top of your lungs!",
+      "Let the squad pick any contact from your phone and you have to text them 'I miss you' right now!",
+      "Do your best catwalk across the room and strike a pose at the end!",
+      "Tell the person the bottle landed on one thing you genuinely find attractive about them!",
+      "Let the person who spun the bottle style your hair however they want!",
+      "Give a 20-second shoulder massage to the person the bottle is pointing at!",
+      "Do 15 jumping jacks while the squad counts out loud!",
+      "Let the squad choose one song and you must lip sync it perfectly for 30 seconds!",
+      "Show the room your camera roll's most recent selfie without editing or explaining it!",
+      "Call anyone in your contact list and say 'You've been on my mind' then hang up!",
+      "Whisper a secret you've never told anyone in this room into the ear of the person the bottle landed on!",
+      "Do your best impression of the person who spun the bottle — accent, mannerisms, everything!",
+      "Let the squad write a caption for your next social media post and you must use it!",
+      "Tell the room your honest first impression of the person the bottle is pointing at!",
+      "Post a selfie with the squad right now — no filter allowed!",
+      "Do a 20-second freestyle rap about the person the bottle landed on!",
+      "Let the person the bottle landed on ask you any question and you must answer truthfully!",
+      "Close your eyes and let the squad move one item in the room — guess what they moved!",
+      "Do your best robot dance for 15 seconds without stopping!",
+      "Send a 'thinking of you 👀' text to the last person you texted and show the room their reply!",
+      "Let the squad pick a word you cannot say for the rest of the game!",
+      "Give a dramatic 30-second acceptance speech like you just won an award for something ridiculous!",
+      "Let the person who spun the bottle take any candid photo of you right now!",
+      "Recite the alphabet backwards as fast as you possibly can!",
+      "Let the squad create a nickname for you and use it for the rest of the game!",
+      "Do your slowest, most dramatic moonwalk across the floor and back!",
+      "Pretend you're a news anchor and deliver breaking news about something in this room!",
+      "Hold a plank position for 20 seconds while someone counts down for you!",
+      "Let the person the bottle points to scroll your camera roll for 10 seconds!",
+      "Make direct eye contact with the person across from you and describe what you see in 3 words!",
+      "Do your best evil laugh for 10 seconds without breaking character!",
+      "Speak in a different accent for the next 2 full rounds — squad picks the accent!",
+      "Let the squad arrange your face into an expression they choose for a group photo!",
+      "Give a 30-second TED Talk about why your pet, favorite food, or hobby is the best!",
+      "Text your best friend 'I have some news 😳' and show the room their response in real time!",
+      "Do your best slow-motion replay of anything that happened in the last 5 minutes!",
+      "Tell everyone in the room one genuine compliment — no repeating words!",
+      "Hold the most dramatic pose you can think of for 20 seconds without laughing!",
+      "Let the squad choose any old song and you must do the original dance to it!",
+      "Read out loud the last 5 Google searches on your phone — no skipping!",
+      "Swap one item of clothing with the person the bottle is pointing at for 2 rounds!",
+      "Describe the person who spun the bottle using only food — be creative!",
+      "Do your most dramatic cinematic walk across the room in slow motion!",
+      "Let the squad choose a word and you must use it in every sentence for 2 minutes!",
+      "Show your most-used emoji and explain why it perfectly represents you!",
+      "Do your best cheerleader routine — make it up on the spot — for 15 seconds!",
+      "Let the person the bottle landed on write any word on your hand in marker!",
+      "Give a heartfelt 20-second speech about why the person who spun the bottle is amazing!",
+      "Stand up and act out your morning routine in complete silence — squad must guess each step!",
+      "Take the spiciest thing available in the room and eat it without making a face!",
+      "Call a random contact and say 'You were in my dream last night' then hang up!",
+      "Let the squad dress you in whatever clothing or accessories are available in the room!",
+      "Recreate a famous painting or movie poster using only people in the room!",
+      "Do your best impression of what you think the person to your right is like at work!",
+      "Stare directly into the eyes of the person the bottle landed on for 30 full seconds!",
+      "Give the person the bottle points to a 10-second pep talk as if they're about to win a championship!",
+      "Do your best silent movie acting for 20 seconds — pick any emotion the squad calls out!",
+      "Let the squad create the most embarrassing possible bio for your dating profile right now!",
+      "Pretend you're a chef and describe your most recent meal like it's a Michelin-star dish!",
+      "Let the person who spun the bottle ask you your most recent three text messages and read them aloud!",
+      "Do 10 squats while narrating each one like a motivational fitness coach!",
+      "Give a 20-second dramatic reading of the last emoji you sent as if it were profound poetry!",
+      "Let the squad pick any two people in the room and you have to choose which one you'd call at 3am!",
+      "Do your funniest impression of someone not in this room — keep going until they guess who!"
     ];
 
     let canvas, ctx;
