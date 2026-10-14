@@ -509,9 +509,9 @@
 
         <!-- Input Bar with Photo Upload, Sticker & Voice Note -->
         <div class="p-3 bg-white/[0.04] border-t border-white/10 flex items-center space-x-1.5 flex-shrink-0">
-          <!-- Gallery / Camera Photo Upload -->
-          <input type="file" id="chat-media-file-input" accept="image/*" class="hidden" onchange="handleChatMediaSelected(event)">
-          <button onclick="document.getElementById('chat-media-file-input').click()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 transition active:scale-90 flex-shrink-0" title="Upload Photo from Gallery">
+          <!-- Gallery / Camera Photo & Video Upload -->
+          <input type="file" id="chat-media-file-input" accept="image/*,video/*" class="hidden" onchange="handleChatMediaSelected(event)">
+          <button onclick="document.getElementById('chat-media-file-input').click()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 transition active:scale-90 flex-shrink-0" title="Upload Photo or Video">
             <span class="text-base">📷</span>
           </button>
 
@@ -541,6 +541,7 @@
     <div id="media-lightbox-modal" style="display: none;" onclick="closeMediaLightbox()" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[150] flex items-center justify-center p-4 cursor-pointer">
       <div class="relative max-w-sm w-full max-h-[85vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
         <img id="lightbox-img" src="" class="max-w-full max-h-[80vh] rounded-2xl object-contain border border-cyan-400/40 shadow-[0_0_50px_rgba(0,240,255,0.4)]" alt="Full Image" />
+        <video id="lightbox-video" src="" controls playsinline class="hidden max-w-full max-h-[80vh] rounded-2xl border border-cyan-400/40 shadow-[0_0_50px_rgba(0,240,255,0.4)]"></video>
         <button onclick="closeMediaLightbox()" class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-black/80 border border-white/30 text-white flex items-center justify-center text-sm font-bold shadow-lg">✕</button>
       </div>
     </div>
@@ -647,6 +648,114 @@
         </div>
       </div>
     </div>
+
+    <!-- ================= MEDIA SEND PREVIEW & VIEW ONCE MODAL ================= -->
+    <div id="chat-media-preview-modal" style="display: none;" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[165] flex items-center justify-center p-4">
+      <div class="bg-[#0f1224] border border-cyan-500/40 rounded-3xl max-w-sm w-full p-4 space-y-3.5 shadow-[0_0_40px_rgba(0,240,255,0.25)] flex flex-col items-center" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div class="w-full flex items-center justify-between pb-2 border-b border-white/10">
+          <div class="flex items-center space-x-2">
+            <span class="text-xl" id="media-preview-icon">📷</span>
+            <div>
+              <h3 class="text-sm font-display font-black text-white leading-none">Share Media</h3>
+              <p class="text-[10px] text-slate-400">Normal or View Once disappearing media</p>
+            </div>
+          </div>
+          <button onclick="closeMediaPreviewModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center text-xs transition active:scale-90">✕</button>
+        </div>
+
+        <!-- Media Preview Box -->
+        <div class="relative w-full h-56 rounded-2xl overflow-hidden border border-white/15 bg-black/50 flex items-center justify-center shadow-inner">
+          <img id="chat-send-preview-img" src="" class="max-w-full max-h-full object-contain" alt="Preview" />
+          <video id="chat-send-preview-video" src="" controls playsinline class="hidden max-w-full max-h-full object-contain"></video>
+          
+          <!-- View Once Active Badge Overlay -->
+          <div id="view-once-preview-badge" class="hidden absolute top-2 right-2 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center space-x-1 animate-bounce">
+            <span class="w-4 h-4 rounded-full border border-black flex items-center justify-center text-[9px] font-mono font-bold">①</span>
+            <span>View Once</span>
+          </div>
+        </div>
+
+        <!-- View Once Toggle Control -->
+        <div class="w-full p-2.5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-lg">👁️</span>
+            <div>
+              <span class="text-xs font-black text-white block leading-tight">View Once Mode</span>
+              <span class="text-[9px] text-slate-400 block leading-tight">Media disappears after being viewed</span>
+            </div>
+          </div>
+          <button id="view-once-toggle-btn" onclick="toggleViewOnceMode()" class="px-3 py-1.5 rounded-xl border font-black text-xs transition active:scale-95 flex items-center space-x-1.5 bg-white/10 border-white/20 text-slate-300">
+            <span class="w-5 h-5 rounded-full border border-dashed border-current flex items-center justify-center text-[10px] font-mono">①</span>
+            <span id="view-once-toggle-text">OFF</span>
+          </button>
+        </div>
+
+        <!-- Optional Caption Input -->
+        <div class="w-full">
+          <input type="text" id="chat-media-caption-input" maxlength="120" placeholder="Add a caption... (optional)" class="w-full bg-white/10 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition" />
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-full grid grid-cols-2 gap-2 pt-1">
+          <button onclick="closeMediaPreviewModal()" class="py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold transition active:scale-95">Cancel</button>
+          <button onclick="confirmSendChatMedia()" class="py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 text-black font-display font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_20px_rgba(0,240,255,0.4)] flex items-center justify-center space-x-1">
+            <span id="media-send-btn-text">Send</span>
+            <span>⚡</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= FULLSCREEN VIEW ONCE VIEWER MODAL ================= -->
+    <div id="view-once-viewer-modal" style="display: none;" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[180] flex flex-col justify-between p-4 select-none">
+      <!-- Top Bar: Sender info, Countdown timer, Close -->
+      <div class="w-full max-w-md mx-auto flex items-center justify-between py-2 px-1">
+        <div class="flex items-center space-x-2">
+          <span id="view-once-viewer-avatar" class="text-xl">😎</span>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span id="view-once-viewer-sender" class="text-xs font-black text-white"></span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-black uppercase tracking-wider flex items-center space-x-1">
+                <span class="w-3 h-3 rounded-full border border-amber-400 flex items-center justify-center text-[7px] font-mono">①</span>
+                <span>View Once</span>
+              </span>
+            </div>
+            <span id="view-once-viewer-time" class="text-[9px] text-slate-400"></span>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <!-- Photo Countdown Timer Badge -->
+          <span id="view-once-timer-badge" class="font-mono text-xs font-bold text-amber-400 bg-amber-500/20 border border-amber-400/30 px-2 py-0.5 rounded-lg">7s</span>
+          <!-- Close button -->
+          <button onclick="closeViewOnceViewer()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-bold shadow-lg transition active:scale-90">✕</button>
+        </div>
+      </div>
+
+      <!-- Countdown Progress Bar (for photos) -->
+      <div id="view-once-progress-container" class="w-full max-w-md mx-auto h-1 bg-white/15 rounded-full overflow-hidden my-1">
+        <div id="view-once-progress-bar" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-100 ease-linear w-full"></div>
+      </div>
+
+      <!-- Center Media Display -->
+      <div class="flex-1 w-full max-w-md mx-auto flex flex-col items-center justify-center overflow-hidden py-2 relative">
+        <img id="view-once-img-element" src="" class="max-w-full max-h-[70vh] rounded-2xl object-contain drop-shadow-[0_0_40px_rgba(245,158,11,0.3)]" alt="View Once" />
+        <video id="view-once-video-element" src="" controls playsinline class="hidden max-w-full max-h-[70vh] rounded-2xl object-contain drop-shadow-[0_0_40px_rgba(245,158,11,0.3)]"></video>
+        <div id="view-once-caption-box" class="hidden mt-3 max-w-[90%] px-3.5 py-1.5 rounded-full bg-black/75 border border-white/15 text-white text-xs text-center font-medium shadow-md">
+          <span id="view-once-caption-text"></span>
+        </div>
+      </div>
+
+      <!-- Bottom Disappearing Notice -->
+      <div class="w-full max-w-md mx-auto py-2 text-center">
+        <span class="inline-flex items-center space-x-1.5 text-[10px] text-amber-300 font-bold bg-amber-500/10 border border-amber-400/20 px-3 py-1 rounded-full shadow-inner">
+          <span>🔥</span>
+          <span>Disappears when closed. You can only view this once!</span>
+        </span>
+      </div>
+    </div>
+
 
 
 
@@ -5210,6 +5319,10 @@
           if (msg.sticker && msg.sticker.image && typeof CHAT !== 'undefined') {
             CHAT.addCustomSticker(msg.sticker, false);
           }
+        } else if (msg.type === 'VIEW_ONCE_OPENED') {
+          if (msg.msgId && typeof CHAT !== 'undefined') {
+            CHAT.markViewOnceOpened(msg.msgId, msg.viewerName);
+          }
         }
       }
     };
@@ -5861,52 +5974,329 @@
       if (micBtn) micBtn.classList.remove('hidden');
     }
 
+    let pendingMediaData = null;
+    let pendingMediaType = 'image'; // 'image' | 'video'
+    let isViewOnceActive = false;
+    let viewOnceTimer = null;
+    let activeViewingMsgId = null;
+
     function handleChatMediaSelected(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       playClick();
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const maxDim = 800;
-          let width = img.width;
-          let height = img.height;
-          if (width > maxDim || height > maxDim) {
-            if (width > height) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            } else {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-          CHAT.sendImageMessage(compressedBase64);
+
+      const isVideo = file.type.startsWith('video/');
+
+      if (isVideo) {
+        // Video size check (14MB limit for smooth WebRTC data transmission)
+        if (file.size > 14 * 1024 * 1024) {
+          alert('Video file is too large! Please choose a video under 14MB.');
+          event.target.value = '';
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          pendingMediaData = e.target.result;
+          pendingMediaType = 'video';
+          isViewOnceActive = false;
+          openMediaPreviewModal();
         };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      } else {
+        // Image compression with canvas
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const maxDim = 900;
+            let width = img.width;
+            let height = img.height;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            pendingMediaData = canvas.toDataURL('image/jpeg', 0.72);
+            pendingMediaType = 'image';
+            isViewOnceActive = false;
+            openMediaPreviewModal();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
       event.target.value = '';
     }
 
-    function openMediaLightbox(url) {
+    function openMediaPreviewModal() {
+      const modal = document.getElementById('chat-media-preview-modal');
+      const previewImg = document.getElementById('chat-send-preview-img');
+      const previewVideo = document.getElementById('chat-send-preview-video');
+      const iconEl = document.getElementById('media-preview-icon');
+      const captionInput = document.getElementById('chat-media-caption-input');
+      const badge = document.getElementById('view-once-preview-badge');
+      const toggleBtn = document.getElementById('view-once-toggle-btn');
+      const toggleText = document.getElementById('view-once-toggle-text');
+      const sendBtnText = document.getElementById('media-send-btn-text');
+
+      if (captionInput) captionInput.value = '';
+
+      // Reset toggle to OFF
+      isViewOnceActive = false;
+      if (badge) badge.classList.add('hidden');
+      if (toggleText) toggleText.innerText = 'OFF';
+      if (toggleBtn) {
+        toggleBtn.className = 'px-3 py-1.5 rounded-xl border font-black text-xs transition active:scale-95 flex items-center space-x-1.5 bg-white/10 border-white/20 text-slate-300';
+      }
+      if (sendBtnText) sendBtnText.innerText = 'Send';
+
+      if (pendingMediaType === 'video') {
+        if (iconEl) iconEl.innerText = '🎥';
+        if (previewImg) previewImg.classList.add('hidden');
+        if (previewVideo) {
+          previewVideo.src = pendingMediaData;
+          previewVideo.classList.remove('hidden');
+        }
+      } else {
+        if (iconEl) iconEl.innerText = '📷';
+        if (previewVideo) {
+          previewVideo.pause();
+          previewVideo.src = '';
+          previewVideo.classList.add('hidden');
+        }
+        if (previewImg) {
+          previewImg.src = pendingMediaData;
+          previewImg.classList.remove('hidden');
+        }
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function toggleViewOnceMode() {
+      playClick();
+      isViewOnceActive = !isViewOnceActive;
+      const badge = document.getElementById('view-once-preview-badge');
+      const toggleBtn = document.getElementById('view-once-toggle-btn');
+      const toggleText = document.getElementById('view-once-toggle-text');
+      const sendBtnText = document.getElementById('media-send-btn-text');
+
+      if (isViewOnceActive) {
+        if (badge) badge.classList.remove('hidden');
+        if (toggleText) toggleText.innerText = '① ON';
+        if (toggleBtn) {
+          toggleBtn.className = 'px-3 py-1.5 rounded-xl border font-black text-xs transition active:scale-95 flex items-center space-x-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-black border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)]';
+        }
+        if (sendBtnText) sendBtnText.innerText = 'Send View Once';
+      } else {
+        if (badge) badge.classList.add('hidden');
+        if (toggleText) toggleText.innerText = 'OFF';
+        if (toggleBtn) {
+          toggleBtn.className = 'px-3 py-1.5 rounded-xl border font-black text-xs transition active:scale-95 flex items-center space-x-1.5 bg-white/10 border-white/20 text-slate-300';
+        }
+        if (sendBtnText) sendBtnText.innerText = 'Send';
+      }
+    }
+
+    function closeMediaPreviewModal() {
+      playClick();
+      const modal = document.getElementById('chat-media-preview-modal');
+      const previewVideo = document.getElementById('chat-send-preview-video');
+      if (previewVideo) {
+        previewVideo.pause();
+        previewVideo.src = '';
+      }
+      if (modal) modal.style.display = 'none';
+      pendingMediaData = null;
+      isViewOnceActive = false;
+    }
+
+    function confirmSendChatMedia() {
+      if (!pendingMediaData) {
+        closeMediaPreviewModal();
+        return;
+      }
+      const captionInput = document.getElementById('chat-media-caption-input');
+      const caption = captionInput ? captionInput.value.trim() : '';
+      const isViewOnce = isViewOnceActive;
+
+      if (pendingMediaType === 'video') {
+        CHAT.sendVideoMessage(pendingMediaData, isViewOnce, caption);
+      } else {
+        CHAT.sendImageMessage(pendingMediaData, isViewOnce, caption);
+      }
+
+      closeMediaPreviewModal();
+    }
+
+    function openMediaLightbox(url, type = 'image') {
       playClick();
       const modal = document.getElementById('media-lightbox-modal');
       const img = document.getElementById('lightbox-img');
-      if (img) img.src = url;
+      const vid = document.getElementById('lightbox-video');
+      if (type === 'video') {
+        if (img) img.classList.add('hidden');
+        if (vid) {
+          vid.src = url;
+          vid.classList.remove('hidden');
+          vid.play().catch(() => {});
+        }
+      } else {
+        if (vid) {
+          vid.pause();
+          vid.src = '';
+          vid.classList.add('hidden');
+        }
+        if (img) {
+          img.src = url;
+          img.classList.remove('hidden');
+        }
+      }
       if (modal) modal.style.display = 'flex';
     }
 
     function closeMediaLightbox() {
       playClick();
       const modal = document.getElementById('media-lightbox-modal');
+      const vid = document.getElementById('lightbox-video');
+      if (vid) {
+        vid.pause();
+        vid.src = '';
+        vid.classList.add('hidden');
+      }
       if (modal) modal.style.display = 'none';
+    }
+
+    function openViewOnceMedia(msgId) {
+      const msg = CHAT.messages.find(x => x.id === msgId);
+      if (!msg) return;
+      if (msg.opened || (CHAT.openedViewOnce && CHAT.openedViewOnce[msgId])) {
+        alert('This media has already been viewed and expired!');
+        return;
+      }
+      playClick();
+      activeViewingMsgId = msgId;
+
+      const modal = document.getElementById('view-once-viewer-modal');
+      const avatarEl = document.getElementById('view-once-viewer-avatar');
+      const senderEl = document.getElementById('view-once-viewer-sender');
+      const timeEl = document.getElementById('view-once-viewer-time');
+      const imgEl = document.getElementById('view-once-img-element');
+      const vidEl = document.getElementById('view-once-video-element');
+      const timerBadge = document.getElementById('view-once-timer-badge');
+      const progressContainer = document.getElementById('view-once-progress-container');
+      const progressBar = document.getElementById('view-once-progress-bar');
+      const captionBox = document.getElementById('view-once-caption-box');
+      const captionText = document.getElementById('view-once-caption-text');
+
+      if (avatarEl) avatarEl.innerText = msg.avatar || '😎';
+      if (senderEl) senderEl.innerText = msg.sender || 'Player';
+      if (timeEl) timeEl.innerText = msg.time || '';
+
+      if (msg.caption) {
+        if (captionText) captionText.innerText = msg.caption;
+        if (captionBox) captionBox.classList.remove('hidden');
+      } else {
+        if (captionBox) captionBox.classList.add('hidden');
+      }
+
+      if (viewOnceTimer) {
+        clearInterval(viewOnceTimer);
+        viewOnceTimer = null;
+      }
+
+      if (msg.video) {
+        if (imgEl) imgEl.classList.add('hidden');
+        if (vidEl) {
+          vidEl.src = msg.video;
+          vidEl.classList.remove('hidden');
+          vidEl.onended = () => {
+            closeViewOnceViewer();
+          };
+          vidEl.play().catch(() => {});
+        }
+        if (timerBadge) timerBadge.innerText = 'Playing';
+        if (progressContainer) progressContainer.classList.add('hidden');
+      } else if (msg.image) {
+        if (vidEl) {
+          vidEl.pause();
+          vidEl.src = '';
+          vidEl.classList.add('hidden');
+        }
+        if (imgEl) {
+          imgEl.src = msg.image;
+          imgEl.classList.remove('hidden');
+        }
+        if (progressContainer) progressContainer.classList.remove('hidden');
+        if (progressBar) progressBar.style.width = '100%';
+
+        const totalDurationMs = 7000;
+        const startTime = Date.now();
+        viewOnceTimer = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const remainingMs = Math.max(0, totalDurationMs - elapsed);
+          const remainingSec = Math.ceil(remainingMs / 1000);
+          const percent = Math.max(0, (remainingMs / totalDurationMs) * 100);
+
+          if (timerBadge) timerBadge.innerText = `${remainingSec}s`;
+          if (progressBar) progressBar.style.width = `${percent}%`;
+
+          if (remainingMs <= 0) {
+            clearInterval(viewOnceTimer);
+            viewOnceTimer = null;
+            closeViewOnceViewer();
+          }
+        }, 100);
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeViewOnceViewer() {
+      playClick();
+      if (viewOnceTimer) {
+        clearInterval(viewOnceTimer);
+        viewOnceTimer = null;
+      }
+      const modal = document.getElementById('view-once-viewer-modal');
+      const vidEl = document.getElementById('view-once-video-element');
+      const imgEl = document.getElementById('view-once-img-element');
+
+      if (vidEl) {
+        vidEl.pause();
+        vidEl.src = '';
+        vidEl.classList.add('hidden');
+      }
+      if (imgEl) {
+        imgEl.src = '';
+        imgEl.classList.add('hidden');
+      }
+      if (modal) modal.style.display = 'none';
+
+      if (activeViewingMsgId) {
+        const closedId = activeViewingMsgId;
+        activeViewingMsgId = null;
+
+        CHAT.markViewOnceOpened(closedId, MP.myName || 'Me');
+
+        if (MP.active) {
+          MP.broadcast({
+            type: 'VIEW_ONCE_OPENED',
+            msgId: closedId,
+            viewerName: MP.myName || 'Player'
+          });
+        }
+      }
     }
 
     /* -------------------------------------------------------------
@@ -5920,14 +6310,50 @@
       replyTo: null,
       toastTimeout: null,
       audioBlobCache: {}, // msgId → blob URL for local audio playback
+      openedViewOnce: {}, // msgId → { opened: true, viewerName }
 
       init() {
         this.messages = [];
         this.unreadCount = 0;
         this.replyTo = null;
         this.audioBlobCache = {};
+        this.openedViewOnce = {};
+        this.loadOpenedViewOnce();
         this.loadCustomStickers();
         this.updateUnreadBadge();
+      },
+
+      saveOpenedViewOnce() {
+        try {
+          const key = 'spark_view_once_' + (MP.roomCode || 'local');
+          sessionStorage.setItem(key, JSON.stringify(this.openedViewOnce || {}));
+        } catch(e) {}
+      },
+
+      loadOpenedViewOnce() {
+        try {
+          const key = 'spark_view_once_' + (MP.roomCode || 'local');
+          const saved = sessionStorage.getItem(key);
+          this.openedViewOnce = saved ? JSON.parse(saved) : {};
+        } catch(e) {
+          this.openedViewOnce = {};
+        }
+      },
+
+      markViewOnceOpened(msgId, viewerName) {
+        if (!this.openedViewOnce) this.openedViewOnce = {};
+        this.openedViewOnce[msgId] = { opened: true, viewerName: viewerName || 'Squad' };
+        this.saveOpenedViewOnce();
+        const m = this.messages.find(x => x.id === msgId);
+        if (m) {
+          m.opened = true;
+          m.openedBy = viewerName || 'Squad';
+          delete m.image;
+          delete m.video;
+        }
+        if (this.isOpen) {
+          this.renderMessages();
+        }
       },
 
       addMessage(msg, isMe = false, isSystem = false) {
@@ -5938,12 +6364,25 @@
           text: msg.text || '',
           audio: msg.audio || null,
           image: msg.image || null,
+          video: msg.video || null,
           sticker: msg.sticker || null,
+          isViewOnce: !!msg.isViewOnce,
+          caption: msg.caption || '',
+          opened: !!msg.opened,
+          openedBy: msg.openedBy || null,
           replyTo: msg.replyTo || null,
           time: msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isMe: isMe,
           isSystem: isSystem
         };
+
+        if (item.isViewOnce && this.openedViewOnce && this.openedViewOnce[item.id]) {
+          item.opened = true;
+          item.openedBy = this.openedViewOnce[item.id].viewerName || 'Squad';
+          delete item.image;
+          delete item.video;
+        }
+
         this.messages.push(item);
 
         if (this.isOpen) {
@@ -6171,7 +6610,7 @@
         container.innerHTML = customHtml + partyHtml;
       },
 
-      sendImageMessage(imageDataUrl) {
+      sendImageMessage(imageDataUrl, isViewOnce = false, caption = '') {
         if (!imageDataUrl) return;
         playSuccess();
         const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -6181,6 +6620,32 @@
           sender: MP.myName || 'Player',
           avatar: MP.myAvatar || '😎',
           image: imageDataUrl,
+          isViewOnce: !!isViewOnce,
+          caption: caption || '',
+          replyTo: this.replyTo ? { ...this.replyTo } : null,
+          time: timeStr
+        };
+
+        if (this.replyTo) cancelReplyMessage();
+
+        this.addMessage(msgPayload, true, false);
+        if (MP.active) {
+          MP.broadcast(msgPayload);
+        }
+      },
+
+      sendVideoMessage(videoDataUrl, isViewOnce = false, caption = '') {
+        if (!videoDataUrl) return;
+        playSuccess();
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgPayload = {
+          type: 'CHAT_MSG',
+          id: 'chat_vid_' + Date.now() + Math.random().toString(36).substr(2, 6),
+          sender: MP.myName || 'Player',
+          avatar: MP.myAvatar || '😎',
+          video: videoDataUrl,
+          isViewOnce: !!isViewOnce,
+          caption: caption || '',
           replyTo: this.replyTo ? { ...this.replyTo } : null,
           time: timeStr
         };
@@ -6245,8 +6710,10 @@
 
         let previewText = escapeHtml(item.text);
         if (item.audio) previewText = "🎙️ [Voice Note]";
-        if (item.image) previewText = "📷 [Photo Shared]";
-        if (item.sticker) previewText = item.sticker.image ? "✂️ [Custom Sticker]" : `🎭 [Sticker: ${item.sticker.emoji || ''}]`;
+        else if (item.isViewOnce) previewText = item.video ? "① [View Once Video]" : "① [View Once Photo]";
+        else if (item.video) previewText = "🎥 [Video Shared]";
+        else if (item.image) previewText = "📷 [Photo Shared]";
+        else if (item.sticker) previewText = item.sticker.image ? "✂️ [Custom Sticker]" : `🎭 [Sticker: ${item.sticker.emoji || ''}]`;
 
         toast.innerHTML = `
           <div class="flex items-center space-x-2.5">
@@ -6280,7 +6747,7 @@
             <div class="text-center py-10 text-slate-500 text-xs space-y-1.5">
               <span class="text-3xl block">💬</span>
               <span class="font-bold text-slate-300 text-sm">Squad Chat is Live!</span>
-              <p class="text-[11px] text-slate-400">Share voice notes 🎙️, upload photos 📷, react to dares, and message your squad in real-time.</p>
+              <p class="text-[11px] text-slate-400">Share voice notes 🎙️, upload photos 📷 & videos 🎥, send View Once ① moments, and message your squad in real-time.</p>
             </div>
           `;
           return;
@@ -6297,9 +6764,59 @@
             `;
           }
 
-
           let bubbleContent = '';
-          if (m.audio) {
+          const isOpened = m.opened || (CHAT.openedViewOnce && CHAT.openedViewOnce[m.id]);
+
+          if (m.isViewOnce) {
+            if (isOpened) {
+              bubbleContent = `
+                <div class="flex items-center space-x-2 py-1 px-1 text-slate-400 select-none">
+                  <span class="w-5 h-5 rounded-full border border-slate-500/60 flex items-center justify-center text-[10px] font-mono font-bold text-slate-400">①</span>
+                  <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-300 italic flex items-center space-x-1">
+                      <span>Opened</span>
+                      <span class="text-[10px] text-emerald-400 font-mono">✓</span>
+                    </span>
+                    <span class="text-[9px] text-slate-400">${m.video ? 'View once video' : 'View once photo'}</span>
+                  </div>
+                </div>
+              `;
+            } else {
+              const mediaTypeLabel = m.video ? 'View Once Video' : 'View Once Photo';
+              const mediaTypeIcon = m.video ? '🎥' : '📷';
+              bubbleContent = `
+                <div class="view-once-bubble py-0.5">
+                  <button onclick="openViewOnceMedia('${m.id}')" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/25 to-orange-500/25 hover:from-amber-500/35 hover:to-orange-500/35 border border-amber-400/50 text-amber-200 transition active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-left cursor-pointer">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-black flex items-center justify-center font-bold text-xs shadow flex-shrink-0">
+                      ①
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center space-x-1">
+                        <span class="text-xs font-black text-amber-300">${mediaTypeLabel}</span>
+                        <span class="text-xs">${mediaTypeIcon}</span>
+                      </div>
+                      <span class="text-[9px] text-amber-200/80 font-semibold block leading-tight">Tap to view (disappears)</span>
+                    </div>
+                  </button>
+                  ${m.caption ? `<p class="text-[10px] text-slate-300 mt-1.5 px-1">${escapeHtml(m.caption)}</p>` : ''}
+                </div>
+              `;
+            }
+          } else if (m.video) {
+            bubbleContent = `
+              <div class="space-y-1.5">
+                <div class="relative max-w-[210px] rounded-xl overflow-hidden border border-cyan-400/30 bg-black/40 shadow">
+                  <video src="${m.video}" controls playsinline preload="metadata" class="max-w-full max-h-[190px] rounded-xl object-contain"></video>
+                </div>
+                ${m.caption ? `<p class="text-xs text-white font-medium px-1">${escapeHtml(m.caption)}</p>` : ''}
+                <div class="flex items-center justify-end text-[9px] text-cyan-300 px-0.5">
+                  <button onclick="openMediaLightbox('${m.video}', 'video')" class="hover:underline flex items-center space-x-1 cursor-pointer">
+                    <span>Fullscreen ⛶</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (m.audio) {
             // Use a safe ID-based approach — src is set post-render via JS to avoid base64 corruption in innerHTML
             bubbleContent = `
               <div class="flex items-center space-x-2 py-0.5">
@@ -6311,7 +6828,7 @@
             if (m.sticker.image) {
               bubbleContent = `
                 <div class="sticker-bubble flex flex-col items-center py-1 select-none">
-                  <img src="${m.sticker.image}" onclick="openMediaLightbox('${m.sticker.image}')" class="max-w-[130px] max-h-[130px] object-contain cursor-pointer hover:scale-105 transition drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]" alt="Sticker" />
+                  <img src="${m.sticker.image}" onclick="openMediaLightbox('${m.sticker.image}', 'image')" class="max-w-[130px] max-h-[130px] object-contain cursor-pointer hover:scale-105 transition drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]" alt="Sticker" />
                   ${m.sticker.label ? `<span class="text-[9px] font-black text-amber-300 mt-1 tracking-wider bg-black/75 px-2.5 py-0.5 rounded-full border border-white/15 text-center">${escapeHtml(m.sticker.label)}</span>` : ''}
                 </div>
               `;
@@ -6326,7 +6843,8 @@
           } else if (m.image) {
             bubbleContent = `
               <div class="space-y-1">
-                <img src="${m.image}" onclick="openMediaLightbox('${m.image}')" class="max-w-[190px] max-h-[190px] rounded-xl object-cover cursor-pointer hover:opacity-90 border border-white/20 transition shadow" alt="Photo" />
+                <img src="${m.image}" onclick="openMediaLightbox('${m.image}', 'image')" class="max-w-[190px] max-h-[190px] rounded-xl object-cover cursor-pointer hover:opacity-90 border border-white/20 transition shadow" alt="Photo" />
+                ${m.caption ? `<p class="text-xs text-white font-medium px-1">${escapeHtml(m.caption)}</p>` : ''}
                 <span class="text-[9px] text-slate-400 block text-right font-medium">Tap to enlarge 🔍</span>
               </div>
             `;
@@ -6350,6 +6868,14 @@
             `;
           }
 
+          const myContainerClass = m.isViewOnce
+            ? (isOpened ? 'bg-white/5 border border-white/10 opacity-75' : 'bg-gradient-to-r from-amber-600/60 to-orange-600/60 border border-amber-400/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]')
+            : 'bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/40 shadow-md';
+
+          const peerContainerClass = m.isViewOnce
+            ? (isOpened ? 'bg-white/5 border border-white/10 opacity-75' : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]')
+            : 'bg-white/10 border border-white/15 shadow-md';
+
           if (m.isMe) {
             return `
               <div class="chat-msg-row relative overflow-hidden group my-1.5" id="chat-msg-${m.id}" data-msg-id="${m.id}">
@@ -6359,7 +6885,7 @@
                 <div class="chat-msg-content relative z-10 flex flex-col items-end space-y-0.5 transition-transform duration-150 ease-out">
                   <div class="flex items-end space-x-1.5 max-w-[88%]">
                     <button onclick="setReplyMessage('${m.id}')" class="opacity-0 group-hover:opacity-100 hover:opacity-100 w-6 h-6 rounded-full bg-white/10 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 flex items-center justify-center text-[10px] transition flex-shrink-0 mb-1" title="Reply">↩️</button>
-                    <div class="chat-bubble-container p-2.5 px-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/40 text-white text-xs font-medium shadow-md break-words">
+                    <div class="chat-bubble-container p-2.5 px-3 rounded-2xl rounded-tr-none ${myContainerClass} text-white text-xs font-medium break-words">
                       ${replyQuoteHtml}
                       ${bubbleContent}
                     </div>
@@ -6379,7 +6905,7 @@
                   <span class="text-[9px] font-bold text-amber-400 pl-6">${escapeHtml(m.sender)}</span>
                   <div class="flex items-end space-x-1.5 max-w-[88%]">
                     <span class="text-sm flex-shrink-0 mb-0.5">${m.avatar}</span>
-                    <div class="chat-bubble-container p-2.5 px-3 rounded-2xl rounded-tl-none bg-white/10 border border-white/15 text-white text-xs font-medium shadow-md break-words">
+                    <div class="chat-bubble-container p-2.5 px-3 rounded-2xl rounded-tl-none ${peerContainerClass} text-white text-xs font-medium break-words">
                       ${replyQuoteHtml}
                       ${bubbleContent}
                     </div>
@@ -6442,6 +6968,8 @@
 
       let snippet = msg.text || '';
       if (msg.audio) snippet = '🎙️ Voice Note';
+      else if (msg.isViewOnce) snippet = msg.video ? '① View Once Video' : '① View Once Photo';
+      else if (msg.video) snippet = '🎥 Video';
       else if (msg.image) snippet = '📷 Photo';
       else if (msg.sticker) snippet = msg.sticker.label ? `🎭 Sticker: ${msg.sticker.label}` : '🎭 Sticker';
       if (snippet.length > 55) snippet = snippet.slice(0, 52) + '...';
@@ -6505,6 +7033,8 @@
 
       let previewText = msg.text || '';
       if (msg.audio) previewText = '🎙️ Voice Note';
+      else if (msg.isViewOnce) previewText = msg.video ? '① View Once Video' : '① View Once Photo';
+      else if (msg.video) previewText = '🎥 Video';
       else if (msg.image) previewText = '📷 Photo';
       else if (msg.sticker) previewText = msg.sticker.label ? `🎭 Sticker: ${msg.sticker.label}` : '🎭 Sticker';
       if (previewEl) previewEl.innerText = previewText;
