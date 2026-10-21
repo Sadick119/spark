@@ -3291,6 +3291,12 @@
         STATE.players = STATE.players.slice(0, STATE.playerCount);
       }
 
+      // Keep player count display in sync
+      const badge = document.getElementById('setup-player-badge');
+      if (badge) badge.innerText = STATE.playerCount;
+      const num = document.getElementById('setup-player-num');
+      if (num) num.innerText = STATE.playerCount;
+
       STATE.players.forEach((p, idx) => {
         const row = document.createElement('div');
         row.className = 'p-2.5 px-3 flex items-center space-x-3';
@@ -3303,7 +3309,7 @@
             <input type="text" id="homepage-player-input-${idx}" value="${p.name}" oninput="updatePlayerName(${idx}, this.value)" placeholder="Enter Player ${idx + 1}'s name..." class="w-full bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-500 border-b border-transparent focus:border-amber-400 py-0.5">
           </div>
           ${STATE.players.length > 2 ? `
-            <button onclick="removeParticipant(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-1.5 py-0.5">✕</button>
+            <button onclick="removeParticipant(${idx})" class="text-slate-500 hover:text-red-400 text-xs px-1.5 py-0.5" title="Remove player">✕</button>
           ` : ''}
         `;
         list.appendChild(row);
@@ -3327,20 +3333,17 @@
 
     function changePlayerCount(delta) {
       playClick();
-      STATE.playerCount = Math.max(2, Math.min(20, STATE.playerCount + delta));
-      document.getElementById('setup-player-num').innerText = STATE.playerCount;
-      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
+      STATE.playerCount = Math.max(2, Math.min(20, (STATE.playerCount || STATE.players.length || 2) + delta));
       renderHomepageParticipants();
     }
 
     function addParticipantRow() {
+      if (STATE.players.length >= 20) return;
       playClick();
       const idx = STATE.players.length;
       const avatar = AVATAR_POOL[idx % AVATAR_POOL.length];
       STATE.players.push({ name: '', avatar: avatar });
       STATE.playerCount = STATE.players.length;
-      document.getElementById('setup-player-num').innerText = STATE.playerCount;
-      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
       renderHomepageParticipants();
     }
 
@@ -3349,8 +3352,6 @@
       playClick();
       STATE.players.splice(idx, 1);
       STATE.playerCount = STATE.players.length;
-      document.getElementById('setup-player-num').innerText = STATE.playerCount;
-      document.getElementById('setup-player-badge').innerText = STATE.playerCount;
       renderHomepageParticipants();
     }
 
