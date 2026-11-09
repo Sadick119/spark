@@ -212,12 +212,16 @@
 
     /* ================= DOUBLE DARE VIBE ================= */
     .doubledare-bg {
-      background: radial-gradient(circle at 50% 25%, #3d2402 0%, #1d0f01 60%, #0a0500 100%);
+      background: radial-gradient(circle at 50% 25%, #240a14 0%, #12040a 60%, #050104 100%);
+      position: relative;
+      overflow: hidden;
     }
     .doubledare-card {
-      background: rgba(38, 20, 2, 0.92);
-      border: 2.5px solid #F59E0B;
-      box-shadow: 0 0 32px rgba(245, 158, 11, 0.5), inset 0 0 18px rgba(245, 158, 11, 0.2);
+      background: linear-gradient(165deg, rgba(32, 10, 20, 0.95) 0%, rgba(14, 3, 9, 0.98) 100%);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 2px solid #FF2A54;
+      box-shadow: 0 0 36px rgba(255, 42, 84, 0.35), inset 0 0 20px rgba(255, 42, 84, 0.15);
     }
 
     /* 1-Card Fullscreen Deck */
@@ -1241,8 +1245,8 @@
 
             <!-- Card 4: Double Dare -->
             <div id="hero-card-4" onclick="selectGame('double-dare')" class="game-hero-card overflow-hidden flex flex-col justify-between p-6 opacity-0 pointer-events-none" style="background: rgba(32, 10, 24, 0.94); border: 2px solid #FF2A54;">
-              <img src="assets/party_home_screen_1787610256101.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" alt="Double Dare">
-              <div class="absolute inset-0 bg-gradient-to-t from-[#14040E] via-transparent to-black/40"></div>
+              <div class="absolute inset-0 bg-gradient-to-br from-rose-600/25 via-transparent to-red-950/40 pointer-events-none"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#14040E] via-transparent to-black/40 pointer-events-none"></div>
 
               <div class="relative z-10 flex justify-between items-center">
                 <span class="px-3 py-1 rounded-full bg-rose-500/20 border border-rose-400/50 text-[10px] font-black text-rose-300 uppercase tracking-wider shadow">
@@ -1706,13 +1710,13 @@
         <!-- Top Turn & Category Bar -->
         <div class="flex items-center justify-between z-20 pt-1">
           <!-- Target Player Pill -->
-          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-rose-500/20 border border-rose-400/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
             <span id="dd-player-avatar" class="text-base">⚡</span>
-            <span id="dd-player-turn" class="text-xs font-black text-amber-300 uppercase tracking-wide">Sarah's Dare</span>
+            <span id="dd-player-turn" class="text-xs font-black text-rose-300 uppercase tracking-wide">Sarah's Dare</span>
           </div>
 
           <!-- Escalation Multiplier Pill -->
-          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-yellow-950/80 border border-yellow-400/60 text-[10px] font-black text-yellow-300 uppercase tracking-widest shadow-[0_0_15px_rgba(250,204,21,0.4)]">
+          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-950/80 border border-red-500/60 text-[10px] font-black text-rose-300 uppercase tracking-widest shadow-[0_0_15px_rgba(244,63,94,0.4)]">
             <span>🔥</span>
             <span id="dd-multiplier-badge">1X BASE DARE</span>
           </div>
@@ -1720,19 +1724,19 @@
 
         <!-- Center 3D Card Deck -->
         <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
-          <div class="spark-card-layer-2" style="background: rgba(40, 20, 5, 0.4); border-color: rgba(245, 158, 11, 0.2);"></div>
-          <div class="spark-card-layer-1" style="background: rgba(60, 30, 8, 0.5); border-color: rgba(245, 158, 11, 0.3);"></div>
+          <div class="spark-card-layer-2" style="background: rgba(40, 10, 25, 0.4); border-color: rgba(255, 42, 84, 0.2);"></div>
+          <div class="spark-card-layer-1" style="background: rgba(60, 15, 35, 0.5); border-color: rgba(255, 42, 84, 0.3);"></div>
 
           <!-- Main Glass Card Front -->
           <div id="dd-card-main-body" class="doubledare-card p-5 rounded-3xl flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
             
             <!-- Card Header -->
-            <div class="flex items-center justify-between text-xs font-bold text-amber-300 pb-1 border-b border-amber-500/20">
-              <div class="flex items-center space-x-1 text-yellow-400">
+            <div class="flex items-center justify-between text-xs font-bold text-rose-300 pb-1 border-b border-rose-500/20">
+              <div class="flex items-center space-x-1 text-rose-400">
                 <span>💥</span>
                 <span id="dd-card-num" class="text-[11px] font-black tracking-wider uppercase">Dare #1 of 20</span>
               </div>
-              <div class="flex items-center space-x-1 text-orange-400 text-[10px] font-black uppercase">
+              <div class="flex items-center space-x-1 text-rose-300 text-[10px] font-black uppercase">
                 <span id="dd-stakes-label">Stakes: 1x Sip</span>
               </div>
             </div>
@@ -1745,7 +1749,7 @@
             </div>
 
             <!-- Multiplier Escalation Glow Badge -->
-            <div id="dd-penalty-box" class="p-2.5 rounded-2xl bg-gradient-to-r from-yellow-950/80 via-orange-950/80 to-yellow-950/80 border border-yellow-400/50 text-xs font-black text-yellow-300 flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(250,204,21,0.25)]">
+            <div id="dd-penalty-box" class="p-2.5 rounded-2xl bg-gradient-to-r from-red-950/80 via-rose-950/80 to-red-950/80 border border-rose-500/50 text-xs font-black text-rose-300 flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(244,63,94,0.25)]">
               <span>🍺</span>
               <span id="dd-penalty-text">PENALTY: TAKE 1 SIP IF FORFEITED</span>
               <span>🔥</span>
@@ -1757,7 +1761,7 @@
                 <button id="dd-btn-accept" onclick="acceptDoubleDare()" class="py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
                   <span>✅ Accept</span>
                 </button>
-                <button id="dd-btn-pass" onclick="passDoubleDare()" class="py-3.5 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_25px_rgba(245,158,11,0.6)] animate-pulse">
+                <button id="dd-btn-pass" onclick="passDoubleDare()" class="py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-white font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95 shadow-[0_0_25px_rgba(244,63,94,0.6)] animate-pulse">
                   <span id="dd-pass-btn-text">⚡ Double Dare! (2x)</span>
                 </button>
               </div>
@@ -1768,17 +1772,17 @@
             </div>
 
             <!-- Spectator Turn Notice -->
-            <div id="dd-spectator-turn-notice" class="hidden p-3.5 rounded-2xl bg-yellow-950/40 border border-yellow-400/40 text-center space-y-1 shadow-[0_0_20px_rgba(250,204,21,0.15)]">
+            <div id="dd-spectator-turn-notice" class="hidden p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-center space-y-1 shadow-[0_0_20px_rgba(244,63,94,0.15)]">
               <div class="flex items-center justify-center space-x-1.5">
-                <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
-                <span id="dd-spectator-msg" class="text-xs font-black text-yellow-300">⏳ Waiting for Player to Accept, Double Dare, or Drink...</span>
+                <span class="inline-block w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                <span id="dd-spectator-msg" class="text-xs font-black text-rose-300">⏳ Waiting for Player to Accept, Double Dare, or Drink...</span>
               </div>
               <p class="text-[10px] text-slate-400">React with emojis below to cheer or dare them! ⚡🍻</p>
             </div>
 
             <!-- Squad Reactions Row -->
-            <div class="space-y-1 pt-1 border-t border-yellow-500/20">
-              <div class="flex items-center justify-between text-[10px] font-bold text-amber-300 px-1">
+            <div class="space-y-1 pt-1 border-t border-rose-500/20">
+              <div class="flex items-center justify-between text-[10px] font-bold text-rose-300 px-1">
                 <span>Squad Turn Order</span>
                 <span>Next player in line ➡️</span>
               </div>
@@ -1793,27 +1797,27 @@
         <!-- Bottom Controls & Drink Counter -->
         <div class="space-y-2.5 z-20 w-full max-w-[345px] mx-auto">
           <!-- Drink Tally -->
-          <div class="p-2.5 rounded-2xl bg-black/70 border border-yellow-500/30 flex items-center justify-between text-xs">
+          <div class="p-2.5 rounded-2xl bg-black/70 border border-white/10 flex items-center justify-between text-xs">
             <div class="flex items-center space-x-2">
-              <span class="text-amber-300 font-bold text-[10px] uppercase tracking-wider">Party Drinks:</span>
-              <div class="flex items-center space-x-1 bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded-lg text-amber-300 font-black">
+              <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Party Drinks:</span>
+              <div class="flex items-center space-x-1 bg-rose-500/20 border border-rose-400/50 px-2 py-0.5 rounded-lg text-rose-300 font-black">
                 <span>🍺</span>
                 <span id="dd-drink-counter">3</span>
               </div>
             </div>
             <div class="flex items-center space-x-1.5">
               <button onclick="changeDrinks(-1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center active:scale-90 transition">-</button>
-              <button onclick="changeDrinks(1)" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center active:scale-90 transition">+</button>
+              <button onclick="changeDrinks(1)" class="w-7 h-7 rounded-lg bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs flex items-center justify-center active:scale-90 transition">+</button>
             </div>
           </div>
 
           <!-- Next Dare & Skip Buttons -->
           <div class="grid grid-cols-5 gap-2">
-            <button onclick="nextDoubleDarePrompt()" class="col-span-3 py-3.5 rounded-2xl bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(245,158,11,0.5)] transition active:scale-95">
+            <button onclick="nextDoubleDarePrompt()" class="col-span-3 py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 shadow-[0_0_20px_rgba(244,63,94,0.4)] transition active:scale-95">
               <span>Next Dare</span>
               <span>➡️</span>
             </button>
-            <button onclick="skipDoubleDarePrompt()" class="col-span-2 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-amber-200 font-display font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95">
+            <button onclick="skipDoubleDarePrompt()" class="col-span-2 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-slate-300 font-display font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-1 transition active:scale-95">
               <span>Skip</span>
               <span>⏭️</span>
             </button>
@@ -4425,7 +4429,7 @@
       if (isMyTurn) {
         if (turnEl) {
           turnEl.innerText = `🔥 YOUR DARE (${(curPlayer.name || 'YOU').toUpperCase()})!`;
-          turnEl.className = "text-xs font-black text-amber-300 uppercase tracking-wide animate-pulse";
+          turnEl.className = "text-xs font-black text-rose-300 uppercase tracking-wide animate-pulse";
         }
         if (actionBox) actionBox.classList.remove('hidden');
         if (spectatorNotice) spectatorNotice.classList.add('hidden');
@@ -4447,7 +4451,7 @@
         reactionsRow.innerHTML = '';
         STATE.players.slice(0, 4).forEach((p, idx) => {
           const isTarget = idx === targetIdx;
-          const borderClass = isTarget ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)] animate-pulse' : 'border-white/20';
+          const borderClass = isTarget ? 'border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.8)] animate-pulse' : 'border-white/20';
 
           const chip = document.createElement('div');
           chip.className = 'flex flex-col items-center space-y-0.5 cursor-pointer transition active:scale-90';
@@ -4458,7 +4462,7 @@
               </div>
               <span class="absolute -top-1 -right-1 text-xs">${isTarget ? '⚡' : ''}</span>
             </div>
-            <span class="text-[9px] font-bold text-amber-200 max-w-[46px] truncate">${p.name || 'Player'}</span>
+            <span class="text-[9px] font-bold text-rose-200 max-w-[46px] truncate">${p.name || 'Player'}</span>
           `;
           reactionsRow.appendChild(chip);
         });
