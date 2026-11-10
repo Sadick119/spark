@@ -65,43 +65,20 @@
       z-index: 10;
     }
 
-    .spark-card-layer-2 {
-      position: absolute;
-      top: -10px;
-      left: 14px;
-      right: 14px;
-      height: 100%;
-      background: rgba(18, 20, 32, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 34px;
-      transform: scale(0.95);
-      z-index: 1;
-      pointer-events: none;
-    }
-
+    .spark-card-layer-2,
     .spark-card-layer-1 {
-      position: absolute;
-      top: -5px;
-      left: 7px;
-      right: 7px;
-      height: 100%;
-      background: rgba(22, 24, 38, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 34px;
-      transform: scale(0.98);
-      z-index: 2;
-      pointer-events: none;
+      display: none !important;
     }
 
     .spark-card-main-glass {
       position: relative;
       background: linear-gradient(165deg, rgba(16, 18, 30, 0.96) 0%, rgba(10, 11, 20, 0.98) 100%);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 2px solid #FF9900;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 153, 0, 0.2), inset 0 0 15px rgba(255, 153, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       border-radius: 32px;
-      z-index: 3;
+      z-index: 10;
     }
 
     .btn-action-complete {
@@ -191,9 +168,14 @@
       background: #080913;
     }
     .nhie-card {
-      background: rgba(24, 12, 48, 0.92);
+      position: relative;
+      background: rgba(16, 18, 30, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 2px solid #A855F7;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(168, 85, 247, 0.2), inset 0 0 12px rgba(168, 85, 247, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      border-radius: 28px;
+      z-index: 10;
     }
 
     @keyframes msgHighlightPulse {
@@ -217,11 +199,14 @@
       overflow: hidden;
     }
     .doubledare-card {
-      background: linear-gradient(165deg, rgba(16, 18, 30, 0.96) 0%, rgba(10, 11, 20, 0.98) 100%);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      position: relative;
+      background: rgba(16, 18, 30, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 2px solid #8b5cf6;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(139, 92, 246, 0.25), inset 0 0 12px rgba(139, 92, 246, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      border-radius: 28px;
+      z-index: 10;
     }
 
     /* 1-Card Fullscreen Deck */
@@ -1316,10 +1301,6 @@
 
         <!-- Center 3D Holographic Card Deck -->
         <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
-          <!-- Shadow Layers for Depth -->
-          <div class="spark-card-layer-2"></div>
-          <div class="spark-card-layer-1"></div>
-
           <!-- Main Glass Card Front -->
           <div id="mockup-card-main-body" class="spark-card-main-glass p-5 flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
             
@@ -1612,9 +1593,6 @@
 
         <!-- Center 3D Card Deck -->
         <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
-          <div class="spark-card-layer-2"></div>
-          <div class="spark-card-layer-1"></div>
-
           <!-- Main Glass Card Front -->
           <div id="nhie-card-main-body" class="nhie-card p-5 rounded-3xl flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
             
@@ -1725,19 +1703,16 @@
 
         <!-- Center 3D Card Deck -->
         <div class="spark-card-deck my-auto py-2 w-full max-w-[345px] mx-auto">
-          <div class="spark-card-layer-2"></div>
-          <div class="spark-card-layer-1"></div>
-
           <!-- Main Glass Card Front -->
           <div id="dd-card-main-body" class="doubledare-card p-5 rounded-3xl flex flex-col justify-between text-center space-y-4 transition-transform duration-200">
             
             <!-- Card Header -->
-            <div class="flex items-center justify-between text-xs font-bold text-rose-300 pb-1 border-b border-rose-500/20">
-              <div class="flex items-center space-x-1 text-rose-400">
+            <div class="flex items-center justify-between text-xs font-bold text-purple-300 pb-1 border-b border-purple-500/30">
+              <div class="flex items-center space-x-1 text-purple-300">
                 <span>💥</span>
                 <span id="dd-card-num" class="text-[11px] font-black tracking-wider uppercase">Dare #1 of 20</span>
               </div>
-              <div class="flex items-center space-x-1 text-rose-300 text-[10px] font-black uppercase">
+              <div class="flex items-center space-x-1 text-amber-300 text-[10px] font-black uppercase">
                 <span id="dd-stakes-label">Stakes: 1x Sip</span>
               </div>
             </div>
@@ -1766,7 +1741,7 @@
                   <span id="dd-pass-btn-text">⚡ Double Dare! (2x)</span>
                 </button>
               </div>
-              <button id="dd-btn-forfeit" onclick="forfeitDoubleDare()" class="w-full py-2.5 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/50 text-red-300 font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95">
+              <button id="dd-btn-forfeit" onclick="forfeitDoubleDare()" class="w-full py-2.5 rounded-2xl bg-red-600/30 hover:bg-red-600/40 border border-red-400/60 text-white font-display font-black text-xs tracking-wider uppercase flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                 <span id="dd-forfeit-btn-text">💥 Forfeit & Drink (1 Sip)</span>
                 <img src="https://emojicdn.elk.sh/🍺?style=apple" class="w-3.5 h-3.5 apple-emoji" alt="Drink">
               </button>
