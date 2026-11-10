@@ -752,110 +752,94 @@
     <main class="flex-1 overflow-y-auto relative flex flex-col">
 
       <!-- ================= SCREEN 0: MODE SELECTION LANDING ================= -->
-      <div id="screen-mode-select" class="screen active flex-col justify-between p-4 sm:p-6 pb-4 sm:pb-6 min-h-full relative overflow-hidden">
+      <div id="screen-mode-select" class="screen active flex-col justify-between p-6 pb-8 min-h-full">
         
-        <!-- Ambient Glowing Background Lights -->
-        <div class="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-gradient-to-br from-amber-500/25 to-orange-600/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-gradient-to-tl from-purple-600/25 via-cyan-500/10 to-transparent blur-3xl pointer-events-none"></div>
-
         <!-- Header / Logo section -->
-        <div class="space-y-2 pt-0.5 text-center relative z-10">
-          <!-- Top Pill -->
-          <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-black/85 border border-[#FF7A00] shadow-[0_0_15px_rgba(255,122,0,0.5)] text-amber-300 text-[9px] sm:text-[10px] font-black uppercase tracking-widest mx-auto relative">
-            <span class="text-xs">🔥</span>
+        <div class="space-y-4 pt-2 text-center">
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-widest animate-pulse mx-auto">
+            <span>🔥</span>
             <span>THE ULTIMATE PARTY GAME</span>
-            <span class="text-xs text-yellow-400">⚡</span>
-            <span class="absolute -right-5 -top-1 text-sm text-amber-300 select-none animate-pulse">✨</span>
+            <span>⚡</span>
           </div>
 
-          <!-- Main Brand Logo Title -->
-          <div class="space-y-0.5">
-            <div class="flex items-center justify-center space-x-2">
-              <span class="text-amber-400 font-black text-base sm:text-2xl -rotate-12 select-none tracking-tighter">\\</span>
-              <h2 class="text-2xl sm:text-4xl font-display font-black tracking-tight italic">
-                <span class="text-white drop-shadow-[0_2px_15px_rgba(255,255,255,0.35)]">SPARK</span>
-                <span class="text-[#FF2A85] drop-shadow-[0_0_25px_rgba(255,42,133,0.7)] ml-1">PARTY</span>
-              </h2>
-              <span class="text-amber-400 font-black text-base sm:text-2xl rotate-12 select-none tracking-tighter">//</span>
-            </div>
-            <p class="text-[11px] sm:text-xs text-slate-300 font-medium tracking-wide">How do you want to play tonight?</p>
+          <div class="space-y-1">
+            <h2 class="text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-rose-500 tracking-tight">
+              SPARK PARTY
+            </h2>
+            <p class="text-xs text-slate-300 font-medium">How do you want to play tonight?</p>
           </div>
         </div>
 
         <!-- Two Big Interactive Hero Mode Cards -->
-        <div class="space-y-3 sm:space-y-4 my-auto py-1 sm:py-2 relative z-10">
+        <div class="space-y-4 my-auto py-2">
 
           <!-- OPTION 1: PASS & PLAY -->
-          <div onclick="goToPassAndPlay()" class="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border-2 border-[#FF7B00] shadow-[0_0_25px_rgba(255,123,0,0.3),inset_0_0_20px_rgba(255,123,0,0.1)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden" style="background: radial-gradient(circle at 100% 45%, rgba(255, 120, 0, 0.32) 0%, rgba(180, 50, 0, 0.15) 50%, rgba(18, 12, 22, 0.96) 100%);">
-            
+          <div onclick="goToPassAndPlay()" class="p-5 rounded-3xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-amber-500/40 hover:border-amber-400 shadow-[0_0_30px_rgba(255,140,0,0.2)] hover:shadow-[0_0_40px_rgba(255,140,0,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl pointer-events-none"></div>
+
             <div class="flex items-start justify-between">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-300 via-amber-400 to-orange-500 flex items-center justify-center text-xl sm:text-2xl shadow-[0_0_20px_rgba(255,160,0,0.5)]">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(255,140,0,0.4)]">
                 📱
               </div>
-              <span class="px-2.5 py-0.5 rounded-full bg-black/75 border border-amber-400 text-amber-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(255,180,0,0.3)]">
-                1 PHONE
+              <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-400/40">
+                1 Phone
               </span>
             </div>
 
-            <div class="mt-2.5 sm:mt-3 space-y-1">
-              <h3 class="font-display font-black text-lg sm:text-xl text-white group-hover:text-amber-300 transition tracking-tight">
+            <div class="mt-4 space-y-1">
+              <h3 class="font-display font-black text-xl text-white group-hover:text-amber-300 transition">
                 Pass & Play
               </h3>
-              <p class="text-[11px] sm:text-xs text-slate-200 leading-snug font-normal">
-                Pass a single phone around the circle with custom player names, forfeits sips, and 3D games!
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Pass a single phone around the circle with custom player names, forfeit sips, and 3D games!
               </p>
             </div>
 
-            <div class="mt-3 sm:mt-4 flex items-center justify-between text-xs font-bold">
-              <div class="flex items-center space-x-1.5 text-purple-300 font-bold text-[11px] sm:text-xs">
-                <span class="text-sm">👥</span>
-                <span>2–20 Players</span>
-              </div>
-              <div class="px-3 py-1.5 rounded-full border border-amber-400/90 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] sm:text-xs font-black tracking-wide flex items-center space-x-1 shadow-[0_0_12px_rgba(255,180,0,0.3)] group-hover:scale-105 transition">
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold">
+              <span class="text-slate-400">2–20 Players</span>
+              <span class="text-amber-400 flex items-center space-x-1 group-hover:translate-x-1 transition font-black">
                 <span>Choose Modes</span>
-                <span class="text-xs font-black">&rarr;</span>
-              </div>
+                <span>&rarr;</span>
+              </span>
             </div>
           </div>
 
           <!-- OPTION 2: ROOM MULTIPLAYER -->
-          <div onclick="goToMultiplayer()" class="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border-2 border-[#00F0FF] shadow-[0_0_25px_rgba(0,240,255,0.3),inset_0_0_20px_rgba(0,240,255,0.1)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden" style="background: radial-gradient(circle at 100% 50%, rgba(0, 180, 255, 0.3) 0%, rgba(140, 30, 240, 0.16) 50%, rgba(10, 14, 28, 0.96) 100%);">
-            
+          <div onclick="goToMultiplayer()" class="p-5 rounded-3xl bg-gradient-to-br from-cyan-950/40 to-purple-950/30 border border-cyan-400/40 hover:border-cyan-300 shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:shadow-[0_0_40px_rgba(0,240,255,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98] group relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-cyan-500/15 blur-2xl pointer-events-none"></div>
+
             <div class="flex items-start justify-between">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center text-xl sm:text-2xl shadow-[0_0_20px_rgba(0,240,255,0.5)]">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(0,240,255,0.4)]">
                 🌐
               </div>
-              <span class="px-2.5 py-0.5 rounded-full bg-black/75 border border-emerald-400 text-emerald-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-[0_0_10px_rgba(52,211,153,0.3)] flex items-center space-x-1">
+              <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider border border-emerald-400/40 flex items-center space-x-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>MULTI-DEVICE</span>
+                <span>Multi-Device</span>
               </span>
             </div>
 
-            <div class="mt-2.5 sm:mt-3 space-y-1">
-              <h3 class="font-display font-black text-lg sm:text-xl text-white group-hover:text-cyan-300 transition tracking-tight">
+            <div class="mt-4 space-y-1">
+              <h3 class="font-display font-black text-xl text-white group-hover:text-cyan-300 transition">
                 Room Multiplayer
               </h3>
-              <p class="text-[11px] sm:text-xs text-slate-200 leading-snug font-normal">
+              <p class="text-xs text-slate-300 leading-relaxed">
                 Connect multiple phones with a 4-digit code. Live synchronized spins, dare broadcasts & emoji reactions!
               </p>
             </div>
 
-            <div class="mt-3 sm:mt-4 flex items-center justify-between text-xs font-bold">
-              <div class="flex items-center space-x-1.5 text-cyan-300 font-bold text-[11px] sm:text-xs">
-                <span class="text-sm">🔑</span>
-                <span>Host or Join</span>
-              </div>
-              <div class="px-3 py-1.5 rounded-full border border-cyan-400/90 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-[10px] sm:text-xs font-black tracking-wide flex items-center space-x-1 shadow-[0_0_12px_rgba(0,240,255,0.3)] group-hover:scale-105 transition">
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold">
+              <span class="text-cyan-300">Host or Join</span>
+              <span class="text-cyan-400 flex items-center space-x-1 group-hover:translate-x-1 transition font-black">
                 <span>Enter Rooms</span>
-                <span class="text-xs font-black">&rarr;</span>
-              </div>
+                <span>&rarr;</span>
+              </span>
             </div>
           </div>
 
         </div>
 
-        <div class="pt-1 sm:pt-2 text-center relative z-10">
-          <span class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.5.0 Live ⚡</span>
+        <div class="pt-2 text-center">
+          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SPARK System • v4.5.0 Live ⚡</span>
         </div>
 
       </div>
