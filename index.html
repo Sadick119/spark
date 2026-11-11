@@ -987,6 +987,31 @@
               </div>
             </div>
 
+            <!-- Game Length / Turn Limit Selector -->
+            <div class="mb-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-2.5">
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-sm">⏳</span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Game Length (Turn Limit)</span>
+                </div>
+                <span id="turn-limit-desc" class="text-[11px] text-amber-400 font-bold">20 Turns (~15 min)</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <button type="button" onclick="setTurnLimit(10)" data-turn-btn="10" class="turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white">
+                  10 <span class="block text-[9px] font-normal text-slate-400">Quick</span>
+                </button>
+                <button type="button" onclick="setTurnLimit(20)" data-turn-btn="20" class="turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]">
+                  20 <span class="block text-[9px] font-normal text-amber-200/70">Standard</span>
+                </button>
+                <button type="button" onclick="setTurnLimit(35)" data-turn-btn="35" class="turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white">
+                  35 <span class="block text-[9px] font-normal text-slate-400">Wild</span>
+                </button>
+                <button type="button" onclick="setTurnLimit('endless')" data-turn-btn="endless" class="turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white">
+                  ♾️ <span class="block text-[9px] font-normal text-slate-400">Endless</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Validation Warning -->
             <div id="homepage-name-validation" class="hidden p-2 rounded-xl bg-red-950/80 border border-red-500/60 text-red-300 text-xs font-bold text-center">
               ⚠️ Please type names for all players before continuing!
@@ -1292,6 +1317,12 @@
             <span id="dod-player-turn" class="text-xs font-black text-amber-300 uppercase tracking-wide">Sarah's Turn</span>
           </div>
 
+          <!-- Turn Progress / End Game Pill -->
+          <button type="button" onclick="confirmEndGameEarly()" title="End game & open Party Wrapped" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-white transition active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+            <span class="global-turn-progress-label">Turn 1/20</span>
+            <span>🏁</span>
+          </button>
+
           <!-- Mode / Spice Pill -->
           <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-950/70 border border-red-500/50 text-[10px] font-black text-red-400 uppercase tracking-widest shadow-[0_0_12px_rgba(239,68,68,0.3)]">
             <span>🔥</span>
@@ -1406,11 +1437,15 @@
       <!-- ================= SCREEN 4: TRUTH OR DARE ================= -->
       <div id="screen-truth-dare" class="screen tod-bg flex-col justify-between p-5 pb-6 min-h-full">
         <div class="space-y-3">
-          <div class="flex justify-center">
+          <div class="flex items-center justify-between">
             <span class="px-4 py-1 rounded-full bg-gradient-to-r from-red-600/90 to-orange-600/90 border border-red-400/60 shadow-[0_0_15px_rgba(255,0,0,0.5)] text-xs font-black text-white uppercase tracking-widest flex items-center space-x-1.5">
               <span id="tod-mode-badge">EXTREME MODE</span>
               <img id="tod-mode-emoji" src="https://emojicdn.elk.sh/🔥?style=apple" class="w-4 h-4 apple-emoji" alt="Fire">
             </span>
+            <button type="button" onclick="confirmEndGameEarly()" title="End game & open Party Wrapped" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-white transition active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+              <span class="global-turn-progress-label">Turn 1/20</span>
+              <span>🏁</span>
+            </button>
           </div>
 
           <div class="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-400/40 shadow-[0_0_20px_rgba(0,240,255,0.2)] flex items-center justify-center space-x-2">
@@ -1522,10 +1557,14 @@
 
       <!-- ================= SCREEN 5: SPIN THE BOTTLE ================= -->
       <div id="screen-spin-bottle" class="screen bottle-bg flex-col items-center justify-between p-5 pb-6 min-h-full">
-        <div class="text-center pt-1">
-          <h3 class="font-display font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 drop-shadow-[0_0_15px_rgba(157,0,255,0.6)]">
+        <div class="w-full flex items-center justify-between pt-1">
+          <h3 class="font-display font-black text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 drop-shadow-[0_0_15px_rgba(157,0,255,0.6)]">
             SPIN THE BOTTLE
           </h3>
+          <button type="button" onclick="confirmEndGameEarly()" title="End game & open Party Wrapped" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-white transition active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+            <span class="global-turn-progress-label">Turn 1/20</span>
+            <span>🏁</span>
+          </button>
         </div>
 
         <div class="relative w-full aspect-square max-w-[340px] my-auto flex items-center justify-center">
@@ -1583,6 +1622,12 @@
             <span id="nhie-player-avatar" class="text-base">✋</span>
             <span id="nhie-player-turn" class="text-xs font-black text-purple-300 uppercase tracking-wide">Confession Round</span>
           </div>
+
+          <!-- Turn Progress / End Game Pill -->
+          <button type="button" onclick="confirmEndGameEarly()" title="End game & open Party Wrapped" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-white transition active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+            <span class="global-turn-progress-label">Turn 1/20</span>
+            <span>🏁</span>
+          </button>
 
           <!-- Mode / Spice Pill -->
           <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-[10px] font-black text-purple-300 uppercase tracking-widest shadow-[0_0_12px_rgba(168,85,247,0.3)]">
@@ -1693,6 +1738,12 @@
             <span id="dd-player-avatar" class="text-base">⚡</span>
             <span id="dd-player-turn" class="text-xs font-black text-rose-300 uppercase tracking-wide">Sarah's Dare</span>
           </div>
+
+          <!-- Turn Progress / End Game Pill -->
+          <button type="button" onclick="confirmEndGameEarly()" title="End game & open Party Wrapped" class="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-white transition active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+            <span class="global-turn-progress-label">Turn 1/20</span>
+            <span>🏁</span>
+          </button>
 
           <!-- Escalation Multiplier Pill -->
           <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-red-950/80 border border-red-500/60 text-[10px] font-black text-rose-300 uppercase tracking-widest shadow-[0_0_15px_rgba(244,63,94,0.4)]">
@@ -1882,6 +1933,31 @@
               <span>&rarr;</span>
             </button>
 
+            <!-- Host Game Length / Turn Limit Selector -->
+            <div class="space-y-1.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-xs">⏳</span>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Host Round Limit</span>
+                </div>
+                <span id="lobby-turn-limit-desc" class="text-[10px] text-amber-400 font-bold">20 Turns</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" onclick="setTurnLimit(10)" data-lobby-turn-btn="10" class="lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+                  10
+                </button>
+                <button type="button" onclick="setTurnLimit(20)" data-lobby-turn-btn="20" class="lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.25)]">
+                  20
+                </button>
+                <button type="button" onclick="setTurnLimit(35)" data-lobby-turn-btn="35" class="lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+                  35
+                </button>
+                <button type="button" onclick="setTurnLimit('endless')" data-lobby-turn-btn="endless" class="lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+                  ♾️
+                </button>
+              </div>
+            </div>
+
             <!-- Intensity / Difficulty Picker -->
             <div class="space-y-1.5">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1">Game Intensity:</span>
@@ -1996,6 +2072,171 @@
         </div>
       </div>
 
+
+      <!-- ================= SCREEN 6: PARTY WRAPPED ================= -->
+      <div id="screen-party-wrapped" class="screen flex-col justify-between p-5 pb-6 min-h-full overflow-y-auto hidden">
+        <div class="space-y-4">
+          
+          <!-- Confetti / Trophy Celebration Banner -->
+          <div class="text-center pt-2 space-y-1">
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-purple-500/20 border border-amber-400/40 shadow-[0_0_15px_rgba(255,140,0,0.3)]">
+              <span class="animate-bounce text-sm">🎉</span>
+              <span class="text-[10px] font-black uppercase tracking-widest text-amber-300">Session Complete</span>
+              <span class="animate-bounce text-sm">✨</span>
+            </div>
+            <h3 class="font-display font-black text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-400 to-purple-400 drop-shadow-[0_0_20px_rgba(255,140,0,0.4)]">
+              PARTY WRAPPED
+            </h3>
+            <p id="wrapped-session-sub" class="text-xs font-semibold text-slate-300">
+              The Night's Official Highlight Reel & Awards
+            </p>
+          </div>
+
+          <!-- MVP Spotlight Card -->
+          <div id="wrapped-mvp-card" class="relative overflow-hidden p-5 rounded-3xl bg-gradient-to-b from-amber-500/20 via-orange-500/10 to-transparent border-2 border-amber-400/60 shadow-[0_0_30px_rgba(255,140,0,0.35)] text-center space-y-3">
+            <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-400 text-black text-xs font-black uppercase tracking-wider shadow-[0_0_12px_rgba(255,191,0,0.6)]">
+              <span>👑</span>
+              <span>THE NIGHT'S MVP</span>
+            </div>
+            
+            <div class="flex flex-col items-center justify-center space-y-2">
+              <div class="relative">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-rose-500 p-1 shadow-[0_0_25px_rgba(255,140,0,0.6)] flex items-center justify-center">
+                  <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center text-4xl" id="wrapped-mvp-avatar">
+                    👑
+                  </div>
+                </div>
+                <span class="absolute -top-2 -right-1 text-2xl animate-pulse">✨</span>
+              </div>
+              <div>
+                <h4 id="wrapped-mvp-name" class="font-display font-black text-2xl text-white tracking-wide">
+                  Player Name
+                </h4>
+                <p id="wrapped-mvp-reason" class="text-xs font-bold text-amber-300/90 mt-0.5">
+                  Crushed the wildest dares & ruled the night
+                </p>
+              </div>
+            </div>
+
+            <!-- MVP Quick Stats -->
+            <div class="grid grid-cols-3 gap-2 pt-1 border-t border-white/10">
+              <div class="p-2 rounded-xl bg-white/5 border border-white/10">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">Dares</span>
+                <span id="wrapped-mvp-dares" class="text-base font-black text-amber-400">0</span>
+              </div>
+              <div class="p-2 rounded-xl bg-white/5 border border-white/10">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">Sips</span>
+                <span id="wrapped-mvp-sips" class="text-base font-black text-cyan-400">0</span>
+              </div>
+              <div class="p-2 rounded-xl bg-white/5 border border-white/10">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">Truths</span>
+                <span id="wrapped-mvp-truths" class="text-base font-black text-purple-400">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Superlative Awards 2x2 Grid -->
+          <div class="space-y-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">🏆 Hall of Fame Awards</span>
+            <div class="grid grid-cols-2 gap-2.5">
+              
+              <!-- Award 1: Iron Liver -->
+              <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-cyan-500/30 shadow-[0_0_15px_rgba(0,240,255,0.1)] space-y-2">
+                <div class="flex items-center space-x-1.5 text-cyan-400">
+                  <span class="text-lg">🍺</span>
+                  <span class="text-[11px] font-black uppercase tracking-wider">Iron Liver</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span id="award-liver-avatar" class="text-2xl">🍻</span>
+                  <div class="truncate">
+                    <span id="award-liver-name" class="block text-xs font-black text-white truncate">Player</span>
+                    <span id="award-liver-stat" class="block text-[10px] font-bold text-cyan-300">0 sips taken</span>
+                  </div>
+                </div>
+                <p class="text-[9px] text-slate-400 font-medium leading-tight">Took the most penalty drinks without flinching</p>
+              </div>
+
+              <!-- Award 2: The Daredevil -->
+              <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.1)] space-y-2">
+                <div class="flex items-center space-x-1.5 text-rose-400">
+                  <span class="text-lg">😈</span>
+                  <span class="text-[11px] font-black uppercase tracking-wider">Daredevil</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span id="award-daredevil-avatar" class="text-2xl">🔥</span>
+                  <div class="truncate">
+                    <span id="award-daredevil-name" class="block text-xs font-black text-white truncate">Player</span>
+                    <span id="award-daredevil-stat" class="block text-[10px] font-bold text-rose-300">0 dares completed</span>
+                  </div>
+                </div>
+                <p class="text-[9px] text-slate-400 font-medium leading-tight">Crushed every extreme dare thrown at them</p>
+              </div>
+
+              <!-- Award 3: The Chicken -->
+              <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)] space-y-2">
+                <div class="flex items-center space-x-1.5 text-amber-400">
+                  <span class="text-lg">🐔</span>
+                  <span class="text-[11px] font-black uppercase tracking-wider">The Chicken</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span id="award-chicken-avatar" class="text-2xl">🐣</span>
+                  <div class="truncate">
+                    <span id="award-chicken-name" class="block text-xs font-black text-white truncate">Player</span>
+                    <span id="award-chicken-stat" class="block text-[10px] font-bold text-amber-300">0 dares dodged</span>
+                  </div>
+                </div>
+                <p class="text-[9px] text-slate-400 font-medium leading-tight">Drank up rather than face the humiliation</p>
+              </div>
+
+              <!-- Award 4: Spiciest Confession -->
+              <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)] space-y-2">
+                <div class="flex items-center space-x-1.5 text-purple-400">
+                  <span class="text-lg">💬</span>
+                  <span class="text-[11px] font-black uppercase tracking-wider">Spicy Truth</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span id="award-truth-avatar" class="text-2xl">🤫</span>
+                  <div class="truncate">
+                    <span id="award-truth-name" class="block text-xs font-black text-white truncate">Player</span>
+                    <span id="award-truth-stat" class="block text-[10px] font-bold text-purple-300">0 confessions</span>
+                  </div>
+                </div>
+                <p class="text-[9px] text-slate-400 font-medium leading-tight">Spilled the dirtiest secrets to the squad</p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Full Squad Leaderboard -->
+          <div class="space-y-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">📊 Full Squad Leaderboard</span>
+            <div id="wrapped-leaderboard-list" class="bg-white/[0.03] border border-white/10 rounded-2xl p-2 divide-y divide-white/[0.06] space-y-1">
+              <!-- Dynamically populated rows -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="space-y-2.5 pt-4">
+          <button onclick="sharePartyWrappedStory()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 hover:opacity-95 text-white font-display font-black text-sm tracking-wide flex items-center justify-center space-x-2 shadow-[0_0_25px_rgba(244,63,94,0.4)] transition active:scale-95">
+            <span>📸</span>
+            <span>Share to Story / Squad</span>
+          </button>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="rematchSameSquad()" class="py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-display font-black text-xs tracking-wide flex items-center justify-center space-x-1 transition active:scale-95">
+              <span>🔄</span>
+              <span>Rematch Squad</span>
+            </button>
+            <button onclick="exitWrappedToMenu()" class="py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-display font-black text-xs tracking-wide flex items-center justify-center space-x-1 transition active:scale-95">
+              <span>🏠</span>
+              <span>Main Menu</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </main>
 
     <!-- REAL-TIME FLOATING EMOJI REACTION CONTAINER -->
@@ -2020,6 +2261,15 @@
 
     const STATE = {
       mode: 'extreme',
+      maxTurns: 20,
+      turnsCompleted: 0,
+      gameStats: {
+        totalSips: 0,
+        totalDaresCompleted: 0,
+        totalDaresForfeited: 0,
+        totalTruths: 0
+      },
+      playerStats: {},
       playerCount: 2,
       currentCardIndex: 0,
       totalGames: 5,
@@ -2995,6 +3245,11 @@
         if (logoThumb) logoThumb.classList.remove('hidden');
         title.innerHTML = '<span>SPARK</span><span class="text-xs text-amber-400">⚡</span>';
         subtitle.innerText = 'Party Night';
+      } else if (screenName === 'party-wrapped') {
+        backBtn.classList.remove('hidden');
+        if (logoThumb) logoThumb.classList.add('hidden');
+        title.innerHTML = '<span>SPARK</span><span class="text-xs text-amber-400">⚡</span>';
+        subtitle.innerText = 'Party Wrapped';
       } else {
         backBtn.classList.remove('hidden');
         if (logoThumb) logoThumb.classList.add('hidden');
@@ -3609,6 +3864,308 @@
       }, 2400);
     }
 
+    /* -------------------------------------------------------------
+       PARTY WRAPPED & TURN LIMIT ENGINE
+    ------------------------------------------------------------- */
+    function ensurePlayerStats(name) {
+      if (!name) name = 'Player';
+      if (!STATE.playerStats[name]) {
+        STATE.playerStats[name] = { sips: 0, dares: 0, forfeited: 0, truths: 0, confessions: [] };
+      }
+      return STATE.playerStats[name];
+    }
+
+    function setTurnLimit(limit, sync = true) {
+      STATE.maxTurns = limit;
+      // Update pass & play buttons
+      document.querySelectorAll('.turn-limit-btn').forEach(btn => {
+        const val = btn.getAttribute('data-turn-btn');
+        const isSelected = (val === String(limit));
+        if (isSelected) {
+          btn.className = 'turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]';
+        } else {
+          btn.className = 'turn-limit-btn py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white';
+        }
+      });
+      // Update lobby buttons
+      document.querySelectorAll('.lobby-turn-btn').forEach(btn => {
+        const val = btn.getAttribute('data-lobby-turn-btn');
+        const isSelected = (val === String(limit));
+        if (isSelected) {
+          btn.className = 'lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.25)]';
+        } else {
+          btn.className = 'lobby-turn-btn py-2 rounded-xl text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10';
+        }
+      });
+
+      const descEl = document.getElementById('turn-limit-desc');
+      const lobbyDescEl = document.getElementById('lobby-turn-limit-desc');
+      const label = limit === 'endless' ? 'Endless Mode ♾️' : `${limit} Turns (~${Math.round(limit * 0.75)} min)`;
+      if (descEl) descEl.textContent = label;
+      if (lobbyDescEl) lobbyDescEl.textContent = limit === 'endless' ? 'Endless ♾️' : `${limit} Turns`;
+
+      updateGlobalTurnProgressUI();
+
+      if (sync && typeof MP !== 'undefined' && MP.active && MP.isHost) {
+        MP.broadcast({
+          type: 'TURN_LIMIT_SYNC',
+          maxTurns: limit
+        });
+      }
+    }
+
+    function updateGlobalTurnProgressUI() {
+      const current = STATE.turnsCompleted + 1;
+      const max = STATE.maxTurns;
+      const label = max === 'endless' ? `Turn ${STATE.turnsCompleted + 1} ♾️` : `Turn ${Math.min(current, max)}/${max}`;
+      document.querySelectorAll('.global-turn-progress-label').forEach(el => {
+        el.textContent = label;
+      });
+    }
+
+    function recordTurnAction(playerName, actionType, count = 1, extraData = null) {
+      if (!playerName) {
+        const current = STATE.players[STATE.currentPlayerIndex];
+        playerName = current ? current.name : 'Player';
+      }
+      const pStats = ensurePlayerStats(playerName);
+
+      if (actionType === 'dare_completed') {
+        pStats.dares += count;
+        STATE.gameStats.totalDaresCompleted += count;
+      } else if (actionType === 'dare_forfeited') {
+        pStats.forfeited += 1;
+        pStats.sips += count;
+        STATE.gameStats.totalDaresForfeited += 1;
+        STATE.gameStats.totalSips += count;
+      } else if (actionType === 'truth_completed') {
+        pStats.truths += count;
+        STATE.gameStats.totalTruths += count;
+        if (extraData) pStats.confessions.push(extraData);
+      } else if (actionType === 'sip_taken') {
+        pStats.sips += count;
+        STATE.gameStats.totalSips += count;
+      }
+
+      STATE.turnsCompleted++;
+      updateGlobalTurnProgressUI();
+
+      // Check turn limit
+      if (STATE.maxTurns !== 'endless' && STATE.turnsCompleted >= Number(STATE.maxTurns)) {
+        setTimeout(() => {
+          triggerPartyWrapped();
+        }, 700);
+        return true;
+      }
+      return false;
+    }
+
+    function confirmEndGameEarly() {
+      playClick();
+      const ok = confirm("🏁 Wrap up the game now and see tonight's Party Wrapped awards & stats?");
+      if (ok) {
+        triggerPartyWrapped();
+      }
+    }
+
+    function triggerPartyWrapped(sync = true) {
+      playSuccess();
+      confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 } });
+      setTimeout(() => confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } }), 250);
+      setTimeout(() => confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } }), 400);
+
+      renderPartyWrappedScreen();
+      navigate('party-wrapped');
+
+      if (sync && typeof MP !== 'undefined' && MP.active && MP.isHost) {
+        MP.broadcast({
+          type: 'PARTY_WRAPPED',
+          gameStats: STATE.gameStats,
+          playerStats: STATE.playerStats
+        });
+      }
+    }
+
+    function renderPartyWrappedScreen() {
+      // Ensure all current players have stats objects
+      const allPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players : [{ name: 'Player', avatar: '👩' }];
+      allPlayers.forEach(p => {
+        if (p && p.name) ensurePlayerStats(p.name);
+      });
+
+      // Update session subtitle
+      const subEl = document.getElementById('wrapped-session-sub');
+      if (subEl) {
+        const squadName = allPlayers[0] ? `${allPlayers[0].name}'s Squad` : 'Party Squad';
+        subEl.textContent = `${squadName} • ${STATE.turnsCompleted} Turns • ${STATE.gameStats.totalSips} Sips • ${STATE.gameStats.totalDaresCompleted} Dares`;
+      }
+
+      // Calculate player scores & rankings
+      const rankedList = allPlayers.map(p => {
+        const stats = ensurePlayerStats(p.name);
+        const score = (stats.dares * 4) + (stats.truths * 3) + stats.sips - (stats.forfeited * 2);
+        return {
+          name: p.name,
+          avatar: p.avatar || '😎',
+          stats,
+          score
+        };
+      }).sort((a, b) => b.score - a.score);
+
+      // MVP Spotlight
+      const mvp = rankedList[0] || { name: 'Squad Leader', avatar: '👑', stats: { dares: 0, sips: 0, truths: 0 }, score: 0 };
+      const mvpAvatarEl = document.getElementById('wrapped-mvp-avatar');
+      const mvpNameEl = document.getElementById('wrapped-mvp-name');
+      const mvpReasonEl = document.getElementById('wrapped-mvp-reason');
+      const mvpDaresEl = document.getElementById('wrapped-mvp-dares');
+      const mvpSipsEl = document.getElementById('wrapped-mvp-sips');
+      const mvpTruthsEl = document.getElementById('wrapped-mvp-truths');
+
+      if (mvpAvatarEl) mvpAvatarEl.textContent = mvp.avatar;
+      if (mvpNameEl) mvpNameEl.textContent = mvp.name;
+      if (mvpDaresEl) mvpDaresEl.textContent = mvp.stats.dares;
+      if (mvpSipsEl) mvpSipsEl.textContent = mvp.stats.sips;
+      if (mvpTruthsEl) mvpTruthsEl.textContent = mvp.stats.truths;
+      if (mvpReasonEl) {
+        if (mvp.stats.dares >= 3) {
+          mvpReasonEl.textContent = `Crushed ${mvp.stats.dares} wild dares and ruled the party! 👑`;
+        } else if (mvp.stats.truths >= 2) {
+          mvpReasonEl.textContent = `Spilled ${mvp.stats.truths} spicy truths with zero shame! 💬`;
+        } else if (mvp.stats.sips >= 5) {
+          mvpReasonEl.textContent = `Survived ${mvp.stats.sips} drinks and kept the vibes electric! ⚡`;
+        } else {
+          mvpReasonEl.textContent = 'Led the squad with unmatched party energy all night! ⚡';
+        }
+      }
+
+      // Superlatives
+      // 1. Iron Liver (most sips)
+      const liverWinner = [...rankedList].sort((a, b) => b.stats.sips - a.stats.sips)[0] || mvp;
+      const liverAvatarEl = document.getElementById('award-liver-avatar');
+      const liverNameEl = document.getElementById('award-liver-name');
+      const liverStatEl = document.getElementById('award-liver-stat');
+      if (liverAvatarEl) liverAvatarEl.textContent = liverWinner.avatar;
+      if (liverNameEl) liverNameEl.textContent = liverWinner.name;
+      if (liverStatEl) liverStatEl.textContent = `${liverWinner.stats.sips} sips taken`;
+
+      // 2. Daredevil (most dares)
+      const daredevilWinner = [...rankedList].sort((a, b) => b.stats.dares - a.stats.dares)[0] || mvp;
+      const ddAvatarEl = document.getElementById('award-daredevil-avatar');
+      const ddNameEl = document.getElementById('award-daredevil-name');
+      const ddStatEl = document.getElementById('award-daredevil-stat');
+      if (ddAvatarEl) ddAvatarEl.textContent = daredevilWinner.avatar;
+      if (ddNameEl) ddNameEl.textContent = daredevilWinner.name;
+      if (ddStatEl) ddStatEl.textContent = `${daredevilWinner.stats.dares} dares crushed`;
+
+      // 3. The Chicken (most forfeits)
+      const chickenWinner = [...rankedList].sort((a, b) => b.stats.forfeited - a.stats.forfeited)[0] || mvp;
+      const chickAvatarEl = document.getElementById('award-chicken-avatar');
+      const chickNameEl = document.getElementById('award-chicken-name');
+      const chickStatEl = document.getElementById('award-chicken-stat');
+      if (chickAvatarEl) chickAvatarEl.textContent = chickenWinner.avatar;
+      if (chickNameEl) chickNameEl.textContent = chickenWinner.name;
+      if (chickStatEl) chickStatEl.textContent = `${chickenWinner.stats.forfeited} dares dodged`;
+
+      // 4. Spiciest Truth (most truths)
+      const truthWinner = [...rankedList].sort((a, b) => b.stats.truths - a.stats.truths)[0] || mvp;
+      const truthAvatarEl = document.getElementById('award-truth-avatar');
+      const truthNameEl = document.getElementById('award-truth-name');
+      const truthStatEl = document.getElementById('award-truth-stat');
+      if (truthAvatarEl) truthAvatarEl.textContent = truthWinner.avatar;
+      if (truthNameEl) truthNameEl.textContent = truthWinner.name;
+      if (truthStatEl) truthStatEl.textContent = `${truthWinner.stats.truths} confessions`;
+
+      // Squad Leaderboard List
+      const listEl = document.getElementById('wrapped-leaderboard-list');
+      if (listEl) {
+        listEl.innerHTML = rankedList.map((p, idx) => {
+          const rankBadges = ['🥇', '🥈', '🥉'];
+          const rankDisplay = idx < 3 ? rankBadges[idx] : `#${idx + 1}`;
+          const isMvp = (idx === 0);
+          return `
+            <div class="flex items-center justify-between p-2.5 rounded-xl ${isMvp ? 'bg-amber-500/10 border border-amber-400/30' : 'bg-transparent'}">
+              <div class="flex items-center space-x-2.5 truncate">
+                <span class="text-sm font-black w-6 text-center text-slate-300">${rankDisplay}</span>
+                <span class="text-xl">${p.avatar}</span>
+                <div class="truncate">
+                  <span class="block text-xs font-black text-white truncate">${p.name} ${isMvp ? '👑' : ''}</span>
+                  <span class="block text-[10px] text-slate-400 font-medium">Score: ${p.score} pts</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-1.5 text-[10px] font-bold">
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30">🔥 ${p.stats.dares}</span>
+                <span class="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">🍺 ${p.stats.sips}</span>
+                <span class="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-400/30">💬 ${p.stats.truths}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function sharePartyWrappedStory() {
+      playClick();
+      const allPlayers = (STATE.players && STATE.players.length > 0) ? STATE.players : [{ name: 'Player', avatar: '👩' }];
+      const rankedList = allPlayers.map(p => {
+        const stats = ensurePlayerStats(p.name);
+        const score = (stats.dares * 4) + (stats.truths * 3) + stats.sips - (stats.forfeited * 2);
+        return { name: p.name, avatar: p.avatar || '😎', stats, score };
+      }).sort((a, b) => b.score - a.score);
+
+      const mvp = rankedList[0] || { name: 'Party Leader', avatar: '👑' };
+      const liver = [...rankedList].sort((a, b) => b.stats.sips - a.stats.sips)[0] || mvp;
+      const daredevil = [...rankedList].sort((a, b) => b.stats.dares - a.stats.dares)[0] || mvp;
+      const chicken = [...rankedList].sort((a, b) => b.stats.forfeited - a.stats.forfeited)[0] || mvp;
+
+      const summaryText = `🎉 SPARK PARTY WRAPPED 🎉\n` +
+        `👑 MVP: ${mvp.name} (${mvp.avatar})\n` +
+        `🍺 Iron Liver: ${liver.name} (${liver.stats.sips} sips)\n` +
+        `😈 Daredevil: ${daredevil.name} (${daredevil.stats.dares} dares)\n` +
+        `🐔 The Chicken: ${chicken.name} (${chicken.stats.forfeited} forfeits)\n` +
+        `⚡ Total Chaos: ${STATE.turnsCompleted} Turns • ${STATE.gameStats.totalSips} Sips Taken\n` +
+        `Play free on Spark ⚡`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Spark Party Wrapped',
+          text: summaryText
+        }).catch(() => {});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summaryText).then(() => {
+          showGameNotification('Party Wrapped recap copied to clipboard! 📋', '📸');
+        }).catch(() => {
+          showGameNotification('Party Wrapped recap ready to share! 📸', '🎉');
+        });
+      } else {
+        showGameNotification('Party Wrapped ready! 📸', '🎉');
+      }
+    }
+
+    function rematchSameSquad() {
+      playSuccess();
+      STATE.turnsCompleted = 0;
+      STATE.gameStats = {
+        totalSips: 0,
+        totalDaresCompleted: 0,
+        totalDaresForfeited: 0,
+        totalTruths: 0
+      };
+      if (STATE.playerStats) {
+        Object.keys(STATE.playerStats).forEach(k => {
+          STATE.playerStats[k] = { sips: 0, dares: 0, forfeited: 0, truths: 0, confessions: [] };
+        });
+      }
+      updateGlobalTurnProgressUI();
+      const targetGame = STATE.selectedGame || 'dare-drink';
+      navigate(targetGame);
+      showGameNotification('Rematch started! Fresh turns & fresh drinks! ⚡', '🔄');
+    }
+
+    function exitWrappedToMenu() {
+      playClick();
+      navigate('mode-select');
+    }
+
     function completeDareAction(sync = true, incomingPayload = null) {
       if (sync && MP.active && !isLocalTurnMyTurn()) {
         playBeep(220, 'sawtooth', 0.2);
@@ -3621,6 +4178,7 @@
       playSuccess();
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       showGameNotification(`${pName} Did the Dare! ✅`, '🎉');
+      recordTurnAction(pName, 'dare_completed', 1);
       if (typeof CHAT !== 'undefined') {
         CHAT.addMessage({ text: `🎉 ${pName} did the dare!` }, false, true);
       }
@@ -3653,6 +4211,7 @@
       playBeep(200, 'sawtooth', 0.25);
       changeDrinks(2, false);
       showGameNotification(`${pName} Took 2 Penalty Drinks! 🍺`, '🍺');
+      recordTurnAction(pName, 'dare_forfeited', 2);
       if (typeof CHAT !== 'undefined') {
         CHAT.addMessage({ text: `🍺 ${pName} forfeited & drank 2 sips!` }, false, true);
       }
@@ -4028,6 +4587,11 @@
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.7 } });
         showGameNotification(`${pName} Completed their ${typeStr}!`, '🎉');
+        if ((STATE.todState.type || '').toLowerCase() === 'truth') {
+          recordTurnAction(pName, 'truth_completed', 1, STATE.todState.answer);
+        } else {
+          recordTurnAction(pName, 'dare_completed', 1);
+        }
         if (typeof CHAT !== 'undefined') {
           CHAT.addMessage({ text: `🎉 ${pName} completed their ${typeStr}!` }, false, true);
         }
@@ -4035,6 +4599,7 @@
         playBeep(200, 'square', 0.2);
         changeDrinks(2, false);
         showGameNotification(`${pName} Chose to Drink (+2 🍺)!`, '🍺');
+        recordTurnAction(pName, 'dare_forfeited', 2);
         if (typeof CHAT !== 'undefined') {
           CHAT.addMessage({ text: `🍺 ${pName} forfeited & drank 2 sips!` }, false, true);
         }
@@ -4313,6 +4878,15 @@
 
     function nextNhiePrompt(sync = true, incomingPayload = null) {
       playClick();
+      // Record guilty votes from previous statement before resetting
+      Object.keys(STATE.nhieState.votes || {}).forEach(name => {
+        if (STATE.nhieState.votes[name] === 'have') {
+          ensurePlayerStats(name).sips += 1;
+          STATE.gameStats.totalSips += 1;
+        }
+      });
+      recordTurnAction(null, 'nhie_statement', 0);
+
       STATE.nhieState.votes = {};
       const list = NHIE_PROMPTS[STATE.mode] || NHIE_PROMPTS.extreme;
 
@@ -4455,6 +5029,7 @@
       playSuccess();
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       showGameNotification(`${pName} Accepted and Completed the Dare! 🎉`, '🎉');
+      recordTurnAction(pName, 'dare_completed', 1);
       if (typeof CHAT !== 'undefined') {
         CHAT.addMessage({ text: `🎉 ${pName} conquered the ${mult}x Double Dare!` }, false, true);
       }
@@ -4527,6 +5102,7 @@
       playBeep(200, 'sawtooth', 0.3);
       changeDrinks(mult, false);
       showGameNotification(`${pName} Forfeited and Drank ${mult} Sips! 🍺`, '🍺');
+      recordTurnAction(pName, 'dare_forfeited', mult);
       if (typeof CHAT !== 'undefined') {
         CHAT.addMessage({ text: `🍺 ${pName} forfeited the Double Dare (+${mult} sips)!` }, false, true);
       }
@@ -4861,6 +5437,7 @@
         playSuccess();
         confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
         showGameNotification(`${chosen.name} completed the dare!`, '🎉');
+        recordTurnAction(chosen.name, 'dare_completed', 1);
         if (typeof CHAT !== 'undefined') {
           CHAT.addMessage({ text: `🎉 ${chosen.name} did the bottle dare!` }, false, true);
         }
@@ -4868,6 +5445,7 @@
         playBeep(200, 'sawtooth', 0.2);
         changeDrinks(2, false);
         showGameNotification(`${chosen.name} took 2 Penalty Drinks!`, '🍺');
+        recordTurnAction(chosen.name, 'dare_forfeited', 2);
         if (typeof CHAT !== 'undefined') {
           CHAT.addMessage({ text: `🍺 ${chosen.name} took 2 penalty drinks!` }, false, true);
         }
@@ -5224,6 +5802,18 @@
           const modeBadge = document.getElementById('lobby-mode-badge');
           const modeEmojis = { chill: '🍦', party: '🎉', spicy: '🌶️', extreme: '🔥' };
           if (modeBadge) modeBadge.innerText = `${modeEmojis[msg.mode] || '🔥'} ${(msg.mode||'extreme').charAt(0).toUpperCase() + (msg.mode||'extreme').slice(1)}`;
+        }
+
+        if (msg.type === 'TURN_LIMIT_SYNC') {
+          setTurnLimit(msg.maxTurns, false);
+          return;
+        }
+
+        if (msg.type === 'PARTY_WRAPPED') {
+          if (msg.gameStats) STATE.gameStats = msg.gameStats;
+          if (msg.playerStats) STATE.playerStats = msg.playerStats;
+          triggerPartyWrapped(false);
+          return;
         }
 
         // Auto-launch game if game is active in room or received any game event
